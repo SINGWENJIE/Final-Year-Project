@@ -10,21 +10,21 @@
     <div class="dashboard-container">
         <aside class="sidebar">
             <div class="logo">
-                <img src="logoname.png" alt="Logo">
+                <img src="../assets/images/logoname.png" alt="Logo">
             </div>
             
             <div class="profile">
-                <img src="admin.png" alt="Admin foto">
+                <img src="../assets/images/admin.png" alt="Admin foto">
                 <p><span class="role">Admin</span></p>
             </div>
             
             <nav>
                 <ul>
-                    <li><a href="#"><img src="product.png"  alt="">Category & Product</a></li>
-                    <li><a href="#"><img src="customer_list.png" alt="">Customer List</a></li>
-                    <li><a href="#"><img src="vieworder.png" alt="">View Orders</a></li>
-                    <li><a href="#"><img src="delivery.png"  alt="">Delivery</a></li>
-                    <li><a href="#"><img src="report.png" alt="">Reports</a></li>
+                    <li><a href="#"><img src="../assets/images/product.png"  alt="">Category & Product</a></li>
+                    <li><a href="#"><img src="../assets/images/customer_list.png" alt="">Customer List</a></li>
+                    <li><a href="#"><img src="../assets/images/vieworder.png" alt="">View Orders</a></li>
+                    <li><a href="#"><img src="../assets/images/delivery.png"  alt="">Delivery</a></li>
+                    <li><a href="#"><img src="../assets/images/report.png" alt="">Reports</a></li>
                 </ul>
             </nav>
         </aside>

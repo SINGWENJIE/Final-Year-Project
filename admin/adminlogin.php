@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($admin_id == $superadmin['id'] && $password == $superadmin['password']) {
         $_SESSION['admin_id'] = "superadmin";
         $_SESSION['role'] = "superadmin";
-        header("Location: superadmin_dashboard.html");
+        header("Location: ../superadmin/superadmin_dashboard.php");
         exit();
     }
 
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($password == $row['password']) {  
             $_SESSION['admin_id'] = $admin_id;
             $_SESSION['role'] = "admin";
-            header("Location: admin_dashboard.html");
+            header("Location: admin_dashboard.php");
             exit();
         } else {
             $error = "Incorrect password!";
@@ -40,11 +40,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <title>Admin Login</title>
-    <link rel="stylesheet" href="AdminStyle.css">
+    <link rel="stylesheet" href="../assets/css/AdminStyle.css">
 </head>
 <body>
     <div class="login-container">
-        <img src="logoname.png" alt="logo" class="logo"> 
+        <img src="../assets/images/logoname.png" alt="logo" class="logo"> 
         <h1>Admin Login</h1>
 
         <?php if (!empty($error)) { ?>
