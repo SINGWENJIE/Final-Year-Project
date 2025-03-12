@@ -173,54 +173,93 @@ header {
     color: white;
 }
 
-.slide-wrapper{
+.loyalty-program {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* 图文分栏布局 */
+.program-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-bottom: 60px;
+}
+
+.image-column {
     position: relative;
-    max-width: 48rem;
-    margin: 0 auto;
+    height: 400px;
 }
 
-.slide{
+.image-placeholder {
+    background: #e0f2f1;
+    border-radius: 12px;
+    height: 100%;
     display: flex;
-    aspect-ratio: 16/9;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    box-shadow: 0 1.5rem 3rem -0.75rem hsla(0, 0%, 0%, 0.25);
+    align-items: center;
+    justify-content: center;
+    color: #45ad9c;
+    text-align: center;
+    padding: 20px;
 }
 
-.slide img{
-    flex: 1 0 100%;
-    scroll-snap-align: start;
-    object-fit: cover;
-}
-
-.slide-nav{
-    display: flex;
-    column-gap: 1rem;
-    position: absolute;
-    bottom: 1.25rem;
-    left: 50%;
-    transform: translate(-50%);
-    z-index: 1;
-}
-
-.slide-nav a{
-    width: 0.5rem;
-    height: 0.5rem;
+.image-placeholder.small {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background-color: #fff;
-    opacity: 0.75;
-    transition: opacity ease 250ms;
 }
 
-.slide-nav a:hover{
-    opacity: 1;
+.content-column h2 {
+    color: #2c3e50;
+    font-family: 'Impact', sans-serif;
+    font-size: 32px;
+    margin-bottom: 15px;
 }
 
+.divider {
+    width: 60px;
+    height: 3px;
+    background: #45ad9c;
+    margin: 20px 0;
+}
 
+.highlight {
+    color: #555;
+    font-size: 18px;
+    line-height: 1.6;
+    padding-right: 30px;
+}
 
+/* 福利网格布局 */
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+}
 
+.benefit-item {
+    display: flex;
+    gap: 25px;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
 
+.benefit-content h3 {
+    color: #2c3e50;
+    font-family: 'Impact', sans-serif;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.benefit-content p {
+    color: #666;
+    line-height: 1.6;
+    font-size: 16px;
+}
 
 
 .footer-nav {
