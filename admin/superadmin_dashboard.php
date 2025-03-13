@@ -39,7 +39,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelector(".logout-btn").addEventListener("click", function() {
-                window.location.href = "logout.php"; 
+                window.location.href = "../admin/logout.php"; 
             });
         });
     </script>

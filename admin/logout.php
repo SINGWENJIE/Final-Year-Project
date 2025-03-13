@@ -2,6 +2,6 @@
 session_start();
 session_unset(); // clear
 session_destroy(); // delete
-header("Location: adminlogin.php"); //bank to loginpage
+header("Location: ../admin/adminlogin.php"); //bank to loginpage
 exit();
 ?>
