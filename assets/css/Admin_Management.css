@@ -1,4 +1,3 @@
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -8,20 +7,29 @@ body {
 
 .dashboard-container {
     display: flex;
-    height: 100vh;
+    height: 100vh; 
 }
 
 .sidebar {
-    width: 250px;
-    min-height: 100vh;
+    width: 250px; 
+    min-height: 100vh; 
     background-color: white;
     color: white;
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: rgb(241, 240, 240);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+
 .logo img {
     width: 150px;
     margin-bottom: 20px;
@@ -97,13 +105,6 @@ nav ul li a img {
     background-color: rgb(241, 240, 240);
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
 }
-.main-content h1 {
-    font-size: 30px; 
-    font-weight: bold; 
-    text-align: left; 
-    color: #019566; 
-    
-}
 
 .header {
     display: flex;
@@ -114,67 +115,109 @@ nav ul li a img {
     background: #ffabab;
     color: white;
     border: none;
-    padding: 15px 20px;
+    padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 15px;
 }
 .logout-btn:hover
 {
     background-color: red;
 }
-.dashboard-cards {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.card {
-    flex: 1;
-    background: white;
-    padding: 5px;
-    border-radius: 8px;
-    box-shadow: black;
-    text-align: center;
+body {
     font-family: Arial, sans-serif;
-}
-.card h3 {
-    font-size: 25px;
-    margin-bottom: 10px;
-    color: black;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
-.card p {
-    font-size: 24px;
-    font-weight: bold;
-    color: black;
-}
-.recent-orders {
-    margin-top: 20px;
+.container {
+    width: 80%;
+    margin: 20px auto;
+    background: #fff;
     padding: 20px;
-    background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-.recent-orders h2 {
-    margin-bottom: 15px;
-    color: #333;
+button, .btn {
+    display: inline-block;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.recent-orders table {
+button {
+    background: green;
+    color: white;
+}
+
+.btn {
+    color: white;
+    margin-right: 5px;
+}
+
+.add-btn { background-color: green; }
+.edit-btn { background-color: blue; }
+.delete-btn { background-color: red; }
+
+.btn:hover, button:hover {
+    opacity: 0.8;
+}
+
+table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
 }
 
-.recent-orders th, .recent-orders td {
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background: #4CAF50;
+    color: white;
+}
+
+tr:hover {
+    background: #f1f1f1;
+}
+
+#adminForm {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input {
+    width: 100%;
     padding: 8px;
-    border: 1px solid black;
-    text-align: center;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
-.recent-orders th {
-    background: #2ad3b2;
-    color: black;
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-buttons button {
+    width: 48%;
 }

@@ -3,7 +3,7 @@ session_start();
 include 'db_connection.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $admin_id = $_POST['admin_id'];
+    $admin_id = mysqli_real_escape_string($conn, $_POST['admin_id']);
     $password = $_POST['password'];
 
     $superadmin = [
@@ -12,20 +12,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ];
 
     if ($admin_id == $superadmin['id'] && $password == $superadmin['password']) {
-        $_SESSION['admin_id'] = "superadmin";
-        $_SESSION['role'] = "superadmin";
-        header("Location: ../superadmin/superadmin_dashboard.php");
+        $_SESSION['admin_id'] = "superAdmin";
+        $_SESSION['role'] = "Super Admin";
+        header("Location: ../admin/superadmin_dashboard.php");
         exit();
     }
 
-    $sql = "SELECT * FROM admin WHERE username = '$admin_id'";
+    $sql = "SELECT * FROM admin WHERE admin_id = '$admin_id'";
     $result = mysqli_query($conn, $sql);//check
 
     if ($row = mysqli_fetch_assoc($result)) {//get the result first row
         if ($password == $row['password']) {  
             $_SESSION['admin_id'] = $admin_id;
-            $_SESSION['role'] = "admin";
-            header("Location: admin_dashboard.php");
+            $_SESSION['role'] = "Admin";
+            header("Location: ../admin/admin_dashboard.php");
             exit();
         } else {
             $error = "Incorrect password!";
