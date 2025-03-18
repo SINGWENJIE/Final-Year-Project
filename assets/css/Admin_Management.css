@@ -26,15 +26,13 @@ body {
     flex-grow: 1;
     padding: 20px;
     background-color: rgb(241, 240, 240);
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
 }
-
-
 .logo img {
     width: 150px;
     margin-bottom: 20px;
 
 }
+
 
 .profile {
     text-align: center;
@@ -57,7 +55,6 @@ body {
     font-size: 18px;
     font-weight: bold;
     margin: 10px 0 0;
-    
 }
 
 .role {
@@ -67,6 +64,7 @@ body {
     border-radius: 15px;
     display: inline-block;
     margin-top: 5px;
+    color: white;
 }
 
 nav ul {
@@ -99,13 +97,6 @@ nav ul li a img {
     transition: 0.3s;
 }
 
-.main-content {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: rgb(241, 240, 240);
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
 .header {
     display: flex;
     justify-content: flex-end;
@@ -123,12 +114,7 @@ nav ul li a img {
 {
     background-color: red;
 }
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
+
 
 .container {
     width: 80%;
@@ -141,32 +127,43 @@ body {
 
 button, .btn {
     display: inline-block;
-    padding: 8px 15px;
+    padding: 10px 20px;
     border: none;
     border-radius: 5px;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
-    transition: background 0.3s;
 }
 
 button {
-    background: green;
+    background: rgb(21, 135, 89);
     color: white;
+}
+button:hover {
+    background-color: #7ab58d;
+    color: black;
 }
 
 .btn {
     color: white;
     margin-right: 5px;
 }
-
-.add-btn { background-color: green; }
-.edit-btn { background-color: blue; }
-.delete-btn { background-color: red; }
-
-.btn:hover, button:hover {
-    opacity: 0.8;
+a {
+    text-decoration: none; 
 }
+.icon-btn {
+    width: 30px; 
+    height: 30px;
+    margin: 0 5px; 
+    cursor: pointer; 
+    transition: transform 0.2s ease-in-out;
+    
+}
+
+.icon-btn:hover {
+    transform: scale(1.2); 
+}
+
 
 table {
     width: 100%;
@@ -176,14 +173,15 @@ table {
 }
 
 th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid black;
 }
 
 th {
-    background: #4CAF50;
-    color: white;
+    background: #2ad3b2;
+    color: black;
+    
 }
 
 tr:hover {
@@ -213,11 +211,3 @@ input {
     border-radius: 4px;
 }
 
-.form-buttons {
-    display: flex;
-    justify-content: space-between;
-}
-
-.form-buttons button {
-    width: 48%;
-}

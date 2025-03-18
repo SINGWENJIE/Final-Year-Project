@@ -1,9 +1,12 @@
 <?php
 
-$conn = new mysqli("localhost", "root", "", "gogo_supermarket");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+session_start();
+include 'db_connection.php';
+
+if (isset($_SESSION['role'])) {
+    $role = $_SESSION['role'];
+} 
+
 
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
@@ -58,7 +61,11 @@ $admins = $conn->query("SELECT * FROM admin");
         </div>
         <div class="profile">
             <img src="../assets/images/superadmin_photo.png" alt="Admin Photo">
-            <p><span class="role">Super Admin</span></p>
+            <p>
+                <a href="../admin/superadmin_dashboard.php" id="roleDirect">
+                <span class="role"><?php echo $role; ?></span>
+                </a>
+                </p>
         </div>
         <nav>
             <ul>
@@ -106,9 +113,14 @@ $admins = $conn->query("SELECT * FROM admin");
                             <td><?php echo $row['admin_id']; ?></td>
                             <td><?php echo $row['email']; ?></td>
                             <td>
-                                <button class="btn edit-btn" onclick="editAdmin(<?php echo $row['id']; ?>, '<?php echo $row['admin_id']; ?>', '<?php echo $row['email']; ?>')">Edit</button>
-                                <a href="?delete=<?php echo $row['id']; ?>" class="btn delete-btn" onclick="return confirm('Are you sure?')">Delete</a>
+                                <a href="#" onclick="editAdmin(<?php echo $row['id']; ?>, '<?php echo $row['admin_id']; ?>', '<?php echo $row['email']; ?>')">
+                                    <img src="../assets/images/edit.png" alt="Edit" class="icon-btn">
+                                </a>
+                                <a href="?delete=<?php echo $row['id']; ?>" onclick="return confirm('Are you sure?')">
+                                    <img src="../assets/images/delete.png" alt="Delete" class="icon-btn">
+                                </a>
                             </td>
+
                         </tr>
                     <?php } ?>
                 </tbody>
@@ -139,11 +151,14 @@ $admins = $conn->query("SELECT * FROM admin");
     function hideForm() {
         document.getElementById("adminForm").style.display = "none";
     }
+    
 </script>
-</body>
-</html>
+<script>
+    document.getElementById("roleDirect").addEventListener("click", function() {
+        window.location.href = "../admin/superadmin_dashboard.php";
+    });
+</script>
 
-<?php $conn->close(); ?>
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelector(".logout-btn").addEventListener("click", function() {
@@ -151,3 +166,8 @@ $admins = $conn->query("SELECT * FROM admin");
             });
         });
     </script>
+</body>
+</html>
+
+<?php $conn->close(); ?>
+
