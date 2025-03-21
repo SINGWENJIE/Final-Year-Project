@@ -69,7 +69,7 @@
             <button type="submit" class="btn">Create Account</button>
 
             <div class="additional-links">
-                <p>Already have an account? <a href="Login.html">Login Now</a></p>
+                <p>Already have an account? <a href="Login.php">Login Now</a></p>
             </div>
         </form>
     </div>

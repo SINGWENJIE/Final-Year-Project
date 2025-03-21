@@ -64,8 +64,8 @@
             <button type="submit" class="btn">Login</button>
 
             <div class="additional-links">
-                <p>First time login as member? <a href="Register.html">Click here</a></p>
-                <p>Forget Your Password? <a href="Register.html">Click here</a></p>
+                <p>First time login as member? <a href="Register.php">Click here</a></p>
+                <p>Forget Your Password? <a href="#">Click here</a></p>
             </div>
         </form>
     </div>
