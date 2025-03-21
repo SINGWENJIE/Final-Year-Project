@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>GOGO | Shop Conveniently</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image" href="image/GOGO.png">
+    <link rel="stylesheet" href="MainPage.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
+</head>
+
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item, .payment-options, .reserve-time, .offers, .order-summary {
+    margin-bottom: 20px;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .cart-item img {
+            width: 80px;
+            height: auto;
+            margin-right: 15px;
+        }
+        .price {
+            color: red;
+            font-weight: bold;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .quantity {
+            display: flex;
+            align-items: center;
+        }
+        .quantity button {
+            background: #02735E;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+</style>
+
+<body>
+    <!--Navbar-->
+    <header>
+        <div class="auth-section">
+            <ul class="auth-links">
+                <li><a href="Login.html">Login</a></li>
+                <li><a href="Register.html">Register</a></li>
+            </ul>
+        </div>
+
+        <div class="header-main">
+            <a href="MainPage.html">
+                <img src="image/gogoname.png" alt="GOGO Logo">
+            </a>
+            <form class="search-form">
+                <div class="search">
+                    <span class="search-icon material-symbols-outlined">search</span>
+                    <input class="search-input" type="search" placeholder="Search">
+                </div>
+            </form>
+        </div>
+    </header>
+
+    <!--Checkout-->
+    <div class="container">
+        <div class="cart-item">
+            <img src="glo_lime.jpg" alt="GLO LIME 1.2L">
+            <div class="item-details">
+                <p>GLO LIME 1.2L</p>
+                <p class="price">RM5.99 <span class="original-price">RM9.90</span></p>
+                <div class="quantity">
+                    <button onclick="updateQuantity(-1)">-</button>
+                    <span id="quantity">1</span>
+                    <button onclick="updateQuantity(1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="payment-options">
+            <h3>Payment</h3>
+            <div>
+                <input type="radio" id="visa1" name="payment" value="VISA MyDebit">
+                <label for="visa1">VISA 🌧MyDebit (Credit/Debit Card)</label>
+            </div>
+            <div>
+                <input type="radio" id="visa2" name="payment" value="VISA MyDebit Pay on Delivery">
+                <label for="visa2">VISA 🌧MyDebit (Pay on Delivery)</label>
+            </div>
+        </section>
+
+        <section class="reserve-time">
+            <h3>Reserve a time</h3>
+            <select>
+                <option>Please select your slot</option>
+                <!-- Add more time slots here -->
+            </select>
+        </section>
+
+        <section class="offers">
+            <h3>Offers</h3>
+            <button>Coupons and Vouchers</button>
+            <button>Use My Lotus’s Points (0 Point)</button>
+        </section>
+
+        <section class="order-summary">
+            <h3>Order Summary</h3>
+            <table>
+                <tr>
+                    <td>Item Subtotal</td>
+                    <td>RM5.99</td>
+                </tr>
+                <tr>
+                    <td>Total (incl. SST) 😊</td>
+                    <td>RM5.99</td>
+                </tr>
+                <tr>
+                    <td>Savings</td>
+                    <td>RM3.91</td>
+                </tr>
+            </table>
+        </section>
+
+        <button class="place-order">Place Order</button>
+
+        <footer>
+            <p>e-Invoice Information</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+
+
+    <div class="footer-nav">
+        <div class="footer-column">
+            <h4>GOGO</h4>
+            <ul>
+                <li><a href="AboutUs.html">About GOGO</a></li>
+                <li><a href="#">Policies</a></li>
+                <li><a href="#">Terms & Conditions</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Download App</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Legal</h4>
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Anti-Bribery</a></li>
+                <li><a href="#">Loyalty Program</a></li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>
