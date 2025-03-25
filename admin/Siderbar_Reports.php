@@ -19,13 +19,11 @@ if (isset($_SESSION['role'])) {
             <img src="../assets/images/logoname.png" alt="Logo">
         </div>
         <div class="profile">
-    <img src="<?php echo ($_SESSION['role'] === 'Super Admin') ? '../assets/images/superadmin_photo.png' : '../assets/images/admin.png'; ?>">
-    <p>
-        <a href="<?php echo ($_SESSION['role'] === 'Super Admin') ? '../admin/superadmin_dashboard.php' : '../admin/admin_dashboard.php'; ?>">
-            <span class="role"><?php echo $_SESSION['role']; ?></span>
-        </a>
-    </p>
-</div>
+            <a href="<?= ($_SESSION['role'] === 'Super Admin') ? 'superadmin_dashboard.php' : 'admin_dashboard.php'; ?>">
+            <img src="<?= ($_SESSION['role'] === 'Super Admin') ? '../assets/images/superadmin_photo.png' : '../assets/images/admin.png'; ?>">
+            <p><span class="role"><?= $_SESSION['role']; ?></span></p>
+            </a>
+        </div>
 
         <nav>
         <ul>

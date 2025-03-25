@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         if (!empty($password)) {
-            $sql = "INSERT INTO admin (admin_id, email, password) VALUES ('$admin_id', '$email', '$password')";
+            $sql = "INSERT INTO admin (admin_id, email, password, role) VALUES ('$admin_id', '$email', '$password', 'admin')";
         } else {
             die("Error: Password cannot be empty!");
         }
