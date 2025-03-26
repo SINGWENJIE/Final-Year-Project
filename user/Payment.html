@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../user/css/Payment.css">
+</head>
+<body>
+    <!-- Checkout Main Content -->
+    <main class="checkout-container">
+        <div class="checkout-steps">
+            <div class="step completed">1. Delivery</div>
+            <div class="step active">2. Payment</div>
+            <div class="step">3. Confirmation</div>
+        </div>
+
+        <div class="checkout-content">
+            <!-- Left Column - Payment Form -->
+            <div class="payment-form">
+                <h2>Payment Method</h2>
+                
+                <form id="paymentForm">
+                    <div class="payment-methods">
+                        <label class="payment-method" onclick="selectPaymentMethod('credit_card')">
+                            <input type="radio" name="payment_method" value="credit_card" required checked>
+                            <i class="fas fa-credit-card method-icon"></i>
+                            <div class="method-details">
+                                <h4>Credit/Debit Card</h4>
+                                <p>Pay with Visa, Mastercard, or other debit/credit cards</p>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-method" onclick="selectPaymentMethod('touch_n_go')">
+                            <input type="radio" name="payment_method" value="touch_n_go">
+                            <i class="fas fa-mobile-alt method-icon"></i>
+                            <div class="method-details">
+                                <h4>Touch 'n Go eWallet</h4>
+                                <p>Pay using your Touch 'n Go eWallet account</p>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-method" onclick="selectPaymentMethod('bank_transfer')">
+                            <input type="radio" name="payment_method" value="bank_transfer">
+                            <i class="fas fa-university method-icon"></i>
+                            <div class="method-details">
+                                <h4>Bank Transfer</h4>
+                                <p>Make a direct bank transfer to our account</p>
+                            </div>
+                        </label>
+                        
+                        <label class="payment-method" onclick="selectPaymentMethod('cash_on_delivery')">
+                            <input type="radio" name="payment_method" value="cash_on_delivery">
+                            <i class="fas fa-money-bill-wave method-icon"></i>
+                            <div class="method-details">
+                                <h4>Cash on Delivery</h4>
+                                <p>Pay cash when your order arrives</p>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Credit Card Form -->
+                    <div id="creditCardForm" class="credit-card-form active">
+                        <div class="card-icons">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visa/visa-original.svg" class="card-icon" alt="Visa">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mastercard/mastercard-original.svg" class="card-icon" alt="Mastercard">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg" class="card-icon" alt="Apple Pay">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="card_number">Card Number</label>
+                            <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required oninput="formatCardNumber(this)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="card_name">Name on Card</label>
+                            <input type="text" id="card_name" name="card_name" placeholder="John Doe" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="card_expiry">Expiry Date</label>
+                                <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/YY" maxlength="5" required oninput="formatExpiryDate(this)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="card_cvv">CVV</label>
+                                <input type="text" id="card_cvv" name="card_cvv" placeholder="123" maxlength="4" required>
+                                <i class="fas fa-question-circle" title="3-digit code on back of card"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="../user/Checkout.html" class="btn-back">Back to Delivery</a>
+                        <button type="submit" class="btn-pay">Complete Payment</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Right Column - Order Summary -->
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                
+                <div class="delivery-info">
+                    <h3>Delivery To:</h3>
+                    <p>John Doe</p>
+                    <p>123 Main Street, Apartment 4B</p>
+                    <p>50000 Kuala Lumpur, Selangor</p>
+                    <p>Phone: +60123456789</p>
+                    <p>Email: john.doe@example.com</p>
+                    <p>Delivery Date: 15 Jun 2023</p>
+                </div>
+                
+                <div class="order-items">
+                    <div class="order-item">
+                        <div class="item-info">
+                            <span class="item-name">SUNLIGHT LINE DISHWASHING LIQUID 800ML</span>
+                            <span class="item-quantity">×1</span>
+                        </div>
+                        <span class="item-price">RM4.99</span>
+                    </div>
+                    
+                    <div class="order-item">
+                        <div class="item-info">
+                            <span class="item-name">BURUH COOKING OIL 5KG</span>
+                            <span class="item-quantity">×1</span>
+                        </div>
+                        <span class="item-price">RM29.90</span>
+                    </div>
+                    
+                    <div class="order-item">
+                        <div class="item-info">
+                            <span class="item-name">GLO LINE 1.2L</span>
+                            <span class="item-quantity">×1</span>
+                        </div>
+                        <span class="item-price">RM5.99</span>
+                    </div>
+                </div>
+                
+                <div class="order-totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span>RM40.88</span>
+                    </div>
+                    
+                    <div class="total-row">
+                        <span>Delivery Fee</span>
+                        <span>RM0.00</span>
+                    </div>
+                    
+                    <div class="total-row discount">
+                        <span>Discount (FREE SHIPPING)</span>
+                        <span>-RM5.00</span>
+                    </div>
+                    
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span>RM35.88</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../user/js/Payment.js"></script>
+</body>
+</html>
