@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_connection.php'; 
+include '../db_connection.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $admin_id = mysqli_real_escape_string($conn, $_POST['admin_id']);

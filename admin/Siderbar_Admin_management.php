@@ -1,12 +1,11 @@
 <?php
 
 session_start();
-include 'db_connection.php';
+include '../db_connection.php';
 
 if (isset($_SESSION['role'])) {
     $role = $_SESSION['role'];
 } 
-
 
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);

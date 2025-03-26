@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_connection.php';
+include '../db_connection.php';
 
 if (isset($_POST['add_category'])) {
     $category_name = $_POST['category_name'];
