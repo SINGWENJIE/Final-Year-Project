@@ -22,11 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     
     if ($id > 0) {
-        if (!empty($password)) {
-            $sql = "UPDATE admin SET admin_id='$admin_id', email='$email', password='$password' WHERE id=$id";
-        } else {
-            $sql = "UPDATE admin SET admin_id='$admin_id', email='$email' WHERE id=$id";
-        }
+        $sql = "UPDATE admin SET admin_id='$admin_id', email='$email' WHERE id=$id";
     } else {
         if (!empty($password)) {
             $sql = "INSERT INTO admin (admin_id, email, password, role) VALUES ('$admin_id', '$email', '$password', 'admin')";
@@ -34,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Error: Password cannot be empty!");
         }
     }
-
+    
     if ($conn->query($sql) === TRUE) {
         header("Location: ../admin/Siderbar_Admin_management.php");
         exit();
@@ -101,7 +97,7 @@ $admins = $conn->query("SELECT * FROM admin");
             <table>
                 <thead>
                     <tr>
-                        <th>Admin ID</th>
+                        <th>Admin Name</th>
                         <th>Email</th>
                         <th>Actions</th>
                     </tr>
@@ -144,7 +140,6 @@ $admins = $conn->query("SELECT * FROM admin");
         document.getElementById("adminId").value = id;
         document.getElementById("admin_id").value = admin_id;
         document.getElementById("email").value = email;
-        document.getElementById("password").value = "";
     }
 
     function hideForm() {
