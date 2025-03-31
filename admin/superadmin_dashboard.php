@@ -1,31 +1,31 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== "Super Admin") {
+if (!isset($_SESSION['admin_name']) || $_SESSION['admin_role'] !== "Super Admin") {
     header("Location: adminlogin.php");
     exit();
 }
 
-$role = $_SESSION['role']; 
+$role = $_SESSION['admin_role'];
 
 $conn = new mysqli("localhost", "root", "", "gogo_supermarket");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$admin_query = "SELECT COUNT(id) AS total_admins FROM admin";
+$admin_query = "SELECT COUNT(admin_id) AS total_admins FROM admin";
 $admin_result = $conn->query($admin_query);
 $total_admins = $admin_result->fetch_assoc()['total_admins'];
 
-$order_query = "SELECT COUNT(id) AS total_orders FROM orders";
+$order_query = "SELECT COUNT(order_id) AS total_orders FROM `order`";
 $order_result = $conn->query($order_query);
 $total_orders = $order_result->fetch_assoc()['total_orders'];
 
-$customer_query = "SELECT COUNT(id) AS total_customers FROM customers";
+$customer_query = "SELECT COUNT(user_id) AS total_user FROM user";
 $customer_result = $conn->query($customer_query);
-$total_customers = $customer_result->fetch_assoc()['total_customers'];
+$total_customers = $customer_result->fetch_assoc()['total_user'];
 
-$payment_query = "SELECT SUM(payment) AS total_payments FROM orders";
+$payment_query = "SELECT COALESCE(SUM(total_price), 0) AS total_payments FROM `order`";
 $payment_result = $conn->query($payment_query);
 $total_payments = $payment_result->fetch_assoc()['total_payments'];
 
@@ -33,12 +33,14 @@ $conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Superadmin Dashboard</title>
     <link rel="stylesheet" href="../assets/css/dashboard_Style.css">
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
@@ -46,13 +48,13 @@ $conn->close();
             <div class="logo">
                 <img src="../assets/images/logoname.png" alt="Logo">
             </div>
-            
+
             <div class="profile">
                 <img src="../assets/images/superadmin_photo.png" alt="Superadmin Photo">
-                <p><span class="role"><?php echo $role; ?></span></p> 
-                
+                <p><span class="role"><?php echo $role; ?></span></p>
+
             </div>
-            
+
             <nav>
                 <ul>
                     <li><a href="Siderbar_Admin_management.php"><img src="../assets/images/admin_photo.png" alt=""> Admin Management</a></li>
@@ -67,11 +69,11 @@ $conn->close();
 
         <main class="main-content">
             <div class="header">
-                <button class="logout-btn">Log out</button>    
+                <button class="logout-btn">Log out</button>
             </div>
             <h1>Welcome, <?php echo $role; ?>!</h1>
 
-            <div class="dashboard-cards"> 
+            <div class="dashboard-cards">
                 <div class="card">
                     <h3>Total Admins</h3>
                     <p><?php echo $total_admins; ?></p>
@@ -97,7 +99,12 @@ $conn->close();
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT id, customer_name, order_quantity, total_price, status FROM orders ORDER BY id DESC LIMIT 4";
+                $sql = "SELECT o.order_id, u.user_name, p.prod_quantity, o.total_price, o.order_status 
+                FROM `order` AS o
+                JOIN product AS p ON o.prod_id = p.prod_id
+                JOIN user AS u ON o.user_id = u.user_id
+                ORDER BY o.order_id DESC 
+                LIMIT 4";
                 $result = $conn->query($sql);
                 ?>
                 <table>
@@ -114,10 +121,10 @@ $conn->close();
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>
-                                        <td>{$row['customer_name']}</td>
+                                        <td>{$row['user_name']}</td>
                                         <td>{$row['order_quantity']}</td>
                                         <td>\${$row['total_price']}</td>
-                                        <td>{$row['status']}</td>
+                                        <td>{$row['order_status']}</td>
                                       </tr>";
                             }
                         } else {
@@ -133,9 +140,10 @@ $conn->close();
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelector(".logout-btn").addEventListener("click", function() {
-                window.location.href = "../admin/logout.php"; 
+                window.location.href = "../admin/logout.php";
             });
         });
     </script>
 </body>
+
 </html>

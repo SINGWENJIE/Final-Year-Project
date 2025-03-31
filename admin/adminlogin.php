@@ -3,28 +3,30 @@ session_start();
 include '../db_connection.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $admin_id = mysqli_real_escape_string($conn, $_POST['admin_id']);
-    $password = $_POST['password'];
+   
+    $admin_name = mysqli_real_escape_string($conn, $_POST['admin_name']);
+    $password = $_POST['admin_password'];
 
     $superadmin = [
-        "id" => "superadmin",
-        "password" => "password" 
+        "admin_name" => "superadmin", 
+        "admin_password" => "password" 
     ];
 
-    if ($admin_id == $superadmin['id'] && $password == $superadmin['password']) {
-        $_SESSION['admin_id'] = "superAdmin";
-        $_SESSION['role'] = "Super Admin";
+    if ($admin_name == $superadmin['admin_name'] && $password == $superadmin['admin_password']) {
+        $_SESSION['admin_name'] = "superAdmin"; 
+        $_SESSION['admin_role'] = "Super Admin";
         header("Location: ../admin/superadmin_dashboard.php");
         exit();
     }
 
-    $sql = "SELECT * FROM admin WHERE admin_id = '$admin_id'";
-    $result = mysqli_query($conn, $sql);//check
+    $sql = "SELECT * FROM admin WHERE admin_name = '$admin_name'";
+    $result = mysqli_query($conn, $sql);
 
-    if ($row = mysqli_fetch_assoc($result)) {//get the result first row
-        if ($password == $row['password']) {  
-            $_SESSION['admin_id'] = $admin_id;
-            $_SESSION['role'] = "Admin";
+    if ($row = mysqli_fetch_assoc($result)) { 
+       
+        if ($password == $row['admin_password']) {  
+            $_SESSION['admin_name'] = $admin_name;  
+            $_SESSION['admin_role'] = ucfirst($row['admin_role']); 
             header("Location: ../admin/admin_dashboard.php");
             exit();
         } else {
@@ -52,8 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php } ?>
 
         <form action="adminlogin.php" method="POST">
-            <input type="text" name="admin_id" placeholder="Enter your ID" required>
-            <input type="password" name="password" placeholder="Enter your password" required>
+            <input type="text" name="admin_name" placeholder="Enter your ID" required>
+            <input type="password" name="admin_password" placeholder="Enter your password" required>
             <button type="submit">Login</button>
         </form>
     </div>

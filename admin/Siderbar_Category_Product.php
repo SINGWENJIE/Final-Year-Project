@@ -4,22 +4,22 @@ include '../db_connection.php';
 
 if (isset($_POST['add_category'])) {
     $category_name = $_POST['category_name'];
-    $conn->query("INSERT INTO category (name) VALUES ('$category_name')");
+    $conn->query("INSERT INTO category (category_name) VALUES ('$category_name')");
     header("Location: ../admin/Siderbar_Category_Product.php");
     exit();
 }
 
 if (isset($_POST['add_product'])) {
     $category_id = $_POST['category_id'];
-    $product_name = $_POST['product_name'];
-    $price = $_POST['price'];
+    $product_name = $_POST['prod_name'];
+    $price = $_POST['prod_price'];
     $stock = $_POST['stock'];  
-    $image = $_FILES['image']['name'];
+    $image = $_FILES['prod_image']['name'];
 
     if (!empty($image)) {
         $target = "../assets/uploads/" . basename($image);
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            $sql = "INSERT INTO product (category_id, name, price, stock, image) 
+        if (move_uploaded_file($_FILES['prod_image']['tmp_name'], $target)) {
+            $sql = "INSERT INTO product (category_id, prod_name, prod_price, stock, prod_image) 
                     VALUES ('$category_id', '$product_name', '$price', '$stock', '$image')";
             if ($conn->query($sql) === TRUE) {
                 echo "<script>alert('Product added successfully!'); window.location.href='Siderbar_Category_Product.php?category_id=$category_id';</script>";
@@ -39,7 +39,7 @@ if (isset($_GET['delete_product']) && isset($_GET['category_id'])) {
     $product_id = $_GET['delete_product'];
     $category_id = $_GET['category_id'];
 
-    $sql = "DELETE FROM product WHERE id='$product_id'";
+    $sql = "DELETE FROM product WHERE prod_id='$product_id'";
     if ($conn->query($sql) === TRUE) {
         echo "<script>alert('Product deleted successfully!'); window.location.href='Siderbar_Category_Product.php?category_id=$category_id';</script>";
         exit();
@@ -53,7 +53,7 @@ if (isset($_GET['delete_category'])) {
 
     $conn->query("DELETE FROM product WHERE category_id='$category_id'");
 
-    $sql = "DELETE FROM category WHERE id='$category_id'";
+    $sql = "DELETE FROM category WHERE category_id='$category_id'";
     if ($conn->query($sql) === TRUE) {
         echo "<script>alert('Category deleted successfully!'); window.location.href='Siderbar_Category_Product.php';</script>";
     } else {
@@ -81,15 +81,15 @@ if (isset($_GET['delete_category'])) {
             <img src="../assets/images/logoname.png" alt="Logo">
         </div>
         <div class="profile">
-            <a href="<?= ($_SESSION['role'] === 'Super Admin') ? 'superadmin_dashboard.php' : 'admin_dashboard.php'; ?>">
-            <img src="<?= ($_SESSION['role'] === 'Super Admin') ? '../assets/images/superadmin_photo.png' : '../assets/images/admin.png'; ?>">
-            <p><span class="role"><?= $_SESSION['role']; ?></span></p>
+            <a href="<?= ($_SESSION['admin_role'] === 'Super Admin') ? 'superadmin_dashboard.php' : 'admin_dashboard.php'; ?>">
+            <img src="<?= ($_SESSION['admin_role'] === 'Super Admin') ? '../assets/images/superadmin_photo.png' : '../assets/images/admin.png'; ?>">
+            <p><span class="admin_role"><?= $_SESSION['admin_role']; ?></span></p>
             </a>
         </div>
 
         <nav>
             <ul>
-                <?php if ($_SESSION['role'] === 'Super Admin') : ?>
+                <?php if ($_SESSION['admin_role'] === 'Super Admin') : ?>
                     <li><a href="Siderbar_Admin_management.php"><img src="../assets/images/admin_photo.png" alt=""> Admin Management</a></li>
                 <?php endif; ?>
                 <li><a href="Siderbar_Category_Product.php"><img src="../assets/images/product.png" alt=""> Category & Product</a></li>
@@ -116,9 +116,9 @@ if (isset($_GET['delete_category'])) {
         $categories = $conn->query("SELECT * FROM category");
         while ($row = $categories->fetch_assoc()) { ?>
         <div class="card">
-            <p><?= $row['name'] ?></p>
-            <button onclick="window.location.href='../admin/Siderbar_Category_Product.php?category_id=<?= $row['id'] ?>'">Manage Products</button>
-            <button onclick="confirmDeleteCategory(<?= $row['id'] ?>)">Delete Category</button> 
+            <p><?= $row['category_name'] ?></p>
+            <button onclick="window.location.href='../admin/Siderbar_Category_Product.php?category_id=<?= $row['category_id'] ?>'">Manage Products</button>
+            <button onclick="confirmDeleteCategory(<?= $row['category_id'] ?>)">Delete Category</button> 
         </div>
     <?php } ?>
 </div>
@@ -129,11 +129,12 @@ if (isset($_GET['delete_category'])) {
 if (isset($_GET['category_id'])) { 
     $category_id = $_GET['category_id'];
 
-    $category_query = $conn->query("SELECT name FROM category WHERE id='$category_id'");
+    $category_query = $conn->query("SELECT category_name FROM category WHERE category_id='$category_id'");
+
     
     if ($category_query && $category_query->num_rows > 0) {
         $category_data = $category_query->fetch_assoc();
-        $category_name = $category_data['name'];
+        $category_name = $category_data['category_name'];
     } else {
         $category_name = "Unknown Category";
     }
@@ -149,10 +150,10 @@ if (isset($_GET['category_id'])) {
 
     <form method="POST" enctype="multipart/form-data">
     <input type="hidden" name="category_id" value="<?= $category_id ?? '' ?>">
-    <input type="text" name="product_name" placeholder="Product Name" required>
-    <input type="number" name="price" placeholder="Price" required>
+    <input type="text" name="prod_name" placeholder="Product Name" required>
+    <input type="number" name="prod_price" placeholder="Price" required>
     <input type="number" name="stock" placeholder="Stock" required>  
-    <input type="file" name="image" required>
+    <input type="file" name="prod_image" required>
     <button type="submit" name="add_product">Add Product</button>
 </form>
 
@@ -161,8 +162,8 @@ if (isset($_GET['category_id'])) {
     if ($products && $products->num_rows > 0) {
         while ($row = $products->fetch_assoc()) { ?>
             <div class="card">
-                <p><?= $row['name'] ?></p>
-                <button onclick="confirmDelete(<?= $row['id'] ?>, <?= $category_id ?>)">Delete</button>
+                <p><?= $row['prod_name'] ?></p>
+                <button onclick="confirmDelete(<?= $row['prod_id'] ?>, <?= $category_id ?>)">Delete</button>
             </div>
     <?php 
         }
