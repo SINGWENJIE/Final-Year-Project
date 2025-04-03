@@ -252,3 +252,25 @@ header {
     color: white;
     text-decoration: underline;
 }
+
+.password-rules {
+    font-size: 12px;
+    color: #666;
+    text-align: left;
+    margin: 15px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .password-rules ul {
+    list-style: none;
+    padding-left: 20px;
+  }
+  
+  .password-rules li::before {
+    content: "✓";
+    color: #45ad9c;
+    margin-right: 5px;
+  }

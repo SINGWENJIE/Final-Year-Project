@@ -1,103 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+session_start();
 
-<head>
-    <title>GOGO | Login Page</title>
-    <link rel="icon" type="image" href="image/GOGO.png">
-    <link rel="stylesheet" href="Login.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-</head>
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $conn = new mysqli("localhost", "username", "", "gogo_supermarket");
+    
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-<body>
-    <header>
-        <div class="header-main">
-            <a href="MainPage.html">
-                <img src="image/gogoname.png" alt="GOGO Logo">
-            </a>
-            <form class="search-form">
-                <div class="search">
-                    <span class="search-icon material-symbols-outlined">search</span>
-                    <input class="search-input" type="search" placeholder="Search">
-                </div>
-            </form>
-        </div>
+    // 查询用户
+    $stmt = $conn->prepare("SELECT user_id, user_password FROM user WHERE user_name = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        <nav>
-            <ul class="nav-links">
-                <li><a href="MainPage.html">Menu</a></li>
-                <li><a href="AboutUs.html">About Lotus</a></li>
-                <li><a href="CustomerService.html">Customer Service</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <div class="login">
-        <form action="" method="POST">
-            <div class="close">
-                <a href="MainPage.html">
-                    <i class='bx bx-x-circle'></i>
-                </a>
-            </div>
-
-            <h1>Login</h1>
-            <div class="divider"></div>
-            <h2>
-                <img src="image/logoname(green).png" alt="GOGO Logo">
-            </h2>
-
-            <div class="input-box">
-                <input type="text" placeholder="Username" required>
-                <i class='bx bx-user'></i>
-            </div>
-
-            <div class="input-box">
-                <input type="password" placeholder="Password" required>
-                <i class='bx bx-lock-alt'></i>
-            </div>
-
-            <div class="remember-forget">
-                <label><input type="checkbox">Remember Me</label>
-                <a href="ForgetPass.html">Forgot Password?</a>
-            </div>
-
-            <button type="submit" class="btn">Login</button>
-
-            <div class="additional-links">
-                <p>First time login as member? <a href="Register.php">Click here</a></p>
-                <p>Forget Your Password? <a href="#">Click here</a></p>
-            </div>
-        </form>
-    </div>
-
-    <div class="footer-nav">
-        <div class="footer-column">
-            <h4>GOGO</h4>
-            <ul>
-                <li><a href="AboutUs.html">About GOGO</a></li>
-                <li><a href="#">Policies</a></li>
-                <li><a href="#">Terms & Conditions</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-column">
-            <h4>Support</h4>
-            <ul>
-                <li><a href="#">FAQs</a></li>
-                <li><a href="#">Download App</a></li>
-                <li><a href="#">Contact Us</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-column">
-            <h4>Legal</h4>
-            <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Anti-Bribery</a></li>
-                <li><a href="#">Loyalty Program</a></li>
-            </ul>
-        </div>
-    </div>
-</body>
-
-</html>
+    if ($result->num_rows == 1) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['user_password'])) {
+            $_SESSION['user_id'] = $user['user_id'];
+            header("Location: MainPage.html");
+        } else {
+            echo "<script>alert('Incorrect Password！'); window.location='Login.html';</script>";
+        }
+    } else {
+        echo "<script>alert('The user does not exist.！'); window.location='Login.html';</script>";
+    }
+    
+    $stmt->close();
+    $conn->close();
+}
+?>

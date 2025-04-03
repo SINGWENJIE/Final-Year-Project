@@ -230,3 +230,22 @@ header {
     color: white;
     text-decoration: underline;
 }
+
+.password-rules {
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.password-rules br {
+    display: none;
+}
+
+.input-box input:invalid {
+    border-color: #ff4444;
+}
+
+.input-box input:valid {
+    border-color: #00C851;
+}
