@@ -1,0 +1,113 @@
+/* Profile.css */
+.profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.profile-container h1 {
+    color: #367F7A;
+    font-family: 'Impact', sans-serif;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #45ad9c;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group input, 
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #45ad9c;
+    outline: none;
+}
+
+.form-group small {
+    display: block;
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.save-btn {
+    background: #45ad9c;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-top: 1.5rem;
+}
+
+.save-btn:hover {
+    background: #367F7A;
+}
+
+/* 图标样式 */
+.bx {
+    font-size: 1.2em;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 2rem;
+}
+
+/* 返回按钮样式 */
+.return-btn {
+    background: #f39c12;  /* 使用品牌辅助色 */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s;
+}
+
+.return-btn:hover {
+    background: #e67e22;
+}
+
+/* 保持保存按钮原有样式 */
+.save-btn {
+    background: #45ad9c;
+    /* 其他样式保持不变 */
+}

@@ -282,3 +282,29 @@ header {
     color: white;
     text-decoration: underline;
 }
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.user-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 2px solid white;
+}
+
+.username {
+    color: white;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+}
