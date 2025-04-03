@@ -1,8 +1,16 @@
 <?php
 session_start();
 
+session_start();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $conn = new mysqli("localhost", "username", "", "gogo_supermarket");
+    // 使用正确的数据库凭据 ✅
+    $conn = new mysqli("localhost", "root", "", "gogo_supermarket");
+    
+    // 检查连接是否成功
+    if ($conn->connect_error) {
+        die("数据库连接失败: " . $conn->connect_error);
+    }
     
     $username = $_POST['username'];
     $password = $_POST['password'];
