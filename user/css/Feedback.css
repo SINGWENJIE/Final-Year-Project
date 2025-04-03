@@ -1,0 +1,217 @@
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Feedback Modal */
+.feedback-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.feedback-container {
+    background-color: white;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease;
+}
+
+.feedback-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.feedback-header h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.feedback-header p {
+    color: #7f8c8d;
+    font-size: 16px;
+}
+
+/* Rating Section */
+.rating-section {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.rating-section h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.star-rating {
+    font-size: 40px;
+    color: #ddd;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.star-rating i {
+    margin: 0 5px;
+    transition: color 0.2s;
+}
+
+.star-rating i.hover {
+    color: #f1c40f;
+}
+
+.star-rating i.active {
+    color: #f1c40f;
+}
+
+.rating-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+
+/* Feedback Form */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    min-height: 100px;
+    resize: vertical;
+    font-size: 14px;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.recommend-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.recommend-options label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.recommend-options input[type="radio"] {
+    margin-right: 5px;
+}
+
+/* Buttons */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.btn.primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: #2980b9;
+}
+
+.btn.secondary {
+    background-color: #ecf0f1;
+    color: #7f8c8d;
+}
+
+.btn.secondary:hover {
+    background-color: #bdc3c7;
+    color: #2c3e50;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .feedback-container {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .star-rating {
+        font-size: 32px;
+    }
+    
+    .recommend-options {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}

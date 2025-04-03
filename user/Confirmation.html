@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - My Lotus's</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../user/css/Confirmation.css">
+</head>
+<body>
+    <div class="confirmation-container">
+        <!-- Header -->
+        <header class="confirmation-header">
+            <div class="logo">My Lotus's</div>
+            <div class="order-status">
+                <span class="badge success">Completed</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="confirmation-content">
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h1>Thank you for your order!</h1>
+            <p class="order-number">Order #<span id="orderId">123456</span></p>
+            <p class="confirmation-message">
+                Your order has been received and is being processed. We've sent a confirmation email to 
+                <strong id="customerEmail">john.doe@example.com</strong> with all the details.
+            </p>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-section">
+                        <h3>Delivery Information</h3>
+                        <p id="customerName">John Doe</p>
+                        <p id="deliveryAddress">123 Main Street, Apartment 4B</p>
+                        <p id="deliveryLocation">50000 Kuala Lumpur, Selangor</p>
+                        <p>Phone: <span id="customerPhone">+60123456789</span></p>
+                        <p>Email: <span id="customerEmailDisplay">john.doe@example.com</span></p>
+                        <p>Delivery Date: <span id="deliveryDate">15 Jun 2023</span></p>
+                    </div>
+                    
+                    <div class="summary-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-method-display">
+                            <i class="fas fa-credit-card"></i>
+                            <span id="paymentMethod">Credit Card ending in 4242</span>
+                        </div>
+                        <p>Payment Status: <span class="badge success">Paid</span></p>
+                        <p>Total Paid: <span id="totalAmount">RM35.88</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="order-items">
+                <h2>Your Items</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderItemsList">
+                        <!-- Items will be populated by JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3">Subtotal</td>
+                            <td id="orderSubtotal">RM40.88</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Delivery Fee</td>
+                            <td id="deliveryFee">RM0.00</td>
+                        </tr>
+                        <tr class="discount">
+                            <td colspan="3">Discount (FREE SHIPPING)</td>
+                            <td id="orderDiscount">-RM5.00</td>
+                        </tr>
+                        <tr class="grand-total">
+                            <td colspan="3">Total</td>
+                            <td id="orderTotal">RM35.88</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Order Actions -->
+            <div class="order-actions">
+                <button id="printReceipt" class="btn secondary">
+                    <i class="fas fa-print"></i> Print Receipt
+                </button>
+                <button id="trackOrder" class="btn primary">
+                    <i class="fas fa-truck"></i> Track Your Order
+                </button>
+                <a href="products.html" class="btn primary">
+                    <i class="fas fa-shopping-bag"></i> Continue Shopping
+                </a>
+            </div>
+
+            <!-- Support Info -->
+            <div class="support-info">
+                <h3>Need Help?</h3>
+                <p>
+                    If you have any questions about your order, please contact our 
+                    <a href="support.html">customer support</a> or call us at 
+                    <strong>+603-1234 5678</strong>.
+                </p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="confirmation-footer">
+            <p>© 2023 My Lotus's. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="../user/js/Confirmation.js"></script>
+</body>
+</html>
