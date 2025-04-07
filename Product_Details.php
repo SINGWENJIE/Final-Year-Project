@@ -35,7 +35,7 @@ if (isset($_POST['action'])) {
 }
 
 // Fetch products from database
-$sql = "SELECT * FROM products LIMIT 25";
+$sql = "SELECT * FROM product LIMIT 25";
 $result = $conn->query($sql);
 ?>
 
