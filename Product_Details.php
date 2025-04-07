@@ -1,18 +1,6 @@
 <?php
 // Product_Details.php
-// Database connection
-$servername = "localhost";
-$username = "root"; // Replace with your database username
-$password = ""; // Replace with your database password
-$dbname = "gogo_supermarket";
-
-// Create connection
-$conn = new mysqli("localhost", "root", "", "gogo_supermarket");
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once 'db_connection.php'; // Include your existing connection file
 
 // Handle actions (Edit, Copy, Delete)
 if (isset($_POST['action'])) {
@@ -20,17 +8,15 @@ if (isset($_POST['action'])) {
     
     switch ($_POST['action']) {
         case 'Edit':
-            // Redirect to edit page or show edit form
             header("Location: edit_product.php?id=$prod_id");
             exit();
             break;
             
         case 'Copy':
-            // Handle copy logic
             $sql = "INSERT INTO products (prod_name, category_id, prod_price, prod_guariffly, prod_image, prod_desc) 
                     SELECT prod_name, category_id, prod_price, prod_guariffly, prod_image, prod_desc 
                     FROM products WHERE prod_id = $prod_id";
-            if ($conn->query($sql) === TRUE) {
+            if ($conn->query($sql) {
                 $message = "Product copied successfully!";
             } else {
                 $message = "Error copying product: " . $conn->error;
@@ -38,9 +24,8 @@ if (isset($_POST['action'])) {
             break;
             
         case 'Delete':
-            // Handle delete logic
             $sql = "DELETE FROM products WHERE prod_id = $prod_id";
-            if ($conn->query($sql) === TRUE) {
+            if ($conn->query($sql)) {
                 $message = "Product deleted successfully!";
             } else {
                 $message = "Error deleting product: " . $conn->error;
@@ -52,9 +37,6 @@ if (isset($_POST['action'])) {
 // Fetch products from database
 $sql = "SELECT * FROM products LIMIT 25";
 $result = $conn->query($sql);
-
-// Close connection
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +44,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details - 9999 Supermarket</title>
+    <title>Product Details - Gogo Supermarket</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,10 +55,12 @@ $conn->close();
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -85,6 +69,8 @@ $conn->close();
         }
         th {
             background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
         }
         .action-buttons {
             margin-top: 20px;
@@ -102,10 +88,26 @@ $conn->close();
             background-color: #f2dede;
             color: #a94442;
         }
+        button {
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+        }
+        input[type="text"] {
+            padding: 5px;
+        }
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+            }
+            table {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>GoGo Supermarket - Product Details</h1>
+    <h1>Gogo Supermarket - Product Details</h1>
     
     <?php if (isset($message)): ?>
         <div class="message <?php echo strpos($message, 'Error') !== false ? 'error' : 'success'; ?>">
@@ -120,13 +122,13 @@ $conn->close();
         </div>
         <div>
             <span>Show all</span> | 
-            <span>Number of rows: 25</span> | 
+            <span>Number of rows: <?php echo $result->num_rows; ?></span> | 
             <span>Filter rows</span> | 
-            <input type="text" placeholder="Search this table">
+            <input type="text" placeholder="Search this table" id="searchInput">
         </div>
     </div>
     
-    <table>
+    <table id="productsTable">
         <thead>
             <tr>
                 <th><input type="checkbox" id="select-all"> Check all</th>
@@ -144,14 +146,14 @@ $conn->close();
                 <?php while($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><input type="checkbox" name="selected[]" value="<?php echo $row['prod_id']; ?>"></td>
-                        <td><?php echo $row['prod_id']; ?></td>
-                        <td><?php echo $row['prod_name']; ?></td>
-                        <td><?php echo $row['category_id']; ?></td>
-                        <td><?php echo $row['prod_price']; ?></td>
-                        <td><?php echo $row['prod_desc']; ?></td>
+                        <td><?php echo htmlspecialchars($row['prod_id']); ?></td>
+                        <td><?php echo htmlspecialchars($row['prod_name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['category_id']); ?></td>
+                        <td><?php echo htmlspecialchars($row['prod_price']); ?></td>
+                        <td><?php echo htmlspecialchars($row['prod_desc'] ?? ''); ?></td>
                         <td>
                             <?php if (!empty($row['prod_image'])): ?>
-                                <img src="<?php echo $row['prod_image']; ?>" alt="Product Image" width="50">
+                                <img src="<?php echo htmlspecialchars($row['prod_image']); ?>" alt="Product Image" width="50">
                             <?php endif; ?>
                         </td>
                         <td>
@@ -159,7 +161,7 @@ $conn->close();
                                 <input type="hidden" name="prod_id" value="<?php echo $row['prod_id']; ?>">
                                 <button type="submit" name="action" value="Edit">Edit</button>
                                 <button type="submit" name="action" value="Copy">Copy</button>
-                                <button type="submit" name="action" value="Delete">Delete</button>
+                                <button type="submit" name="action" value="Delete" onclick="return confirm('Are you sure?')">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -176,7 +178,7 @@ $conn->close();
         <strong>With selected:</strong>
         <button form="bulk-form" type="submit" name="action" value="Edit">Edit</button>
         <button form="bulk-form" type="submit" name="action" value="Copy">Copy</button>
-        <button form="bulk-form" type="submit" name="action" value="Delete">Delete</button>
+        <button form="bulk-form" type="submit" name="action" value="Delete" onclick="return confirm('Are you sure you want to delete selected items?')">Delete</button>
     </div>
     
     <form id="bulk-form" method="post"></form>
@@ -187,6 +189,17 @@ $conn->close();
             const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
                 checkbox.checked = this.checked;
+            });
+        });
+
+        // Simple search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const input = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#productsTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
             });
         });
     </script>
