@@ -16,7 +16,7 @@ if (isset($_POST['action'])) {
             $sql = "INSERT INTO products (prod_name, category_id, prod_price, prod_guariffly, prod_image, prod_desc) 
                     SELECT prod_name, category_id, prod_price, prod_guariffly, prod_image, prod_desc 
                     FROM products WHERE prod_id = $prod_id";
-            if ($conn->query($sql) {
+            if ($conn->query($sql)) {
                 $message = "Product copied successfully!";
             } else {
                 $message = "Error copying product: " . $conn->error;
