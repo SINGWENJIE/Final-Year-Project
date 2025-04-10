@@ -270,7 +270,6 @@ header {
   }
   
   .password-rules li::before {
-    content: "✓";
     color: #45ad9c;
     margin-right: 5px;
   }

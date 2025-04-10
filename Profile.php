@@ -24,6 +24,30 @@ $user = $result->fetch_assoc();
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
+    <header>
+        <div class="auth-section">
+            <ul class="auth-links">
+                <li><a href="Login.html">Login</a></li>
+                <li><a href="Register.html">Register</a></li>
+            </ul>
+            <a href="ShoppingCart.html" class="shopping-cart-link">
+                <img src="image/cart.png" alt="Cart" class="shopping-cart">
+            </a>
+        </div>
+
+        <div class="header-main">
+            <a href="MainPage.html">
+                <img src="image/gogoname.png" alt="GOGO Logo">
+            </a>
+            <form class="search-form">
+                <div class="search">
+                    <span class="search-icon material-symbols-outlined">search</span>
+                    <input class="search-input" type="search" placeholder="Search">
+                </div>
+            </form>
+        </div>
+    </header>
+
     <!-- 已移除导航栏包含语句 -->
 
     <div class="profile-container">
@@ -73,9 +97,40 @@ $user = $result->fetch_assoc();
             <button type="submit" class="save-btn">
                 <i class='bx bx-save'></i> Save Changes
             </button>
-            <a href="MainPage.html" class="return-btn">
-            <i class='bx bx-home'></i> Back to Main
+            
+            <a href="MainPage.php" class="return-btn">
+                <i class='bx bx-home'></i> Back to Main
+            </a>
         </form>
     </div>
+
+    <div class="footer-nav">
+        <div class="footer-column">
+            <h4>GOGO</h4>
+            <ul>
+                <li><a href="AboutUs.html">About GOGO</a></li>
+                <li><a href="#">Policies</a></li>
+                <li><a href="#">Terms & Conditions</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Legal</h4>
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Anti-Bribery</a></li>
+                <li><a href="#">Loyalty Program</a></li>
+            </ul>
+        </div>
+    </div>
+
 </body>
 </html>
