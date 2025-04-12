@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Smartwatch - Product Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .cart-icon-container {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .cart-icon-container i {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+        
+        /* Product Section */
+        .product {
+            display: flex;
+            flex-wrap: wrap;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .product-images {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .main-image-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        
+        .zoom-lens {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 255, 255, 0.4);
+            cursor: zoom-in;
+            display: none;
+        }
+        
+        .zoom-result {
+            position: absolute;
+            top: 0;
+            left: calc(100% + 20px);
+            width: 400px;
+            height: 400px;
+            background-color: white;
+            border: 1px solid #d4d4d4;
+            background-repeat: no-repeat;
+            display: none;
+            z-index: 100;
+        }
+        
+        .thumbnail-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .thumbnail {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .thumbnail:hover, .thumbnail.active {
+            border-color: #3498db;
+        }
+        
+        .product-details {
+            flex: 1;
+            min-width: 300px;
+            padding: 30px;
+        }
+        
+        .product-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        
+        .product-brand {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stars {
+            color: #f39c12;
+            margin-right: 10px;
+        }
+        
+        .review-count {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .price-container {
+            margin: 20px 0;
+        }
+        
+        .current-price {
+            font-size: 28px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-left: 10px;
+        }
+        
+        .discount {
+            background: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .availability {
+            color: #27ae60;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .description {
+            margin-bottom: 25px;
+            color: #555;
+        }
+        
+        .features {
+            margin-bottom: 25px;
+        }
+        
+        .features li {
+            margin-bottom: 8px;
+            list-style-position: inside;
+        }
+        
+        .color-options, .size-options {
+            margin-bottom: 20px;
+        }
+        
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .color-option, .size-option {
+            display: inline-block;
+            margin-right: 10px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .color-option.selected, .size-option.selected {
+            border-color: #3498db;
+            background-color: #f0f8ff;
+        }
+        
+        .quantity-selector {
+            margin-bottom: 25px;
+        }
+        
+        .quantity {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background: #f0f0f0;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .quantity-input {
+            width: 50px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #ddd;
+            margin: 0 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .wishlist {
+            display: flex;
+            align-items: center;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .wishlist i {
+            margin-right: 8px;
+            color: #e74c3c;
+        }
+        
+        /* Product Tabs */
+        .product-tabs {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            position: relative;
+        }
+        
+        .tab-btn.active {
+            color: #3498db;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Shopping Cart Sidebar */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .cart-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background-color: #fff;
+            z-index: 999;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-sidebar.show {
+            right: 0;
+        }
+        
+        .cart-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cart-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 0.5rem;
+        }
+        
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+        }
+        
+        .cart-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+        
+        .cart-item-img {
+            width: 80px;
+            height: 80px;
+            margin-right: 1rem;
+        }
+        
+        .cart-item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-details h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+        
+        .cart-item-details p {
+            margin: 0 0 0.5rem 0;
+            font-weight: bold;
+        }
+        
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 25px;
+            height: 25px;
+            background-color: #f5f5f5;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cart-item-quantity span {
+            margin: 0 0.5rem;
+        }
+        
+        .remove-item {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .cart-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product {
+                flex-direction: column;
+            }
+            
+            .product-images, .product-details {
+                padding: 15px;
+            }
+            
+            .main-image-container {
+                height: 300px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .zoom-result {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">ShopEase</div>
+            <div class="cart-icon-container">
+                <i class="fas fa-shopping-cart" id="cartIcon"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </header>
+
+        <div class="product">
+            <div class="product-images">
+                <div class="main-image-container">
+                    <img src="https://via.placeholder.com/600x400?text=Smartwatch+Main" alt="Premium Smartwatch" class="main-image" id="mainImage">
+                    <div class="zoom-lens"></div>
+                    <div class="zoom-result"></div>
+                </div>
+                <div class="thumbnail-container">
+                    <img src="https://via.placeholder.com/100x100?text=Front" alt="Front View" class="thumbnail active">
+                    <img src="https://via.placeholder.com/100x100?text=Side" alt="Side View" class="thumbnail">
+                    <img src="https://via.placeholder.com/100x100?text=Back" alt="Back View" class="thumbnail">
+                    <img src="https://via.placeholder.com/100x100?text=Display" alt="Display" class="thumbnail">
+                </div>
+            </div>
+            
+            <div class="product-details">
+                <h1 class="product-title">Premium Smartwatch X9 Pro</h1>
+                <p class="product-brand">By TechGadgets</p>
+                
+                <div class="rating">
+                    <div class="stars">★★★★☆</div>
+                    <a href="#reviews" class="review-count">142 Reviews</a>
+                </div>
+                
+                <div class="price-container">
+                    <span class="current-price">RM199.99</span>
+                    <span class="original-price">RM249.99</span>
+                    <span class="discount">20% OFF</span>
+                </div>
+                
+                <p class="availability">In Stock (Only 5 left)</p>
+                
+                <p class="description">
+                    The Premium Smartwatch X9 Pro is the ultimate wearable device with advanced health tracking, 
+                    always-on display, and 7-day battery life. Stay connected with notifications, calls, 
+                    and music control right on your wrist.
+                </p>
+                
+                <ul class="features">
+                    <li>1.78" AMOLED Always-On Display</li>
+                    <li>Blood Oxygen & Heart Rate Monitoring</li>
+                    <li>Water Resistant (5ATM)</li>
+                    <li>Built-in GPS & NFC for Payments</li>
+                    <li>7-day battery life</li>
+                </ul>
+                
+                <div class="color-options">
+                    <p class="option-title">Color:</p>
+                    <span class="color-option selected" data-color="black">Black</span>
+                    <span class="color-option" data-color="silver">Silver</span>
+                    <span class="color-option" data-color="blue">Blue</span>
+                </div>
+                
+                <div class="size-options">
+                    <p class="option-title">Size:</p>
+                    <span class="size-option selected" data-size="42mm">Standard (42mm)</span>
+                    <span class="size-option" data-size="46mm">Large (46mm)</span>
+                </div>
+                
+                <div class="quantity-selector">
+                    <p class="option-title">Quantity:</p>
+                    <div class="quantity">
+                        <button class="quantity-btn" id="decreaseQty">-</button>
+                        <input type="number" value="1" min="1" class="quantity-input" id="quantityInput">
+                        <button class="quantity-btn" id="increaseQty">+</button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="addToCartBtn">Add to Cart</button>
+                    <button class="btn btn-secondary">Buy Now</button>
+                </div>
+                
+                <div class="wishlist">
+                    <i class="far fa-heart"></i> <span>Add to Wishlist</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-tabs">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="description">Description</button>
+                <button class="tab-btn" data-tab="specs">Specifications</button>
+                <button class="tab-btn" data-tab="reviews">Reviews</button>
+                <button class="tab-btn" data-tab="shipping">Shipping & Returns</button>
+            </div>
+            
+            <div id="description" class="tab-content active">
+                <h3>Detailed Product Description</h3>
+                <p>
+                    The Premium Smartwatch X9 Pro revolutionizes your daily routine with its cutting-edge technology 
+                    and sleek design. The 1.78" AMOLED display offers vibrant colors and excellent visibility even 
+                    in direct sunlight, with an always-on option to keep your essential information at a glance.
+                </p>
+                <p>
+                    Track your health metrics with precision using our advanced sensors that monitor heart rate, 
+                    blood oxygen levels, stress, and sleep quality. The built-in GPS accurately records your outdoor 
+                    activities like running, cycling, and hiking without needing your phone.
+                </p>
+                <p>
+                    With 7-day battery life, you'll spend less time charging and more time enjoying your smartwatch. 
+                    The fast charging capability gives you a full day's power in just 15 minutes.
+                </p>
+            </div>
+            
+            <div id="specs" class="tab-content">
+                <h3>Technical Specifications</h3>
+                <ul>
+                    <li><strong>Display:</strong> 1.78" AMOLED, 448×368 pixels</li>
+                    <li><strong>Battery:</strong> 450mAh, up to 7 days</li>
+                    <li><strong>Connectivity:</strong> Bluetooth 5.2, NFC</li>
+                    <li><strong>Sensors:</strong> Heart rate, SpO2, Accelerometer, Gyroscope, Ambient light</li>
+                    <li><strong>Water Resistance:</strong> 5ATM (50 meters)</li>
+                    <li><strong>Compatibility:</strong> Android 8.0+, iOS 12.0+</li>
+                    <li><strong>Materials:</strong> Aluminum case, Gorilla Glass 3, Silicone band</li>
+                </ul>
+            </div>
+            
+            <div id="reviews" class="tab-content">
+                <h3>Customer Reviews</h3>
+                <div class="review">
+                    <div class="review-header">
+                        <span class="review-author">John D.</span>
+                        <span class="review-rating">★★★★★</span>
+                        <span class="review-date">March 15, 2023</span>
+                    </div>
+                    <p class="review-text">Absolutely love this smartwatch! The battery life is incredible and the display is so crisp.</p>
+                </div>
+                <div class="review">
+                    <div class="review-header">
+                        <span class="review-author">Sarah M.</span>
+                        <span class="review-rating">★★★★☆</span>
+                        <span class="review-date">February 28, 2023</span>
+                    </div>
+                    <p class="review-text">Great features but the companion app could use some improvements.</p>
+                </div>
+            </div>
+            
+            <div id="shipping" class="tab-content">
+                <h3>Shipping & Return Policy</h3>
+                <p>
+                    <strong>Shipping:</strong> Free standard shipping on all orders. Delivers in 3-5 business days.
+                </p>
+                <p>
+                    <strong>Returns:</strong> 30-day money-back guarantee. Items must be unused and in original packaging.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Sidebar -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button class="close-cart" id="closeCart">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="empty-cart">Your cart is empty</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-price">RM0.00</span>
+            </div>
+            <button class="checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const cartIcon = document.getElementById('cartIcon');
+            const cartOverlay = document.getElementById('cartOverlay');
+            const cartSidebar = document.getElementById('cartSidebar');
+            const closeCart = document.getElementById('closeCart');
+            const cartItemsContainer = document.getElementById('cartItems');
+            const cartCount = document.querySelector('.cart-count');
+            const totalPriceElement = document.querySelector('.total-price');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const quantityInput = document.getElementById('quantityInput');
+            const increaseQty = document.getElementById('increaseQty');
+            const decreaseQty = document.getElementById('decreaseQty');
+            const mainImage = document.getElementById('mainImage');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const sizeOptions = document.querySelectorAll('.size-option');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const zoomLens = document.querySelector('.zoom-lens');
+            const zoomResult = document.querySelector('.zoom-result');
+            
+            // Initialize cart from localStorage or empty array
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let totalPrice = 0;
+
+            // Toggle cart visibility
+            cartIcon.addEventListener('click', toggleCart);
+            cartOverlay.addEventListener('click', toggleCart);
+            closeCart.addEventListener('click', toggleCart);
+
+            function toggleCart() {
+                cartOverlay.classList.toggle('show');
+                cartSidebar.classList.toggle('show');
+            }
+
+            // Initialize cart UI
+            updateCart();
+
+            // Add to cart functionality
+            addToCartBtn.addEventListener('click', function() {
+                const selectedColor = document.querySelector('.color-option.selected').getAttribute('data-color');
+                const selectedSize = document.querySelector('.size-option.selected').getAttribute('data-size');
+                const quantity = parseInt(quantityInput.value);
+                
+                const product = {
+                    id: 'prod123-' + selectedColor + '-' + selectedSize, // Unique ID based on color and size
+                    name: 'Premium Smartwatch X9 Pro (' + selectedSize + ', ' + selectedColor + ')',
+                    price: 199.99,
+                    quantity: quantity,
+                    image: 'https://via.placeholder.com/100x100?text=Smartwatch+' + selectedColor,
+                    color: selectedColor,
+                    size: selectedSize
+                };
+                
+                addToCart(product);
+            });
+
+            // Function to add item to cart
+            function addToCart(product) {
+                // Check if product already exists in cart
+                const existingItem = cart.find(item => item.id === product.id);
+                
+                if (existingItem) {
+                    existingItem.quantity += product.quantity;
+                } else {
+                    cart.push(product);
+                }
+                
+                saveCart();
+                updateCart();
+                
+                // Show confirmation
+                alert(`${product.quantity} ${product.name} added to cart!`);
+            }
+
+            // Function to update cart UI
+            function updateCart() {
+                // Update cart count
+                const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+                cartCount.textContent = itemCount;
+                
+                // Update cart items
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+                    totalPriceElement.textContent = 'RM0.00';
+                    return;
+                }
+                
+                cartItemsContainer.innerHTML = '';
+                totalPrice = 0;
+                
+                cart.forEach(item => {
+                    totalPrice += item.price * item.quantity;
+                    
+                    const cartItemElement = document.createElement('div');
+                    cartItemElement.className = 'cart-item';
+                    cartItemElement.innerHTML = `
+                        <div class="cart-item-img">
+                            <img src="${item.image}" alt="${item.name}">
+                        </div>
+                        <div class="cart-item-details">
+                            <h3>${item.name}</h3>
+                            <p>RM${item.price.toFixed(2)}</p>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                            </div>
+                        </div>
+                        <button class="remove-item" data-id="${item.id}">&times;</button>
+                    `;
+                    
+                    cartItemsContainer.appendChild(cartItemElement);
+                });
+                
+                totalPriceElement.textContent = `RM${totalPrice.toFixed(2)}`;
+                
+                // Add event listeners to new buttons
+                document.querySelectorAll('.minus').forEach(btn => {
+                    btn.addEventListener('click', decreaseQuantity);
+                });
+                
+                document.querySelectorAll('.plus').forEach(btn => {
+                    btn.addEventListener('click', increaseQuantity);
+                });
+                
+                document.querySelectorAll('.remove-item').forEach(btn => {
+                    btn.addEventListener('click', removeItem);
+                });
+            }
+
+            // Quantity adjustment functions
+            function decreaseQuantity(e) {
+                const id = e.target.getAttribute('data-id');
+                const item = cart.find(item => item.id === id);
+                
+                if (item.quantity > 1) {
+                    item.quantity--;
+                } else {
+                    cart = cart.filter(item => item.id !== id);
+                }
+                
+                saveCart();
+                updateCart();
+            }
+
+            function increaseQuantity(e) {
+                const id = e.target.getAttribute('data-id');
+                const item = cart.find(item => item.id === id);
+                item.quantity++;
+                saveCart();
+                updateCart();
+            }
+
+            function removeItem(e) {
+                const id = e.target.getAttribute('data-id');
+                cart = cart.filter(item => item.id !== id);
+                saveCart();
+                updateCart();
+            }
+
+            function saveCart() {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+
+            // Quantity selector
+            increaseQty.addEventListener('click', function() {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            });
+
+            decreaseQty.addEventListener('click', function() {
+                if (parseInt(quantityInput.value) > 1) {
+                    quantityInput.value = parseInt(quantityInput.value) - 1;
+                }
+            });
+
+            // Thumbnail image gallery
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    // Update main image
+                    mainImage.src = this.src.replace('100x100', '600x400');
+                    
+                    // Update active thumbnail
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Color and size selection
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            sizeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    sizeOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Tab functionality
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Image zoom functionality
+            if (mainImage && zoomLens && zoomResult) {
+                mainImage.addEventListener('mousemove', moveLens);
+                mainImage.addEventListener('mouseenter', showZoom);
+                mainImage.addEventListener('mouseleave', hideZoom);
+                
+                function showZoom() {
+                    zoomLens.style.display = 'block';
+                    zoomResult.style.display = 'block';
+                }
+                
+                function hideZoom() {
+                    zoomLens.style.display = 'none';
+                    zoomResult.style.display = 'none';
+                }
+                
+                function moveLens(e) {
+                    e.preventDefault();
+                    
+                    // Get cursor position
+                    const pos = getCursorPos(e);
+                    let x = pos.x - (zoomLens.offsetWidth / 2);
+                    let y = pos.y - (zoomLens.offsetHeight / 2);
+                    
+                    // Prevent lens from going outside image
+                    if (x > mainImage.width - zoomLens.offsetWidth) x = mainImage.width - zoomLens.offsetWidth;
+                    if (x < 0) x = 0;
+                    if (y > mainImage.height - zoomLens.offsetHeight) y = mainImage.height - zoomLens.offsetHeight;
+                    if (y < 0) y = 0;
+                    
+                    // Set lens position
+                    zoomLens.style.left = x + 'px';
+                    zoomLens.style.top = y + 'px';
+                    
+                    // Calculate zoomed image position
+                    const cx = zoomResult.offsetWidth / zoomLens.offsetWidth;
+                    const cy = zoomResult.offsetHeight / zoomLens.offsetHeight;
+                    
+                    // Set zoomed image background
+                    zoomResult.style.backgroundImage = `url('${mainImage.src}')`;
+                    zoomResult.style.backgroundSize = `${mainImage.width * cx}px ${mainImage.height * cy}px`;
+                    zoomResult.style.backgroundPosition = `-${x * cx}px -${y * cy}px`;
+                }
+                
+                function getCursorPos(e) {
+                    const a = mainImage.getBoundingClientRect();
+                    return {
+                        x: e.pageX - a.left - window.pageXOffset,
+                        y: e.pageY - a.top - window.pageYOffset
+                    };
+                }
+            }
+        });
+    </script>
+</body>
+</html>
