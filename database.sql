@@ -1,29 +1,33 @@
--- ADMIN TABLE (unchanged as requested)
+-- Create admin table
 CREATE TABLE `admin` (
   `admin_id` int(11) NOT NULL,
   `admin_name` varchar(100) NOT NULL,
   `admin_email` varchar(255) NOT NULL,
   `admin_password` varchar(255) NOT NULL,
   `admin_phone_num` varchar(20) DEFAULT NULL,
-  `admin_role` enum('superadmin','admin') NOT NULL DEFAULT 'admin'
+  `admin_role` enum('superadmin','admin') NOT NULL DEFAULT 'admin',
+  PRIMARY KEY (`admin_id`),
+  UNIQUE KEY `admin_email` (`admin_email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insert initial admin data (unchanged)
+-- Insert initial admin data
 INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `admin_password`, `admin_phone_num`, `admin_role`) VALUES
 (1, 'qiaoxuan', 'qx@gmail.com', 'password', '0167371239', 'admin');
 
--- CATEGORY TABLE (unchanged as requested)
+-- Create category table
 CREATE TABLE `category` (
   `category_id` int(11) NOT NULL,
-  `category_name` varchar(100) NOT NULL
+  `category_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`category_id`),
+  UNIQUE KEY `category_name` (`category_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insert initial category data (unchanged)
+-- Insert initial category data
 INSERT INTO `category` (`category_id`, `category_name`) VALUES
 (3, 'ice cream'),
 (2, 'snacks');
 
--- PRODUCT TABLE (unchanged as requested)
+-- Create product table
 CREATE TABLE `product` (
   `prod_id` int(11) NOT NULL,
   `prod_name` varchar(255) NOT NULL,
@@ -32,254 +36,268 @@ CREATE TABLE `product` (
   `prod_description` text DEFAULT NULL,
   `prod_quantity` int(11) NOT NULL DEFAULT 0,
   `prod_image` varchar(255) DEFAULT NULL,
-  `stock` int(11) DEFAULT NULL
+  `stock` int(11) DEFAULT NULL,
+  PRIMARY KEY (`prod_id`),
+  KEY `category_id` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- USERS TABLE (enhanced with indexes)
-CREATE TABLE users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    user_password VARCHAR(255) NOT NULL,
-    password_reset_token VARCHAR(255),
-    token_expiry TIMESTAMP NULL,
-    user_phone_num VARCHAR(20),
-    user_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login TIMESTAMP NULL,
-    admin_id INT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    email_verified BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
-    INDEX idx_email (email),
-    INDEX idx_admin (admin_id)
-);
+-- Create users table
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(100) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `user_password` varchar(255) NOT NULL,
+  `password_reset_token` varchar(255) DEFAULT NULL,
+  `token_expiry` timestamp NULL DEFAULT NULL,
+  `user_phone_num` varchar(20) DEFAULT NULL,
+  `user_created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `user_updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `last_login` timestamp NULL DEFAULT NULL,
+  `admin_id` int(11) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `email_verified` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `idx_admin` (`admin_id`),
+  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ADDRESS TABLE (enhanced with indexes)
-CREATE TABLE address (
-    address_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    recipient_name VARCHAR(100) NOT NULL,
-    street_address VARCHAR(255) NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    state VARCHAR(100) NOT NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    country VARCHAR(100) NOT NULL DEFAULT 'Malaysia',
-    is_default BOOLEAN DEFAULT FALSE,
-    phone_number VARCHAR(20) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    INDEX idx_user (user_id),
-    INDEX idx_default (is_default, user_id)
-);
+-- Create address table
+CREATE TABLE `address` (
+  `address_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `recipient_name` varchar(100) NOT NULL,
+  `street_address` varchar(255) NOT NULL,
+  `city` varchar(100) NOT NULL,
+  `state` varchar(100) NOT NULL,
+  `postal_code` varchar(20) NOT NULL,
+  `country` varchar(100) NOT NULL DEFAULT 'Malaysia',
+  `is_default` tinyint(1) DEFAULT 0,
+  `phone_number` varchar(20) NOT NULL,
+  PRIMARY KEY (`address_id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_default` (`is_default`,`user_id`),
+  CONSTRAINT `address_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ORDERS TABLE (enhanced with indexes and status tracking)
-CREATE TABLE orders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    shipping_address_id INT NOT NULL,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    total_amount DECIMAL(12,2) NOT NULL,
-    discount_amount DECIMAL(10,2) DEFAULT 0.00,
-    shipping_cost DECIMAL(10,2) DEFAULT 0.00,
-    tax_amount DECIMAL(10,2) DEFAULT 0.00,
-    final_amount DECIMAL(12,2) NOT NULL,
-    order_status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded') DEFAULT 'pending',
-    notes TEXT,
-    admin_id INT NULL,
-    expected_delivery_date DATE,
-    status_updated_at TIMESTAMP NULL,
-    cancellation_reason TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (shipping_address_id) REFERENCES address(address_id),
-    FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
-    INDEX idx_user (user_id),
-    INDEX idx_status (order_status),
-    INDEX idx_date (order_date)
-);
+-- Create orders table
+CREATE TABLE `orders` (
+  `order_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `shipping_address_id` int(11) NOT NULL,
+  `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `total_amount` decimal(12,2) NOT NULL,
+  `discount_amount` decimal(10,2) DEFAULT 0.00,
+  `shipping_cost` decimal(10,2) DEFAULT 0.00,
+  `tax_amount` decimal(10,2) DEFAULT 0.00,
+  `final_amount` decimal(12,2) NOT NULL,
+  `order_status` enum('pending','processing','shipped','delivered','cancelled','refunded') DEFAULT 'pending',
+  `notes` text DEFAULT NULL,
+  `admin_id` int(11) DEFAULT NULL,
+  `expected_delivery_date` date DEFAULT NULL,
+  `status_updated_at` timestamp NULL DEFAULT NULL,
+  `cancellation_reason` text DEFAULT NULL,
+  PRIMARY KEY (`order_id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_status` (`order_status`),
+  KEY `idx_date` (`order_date`),
+  KEY `shipping_address_id` (`shipping_address_id`),
+  KEY `admin_id` (`admin_id`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`shipping_address_id`) REFERENCES `address` (`address_id`),
+  CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE order_item (
-    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    prod_id INT NOT NULL,
-    quantity INT NOT NULL,
-    unit_price DECIMAL(10,2) NOT NULL,
-    discount_amount DECIMAL(10,2) DEFAULT 0.00,
-    subtotal DECIMAL(12,2) NOT NULL,
-    product_name VARCHAR(255) NOT NULL,
-    product_image VARCHAR(255),
-    product_description TEXT,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (prod_id) REFERENCES product(prod_id),
-    INDEX idx_order (order_id),
-    INDEX idx_product (prod_id)
-);
+-- Create order_item table
+CREATE TABLE `order_item` (
+  `order_item_id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL,
+  `prod_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `unit_price` decimal(10,2) NOT NULL,
+  `discount_amount` decimal(10,2) DEFAULT 0.00,
+  `subtotal` decimal(12,2) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `product_image` varchar(255) DEFAULT NULL,
+  `product_description` text DEFAULT NULL,
+  PRIMARY KEY (`order_item_id`),
+  KEY `idx_order` (`order_id`),
+  KEY `idx_product` (`prod_id`),
+  CONSTRAINT `order_item_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
+  CONSTRAINT `order_item_ibfk_2` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- CART TABLE (unchanged)
-CREATE TABLE cart (
-    cart_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    INDEX idx_user (user_id)
-);
+-- Create cart table
+CREATE TABLE `cart` (
+  `cart_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `is_active` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`cart_id`),
+  KEY `idx_user` (`user_id`),
+  CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- CART ITEM TABLE (updated product_id to prod_id)
-CREATE TABLE cart_item (
-    cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    cart_id INT NOT NULL,
-    prod_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cart_id) REFERENCES cart(cart_id) ON DELETE CASCADE,
-    FOREIGN KEY (prod_id) REFERENCES product(prod_id),
-    UNIQUE KEY (cart_id, prod_id)
-);
+-- Create cart_item table
+CREATE TABLE `cart_item` (
+  `cart_item_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cart_id` int(11) NOT NULL,
+  `prod_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`cart_item_id`),
+  UNIQUE KEY `cart_id` (`cart_id`,`prod_id`),
+  KEY `prod_id` (`prod_id`),
+  CONSTRAINT `cart_item_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `cart` (`cart_id`) ON DELETE CASCADE,
+  CONSTRAINT `cart_item_ibfk_2` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- PAYMENT TABLE (enhanced with more payment methods and tracking)
-CREATE TABLE payment (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    amount DECIMAL(12,2) NOT NULL,
-    payment_method ENUM('credit_card', 'debit_card', 'paypal', 'bank_transfer', 'cash_on_delivery', 'ewallet', 'buy_now_pay_later') NOT NULL,
-    transaction_id VARCHAR(255),
-    payment_status ENUM('pending', 'completed', 'failed', 'refunded', 'partially_refunded') DEFAULT 'pending',
-    payment_date TIMESTAMP NULL,
-    receipt_url VARCHAR(255),
-    payment_details JSON,
-    failure_reason TEXT,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    INDEX idx_order (order_id),
-    INDEX idx_status (payment_status),
-    INDEX idx_transaction (transaction_id)
-);
+-- Create payment table
+CREATE TABLE `payment` (
+  `payment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL,
+  `amount` decimal(12,2) NOT NULL,
+  `payment_method` enum('credit_card','debit_card','paypal','bank_transfer','cash_on_delivery','ewallet','buy_now_pay_later') NOT NULL,
+  `transaction_id` varchar(255) DEFAULT NULL,
+  `payment_status` enum('pending','completed','failed','refunded','partially_refunded') DEFAULT 'pending',
+  `payment_date` timestamp NULL DEFAULT NULL,
+  `receipt_url` varchar(255) DEFAULT NULL,
+  `payment_details` json DEFAULT NULL,
+  `failure_reason` text DEFAULT NULL,
+  PRIMARY KEY (`payment_id`),
+  KEY `idx_order` (`order_id`),
+  KEY `idx_status` (`payment_status`),
+  KEY `idx_transaction` (`transaction_id`),
+  CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- DELIVERY TABLE (enhanced with more tracking info)
-CREATE TABLE delivery (
-    delivery_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    tracking_number VARCHAR(100),
-    delivery_status ENUM('processing', 'shipped', 'in_transit', 'out_for_delivery', 'delivered', 'returned', 'failed') DEFAULT 'processing',
-    carrier_name VARCHAR(100),
-    estimated_delivery_date DATE,
-    actual_delivery_date DATE NULL,
-    notes TEXT,
-    admin_id INT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    shipping_method VARCHAR(100),
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
-    INDEX idx_order (order_id),
-    INDEX idx_tracking (tracking_number),
-    INDEX idx_status (delivery_status)
-);
+-- Create delivery table
+CREATE TABLE `delivery` (
+  `delivery_id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL,
+  `tracking_number` varchar(100) DEFAULT NULL,
+  `delivery_status` enum('processing','shipped','in_transit','out_for_delivery','delivered','returned','failed') DEFAULT 'processing',
+  `carrier_name` varchar(100) DEFAULT NULL,
+  `estimated_delivery_date` date DEFAULT NULL,
+  `actual_delivery_date` date DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `admin_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `shipping_method` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`delivery_id`),
+  KEY `idx_order` (`order_id`),
+  KEY `idx_tracking` (`tracking_number`),
+  KEY `idx_status` (`delivery_status`),
+  KEY `admin_id` (`admin_id`),
+  CONSTRAINT `delivery_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
+  CONSTRAINT `delivery_ibfk_2` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- VOUCHER TABLE (enhanced with more voucher types)
-CREATE TABLE voucher (
-    voucher_id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    discount_type ENUM('percentage', 'fixed_amount', 'free_shipping') NOT NULL,
-    discount_value DECIMAL(10,2) NOT NULL,
-    min_order_amount DECIMAL(10,2) DEFAULT 0.00,
-    valid_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    valid_to TIMESTAMP NOT NULL,
-    max_uses INT,
-    current_uses INT DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    voucher_name VARCHAR(100),
-    description TEXT,
-    admin_id INT NOT NULL COMMENT 'Admin who created voucher',
-    FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
-    INDEX idx_code (code),
-    INDEX idx_validity (valid_from, valid_to)
-);
+-- Create voucher table
+CREATE TABLE `voucher` (
+  `voucher_id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL,
+  `discount_type` enum('percentage','fixed_amount','free_shipping') NOT NULL,
+  `discount_value` decimal(10,2) NOT NULL,
+  `min_order_amount` decimal(10,2) DEFAULT 0.00,
+  `valid_from` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `valid_to` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 30 DAY),
+  `max_uses` int(11) DEFAULT NULL,
+  `current_uses` int(11) DEFAULT 0,
+  `is_active` tinyint(1) DEFAULT 1,
+  `voucher_name` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `admin_id` int(11) NOT NULL COMMENT 'Admin who created voucher',
+  PRIMARY KEY (`voucher_id`),
+  UNIQUE KEY `code` (`code`),
+  KEY `idx_validity` (`valid_from`,`valid_to`),
+  KEY `admin_id` (`admin_id`),
+  CONSTRAINT `voucher_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- USER VOUCHER TABLE (unchanged)
-CREATE TABLE user_voucher (
-    user_voucher_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    voucher_id INT NOT NULL,
-    claimed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    used_at TIMESTAMP NULL,
-    order_id INT NULL,
-    is_used BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (voucher_id) REFERENCES voucher(voucher_id),
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    INDEX idx_user (user_id),
-    INDEX idx_voucher (voucher_id)
-);
+-- Create user_voucher table
+CREATE TABLE `user_voucher` (
+  `user_voucher_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `voucher_id` int(11) NOT NULL,
+  `claimed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `used_at` timestamp NULL DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `is_used` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`user_voucher_id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_voucher` (`voucher_id`),
+  KEY `order_id` (`order_id`),
+  CONSTRAINT `user_voucher_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `user_voucher_ibfk_2` FOREIGN KEY (`voucher_id`) REFERENCES `voucher` (`voucher_id`),
+  CONSTRAINT `user_voucher_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- PROMOTION TABLE (updated product_id to prod_id)
-CREATE TABLE promotion (
-    promotion_id INT AUTO_INCREMENT PRIMARY KEY,
-    prod_id INT NULL,
-    category_id INT NULL,
-    promo_code VARCHAR(50) NOT NULL UNIQUE,
-    discount_type ENUM('percentage', 'fixed_amount', 'buy_x_get_y') NOT NULL DEFAULT 'percentage',
-    discount_value DECIMAL(10,2) NOT NULL,
-    start_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    end_date TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 30 DAY),
-    promo_status ENUM('active', 'inactive', 'expired') DEFAULT 'active',
-    max_uses INT,
-    current_uses INT DEFAULT 0,
-    min_order_amount DECIMAL(10,2) DEFAULT 0.00,
-    admin_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    promo_name VARCHAR(100) NOT NULL,
-    promo_description TEXT,
-    FOREIGN KEY (prod_id) REFERENCES product(prod_id),
-    FOREIGN KEY (category_id) REFERENCES category(category_id),
-    FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
-    INDEX idx_product (prod_id),
-    INDEX idx_category (category_id),
-    INDEX idx_dates (start_date, end_date)
-);
+-- Create promotion table
+CREATE TABLE `promotion` (
+  `promotion_id` int(11) NOT NULL AUTO_INCREMENT,
+  `prod_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `promo_code` varchar(50) NOT NULL,
+  `discount_type` enum('percentage','fixed_amount','buy_x_get_y') NOT NULL DEFAULT 'percentage',
+  `discount_value` decimal(10,2) NOT NULL,
+  `start_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `end_date` timestamp NOT NULL DEFAULT (current_timestamp() + interval 30 day),
+  `promo_status` enum('active','inactive','expired') DEFAULT 'active',
+  `max_uses` int(11) DEFAULT NULL,
+  `current_uses` int(11) DEFAULT 0,
+  `min_order_amount` decimal(10,2) DEFAULT 0.00,
+  `admin_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `promo_name` varchar(100) NOT NULL,
+  `promo_description` text DEFAULT NULL,
+  PRIMARY KEY (`promotion_id`),
+  UNIQUE KEY `promo_code` (`promo_code`),
+  KEY `idx_product` (`prod_id`),
+  KEY `idx_category` (`category_id`),
+  KEY `idx_dates` (`start_date`,`end_date`),
+  KEY `admin_id` (`admin_id`),
+  CONSTRAINT `promotion_ibfk_1` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`),
+  CONSTRAINT `promotion_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`),
+  CONSTRAINT `promotion_ibfk_3` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- FEEDBACK TABLE (updated product_id to prod_id)
-CREATE TABLE feedback (
-    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    order_id INT NOT NULL,
-    prod_id INT NOT NULL,
-    rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    comment TEXT,
-    feedback_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_approved BOOLEAN DEFAULT FALSE,
-    admin_id INT NULL,
-    admin_response TEXT,
-    response_date TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (prod_id) REFERENCES product(prod_id),
-    FOREIGN KEY (admin_id) REFERENCES admin(admin_id),
-    INDEX idx_product (prod_id),
-    INDEX idx_user (user_id),
-    INDEX idx_rating (rating)
-);
+-- Create feedback table
+CREATE TABLE `feedback` (
+  `feedback_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `prod_id` int(11) NOT NULL,
+  `rating` tinyint(4) NOT NULL CHECK (`rating` between 1 and 5),
+  `comment` text DEFAULT NULL,
+  `feedback_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `is_approved` tinyint(1) DEFAULT 0,
+  `admin_id` int(11) DEFAULT NULL,
+  `admin_response` text DEFAULT NULL,
+  `response_date` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`feedback_id`),
+  KEY `idx_product` (`prod_id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_rating` (`rating`),
+  KEY `order_id` (`order_id`),
+  KEY `admin_id` (`admin_id`),
+  CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `feedback_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
+  CONSTRAINT `feedback_ibfk_3` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`),
+  CONSTRAINT `feedback_ibfk_4` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- WISHLIST TABLE (updated product_id to prod_id)
-CREATE TABLE wishlist (
-    wishlist_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    prod_id INT NOT NULL,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (prod_id) REFERENCES product(prod_id) ON DELETE CASCADE,
-    UNIQUE KEY (user_id, prod_id)
-);
-
--- Add primary key constraints to the tables you provided
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`admin_id`),
-  ADD UNIQUE KEY `admin_email` (`admin_email`);
-
-ALTER TABLE `category`
-  ADD PRIMARY KEY (`category_id`),
-  ADD UNIQUE KEY `category_name` (`category_name`);
-
-ALTER TABLE `product`
-  ADD PRIMARY KEY (`prod_id`),
-  ADD KEY `category_id` (`category_id`);
+-- Create wishlist table
+CREATE TABLE `wishlist` (
+  `wishlist_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `prod_id` int(11) NOT NULL,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`wishlist_id`),
+  UNIQUE KEY `user_id` (`user_id`,`prod_id`),
+  KEY `prod_id` (`prod_id`),
+  CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
