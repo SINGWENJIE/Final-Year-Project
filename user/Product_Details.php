@@ -1,5 +1,5 @@
 <?php
-require_once 'db_connection.php';
+require_once __DIR__ . '/../db_connection.php';
 
 // Check if product ID is provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -10,10 +10,10 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $product_id = intval($_GET['id']);
 
 // Fetch product details
-$product_query = "SELECT p.*, c.category_name 
-                  FROM product p 
-                  JOIN category c ON p.category_id = c.category_id 
-                  WHERE p.prod_id = ?";
+$product_query = "SELECT p.*, c.category_name
+    FROM product p
+    JOIN category c ON p.category_id = c.category_id
+    WHERE p.prod_id = ?";
 $stmt = $conn->prepare($product_query);
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
@@ -24,6 +24,7 @@ if (!$product) {
     header("Location: products.php");
     exit();
 }
+
 
 // Fetch related products (same category)
 $related_query = "SELECT prod_id, prod_name, prod_price, prod_image 
@@ -44,7 +45,7 @@ $page_title = $product['prod_name'] . " | GoGo Supermarket";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?></title>
-    <link rel="stylesheet" href="css/product_details.css">
+    <link rel="stylesheet" href="../user/css/Product_Detail.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -295,6 +296,6 @@ $page_title = $product['prod_name'] . " | GoGo Supermarket";
 
     <?php include 'footer.php'; ?>
 
-    <script src="js/product_details.js"></script>
+    <script src="../user/js/Product_Detail.js"></script>
 </body>
 </html>
