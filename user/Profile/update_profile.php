@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db_connection.php';
+require_once '../../db_connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -22,13 +22,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
     }
 
     // 更新数据库
-    $stmt = $conn->prepare("UPDATE user SET 
-        user_name = ?, 
-        email = ?, 
-        user_phone_num = ?, 
-        birth_date = ?, 
-        address = ?
-        WHERE user_id = ?");
+    $stmt = $conn->prepare("UPDATE users SET 
+    user_name = ?, 
+    email = ?, 
+    user_phone_num = ?, 
+    birth_date = ?, 
+    address = ?
+    WHERE user_id = ?");
 
     $stmt->bind_param("sssssi", 
         $username, 
@@ -40,9 +40,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
     );
 
     if ($stmt->execute()) {
-        header("Location: profile.php?success=1");
+        $_SESSION['success'] = "Profile updated successfully!";
+        header("Location: profile.php");
+        exit();
     } else {
-        echo "Error updating: " . $conn->error;
+        $_SESSION['error'] = "Error updating profile: " . $conn->error;
+        header("Location: profile.php");
+        exit();
     }
     
     $stmt->close();

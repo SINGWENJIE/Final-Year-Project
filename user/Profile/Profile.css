@@ -1,3 +1,106 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #45ad9c;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10; /* 加入这一行确保在前层 */
+}
+
+
+/* 右上角的 Login、Register 和 Shopping Cart */
+.auth-section {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.auth-links {
+    display: flex;
+    list-style: none;
+    margin-bottom: 10px; /* 让 Shopping Cart 和 Login/Register 之间有空隙 */
+}
+
+.auth-links li {
+    margin-left: 20px;
+}
+
+.auth-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.shopping-cart-link {
+    display: block;
+}
+
+.shopping-cart {
+    width: 50px;
+    height: auto;
+}
+
+/* Logo 和搜索栏 */
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.header-main img {
+    width: 180px;
+    height: 70px;
+}
+
+.search-form {
+    flex-grow: 1;
+    margin-left: 20px;
+}
+
+.search {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 28px;
+    background-color: #f6f6f6;
+}
+
+.search-input {
+    font-size: 16px;
+    font-family: 'Lexend', sans-serif;
+    color: #333333;
+    margin-left: 10px;
+    outline: none;
+    border: none;
+    background: transparent;
+    flex-grow: 1;
+}
+
+.search-input::placeholder,
+.search-icon {
+    color: rgba(0, 0, 0, 0.25);
+}
+
 /* Profile.css */
 .profile-container {
     max-width: 800px;
@@ -53,61 +156,120 @@
     margin-top: 4px;
 }
 
-.save-btn {
-    background: #45ad9c;
-    color: white;
+.action-buttons {
+    display: flex;
+    justify-content: center;  /* 水平居中 */
+    gap: 20px;                 /* 按钮之间的间距 */
+    margin-top: 30px;
+    flex-wrap: wrap;          /* 小屏幕时可以自动换行 */
+}
+
+.save-btn,
+.return-btn {
     padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
     font-size: 16px;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background 0.3s;
     display: flex;
     align-items: center;
     gap: 8px;
-    width: fit-content;
-    margin-top: 1.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Save 按钮 */
+.save-btn {
+    background-color: #39b8a9;
+    color: white;
 }
 
 .save-btn:hover {
-    background: #367F7A;
+    background-color: #2aa697;
+    transform: translateY(-2px);
 }
 
-/* 图标样式 */
-.bx {
-    font-size: 1.2em;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 2rem;
-}
-
-/* 返回按钮样式 */
+/* Back 按钮 */
 .return-btn {
-    background: #f39c12;  /* 使用品牌辅助色 */
+    background-color: #f59e0b;
     color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background 0.3s;
 }
 
 .return-btn:hover {
-    background: #e67e22;
+    background-color: #e68a00;
+    transform: translateY(-2px);
 }
 
-/* 保持保存按钮原有样式 */
-.save-btn {
-    background: #45ad9c;
-    /* 其他样式保持不变 */
+.alert {
+    padding: 10px 20px;
+    margin: 15px auto;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.success-alert {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.error-alert {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.footer-nav {
+    background-color: #45ad9c;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: space-around;
+    margin-top: auto; /* 确保固定在底部 */
+}
+
+.footer-column {
+    flex: 1;
+    max-width: 250px;
+    padding: 0 20px;
+}
+
+.footer-column h4 {
+    color: white;
+    font-family: 'Impact', sans-serif;
+    font-size: 18px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    padding-bottom: 10px;
+}
+
+.footer-column ul {
+    list-style: none;
+}
+
+.footer-column li {
+    margin-bottom: 8px;
+}
+
+.footer-column a {
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.footer-column a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.flatpickr-input {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
 }
