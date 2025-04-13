@@ -174,46 +174,46 @@ header {
     padding: 40px 0;
     display: flex;
     justify-content: center;
-  }
+}
   
-  .promo-grid {
+.promo-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 30px;
     max-width: 800px;
     width: 90%;
-  }
+}
   
-  .promo-box {
+.promo-box {
     background: #fff;
     border-radius: 15px;
     box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     padding: 20px;
     text-align: center;
     transition: transform 0.3s ease;
-  }
+}
   
-  .promo-box:hover {
+.promo-box:hover {
     transform: translateY(-5px);
-  }
+}
   
-  .promo-box img {
+.promo-box img {
     width: 100%;
     border-radius: 10px;
     margin-bottom: 15px;
-  }
+}
   
-  .promo-box h3 {
+.promo-box h3 {
     color: #00a3a1;
     margin-bottom: 10px;
-  }
+}
   
-  .promo-box p {
+.promo-box p {
     font-size: 14px;
     color: #555;
-  }
+}
   
-  .promo-box button {
+.promo-box button {
     margin-top: 10px;
     background: #00a3a1;
     color: #fff;
@@ -221,11 +221,11 @@ header {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-  }
+}
   
-  .promo-box button:hover {
+.promo-box button:hover {
     background: #008c8a;
-  }
+}
 
 .footer-nav {
     background-color: #45ad9c;
@@ -268,30 +268,4 @@ header {
 .footer-column a:hover {
     color: white;
     text-decoration: underline;
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.user-avatar {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.user-avatar img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-    border: 2px solid white;
-}
-
-.username {
-    color: white;
-    font-size: 16px;
-    font-family: 'Arial', sans-serif;
 }

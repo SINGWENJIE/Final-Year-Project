@@ -128,7 +128,7 @@ $user = $result->fetch_assoc();
             <ul>
                 <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
                 <li><a href="#">Policies</a></li>
-                <li><a href="#">Terms & Conditions</a></li>
+                <li><a href="../TermsConditions/TermsConditions.html">Terms & Conditions</a></li>
             </ul>
         </div>
 
