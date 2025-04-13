@@ -11,7 +11,7 @@ if (isset($_POST['add_category'])) {
 
 if (isset($_POST['add_product'])) {
     $category_id = $_POST['category_id'];
-    $product_name = $_POST['prod_name'];
+    $product_name = mysqli_real_escape_string($conn, $_POST['prod_name']);
     $price = $_POST['prod_price'];
     $stock = $_POST['stock'];  
     $image = $_FILES['prod_image']['name'];
@@ -61,9 +61,6 @@ if (isset($_GET['delete_category'])) {
     }
     exit();
 }
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -73,6 +70,7 @@ if (isset($_GET['delete_category'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Category & Product</title>
     <link rel="stylesheet" href="../assets/css/Category&product.css">
+    <link rel="stylesheet" href="../assets/css/Global_style.css">
 </head>
 <body>
 <div class="dashboard-container">
@@ -115,11 +113,16 @@ if (isset($_GET['delete_category'])) {
         <?php
         $categories = $conn->query("SELECT * FROM category");
         while ($row = $categories->fetch_assoc()) { ?>
-        <div class="card">
-            <p><?= $row['category_name'] ?></p>
-            <button onclick="window.location.href='../admin/Siderbar_Category_Product.php?category_id=<?= $row['category_id'] ?>'">Manage Products</button>
-            <button onclick="confirmDeleteCategory(<?= $row['category_id'] ?>)">Delete Category</button> 
-        </div>
+       <div class="card">
+    <p><?= $row['category_name'] ?></p>
+    <button onclick="window.location.href='../admin/Siderbar_Category_Product.php?category_id=<?= $row['category_id'] ?>'">
+        <img src="../assets/images/manage.png" alt="Manage Products" class="icon-btn">
+    </button>
+    <button onclick="confirmDeleteCategory(<?= $row['category_id'] ?>)">
+    <img src="../assets/images/delete.png" alt="Delete" class="icon-btn">
+    </button>
+</div>
+
     <?php } ?>
 </div>
 
@@ -163,7 +166,10 @@ if (isset($_GET['category_id'])) {
         while ($row = $products->fetch_assoc()) { ?>
             <div class="card">
                 <p><?= $row['prod_name'] ?></p>
-                <button onclick="confirmDelete(<?= $row['prod_id'] ?>, <?= $category_id ?>)">Delete</button>
+                <button onclick="confirmDelete(<?= $row['prod_id'] ?>, <?= $category_id ?>)">
+                <img src="../assets/images/delete.png" alt="Delete" class="icon-btn">
+</button>
+
             </div>
     <?php 
         }

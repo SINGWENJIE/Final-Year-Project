@@ -1,0 +1,124 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f9;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh; 
+}
+
+.sidebar {
+    width: 250px; 
+    min-height: 100vh; 
+    background-color: white;
+    color: black;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: rgb(241, 240, 240);
+}
+
+.logo img {
+    width: 150px;
+    margin-bottom: 20px;
+}
+
+.profile {
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dfdfdf; 
+    width: 100%; 
+    margin-bottom: 15px;
+}
+
+.profile img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid rgb(43, 151, 117);
+    padding: 5px;
+}
+
+.profile p {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0 0;
+}
+
+.admin_role {
+    font-size: 14px;
+    background: #16a085;
+    padding: 4px 10px;
+    border-radius: 15px;
+    display: inline-block;
+    margin-top: 5px;
+    color: white;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+nav ul li {
+    margin: 15px 0;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: black;
+    font-size: 16px;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: rgb(33, 131, 100);
+    color: white;
+}
+
+nav ul li a img {
+    width: 24px; 
+    height: 24px;
+    transition: 0.3s;
+}
+
+.header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.logout-btn {
+    background: #ffabab;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background-color: red;
+}
+
+.container {
+    width: 100%;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}

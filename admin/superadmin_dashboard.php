@@ -17,17 +17,17 @@ $admin_query = "SELECT COUNT(admin_id) AS total_admins FROM admin";
 $admin_result = $conn->query($admin_query);
 $total_admins = $admin_result->fetch_assoc()['total_admins'];
 
-$order_query = "SELECT COUNT(order_id) AS total_orders FROM `order`";
+$order_query = "SELECT COUNT(order_id) AS total_orders FROM `orders`";
 $order_result = $conn->query($order_query);
 $total_orders = $order_result->fetch_assoc()['total_orders'];
 
-$customer_query = "SELECT COUNT(user_id) AS total_user FROM user";
+$customer_query = "SELECT COUNT(user_id) AS total_user FROM users";
 $customer_result = $conn->query($customer_query);
 $total_customers = $customer_result->fetch_assoc()['total_user'];
 
-$payment_query = "SELECT COALESCE(SUM(total_price), 0) AS total_payments FROM `order`";
+$payment_query = "SELECT COALESCE(SUM(total_amount), 0) AS total_amount FROM `orders`";
 $payment_result = $conn->query($payment_query);
-$total_payments = $payment_result->fetch_assoc()['total_payments'];
+$total_payments = $payment_result->fetch_assoc()['total_amount'];
 
 $conn->close();
 ?>
@@ -39,6 +39,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Superadmin Dashboard</title>
     <link rel="stylesheet" href="../assets/css/dashboard_Style.css">
+    <link rel="stylesheet" href="../assets/css/Global_style.css">
 </head>
 
 <body>
@@ -51,7 +52,7 @@ $conn->close();
 
             <div class="profile">
                 <img src="../assets/images/superadmin_photo.png" alt="Superadmin Photo">
-                <p><span class="role"><?php echo $role; ?></span></p>
+                <p><span class="admin_role"><?php echo $role; ?></span></p>
 
             </div>
 
@@ -99,12 +100,14 @@ $conn->close();
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT o.order_id, u.user_name, p.prod_quantity, o.total_price, o.order_status 
-                FROM `order` AS o
-                JOIN product AS p ON o.prod_id = p.prod_id
-                JOIN user AS u ON o.user_id = u.user_id
-                ORDER BY o.order_id DESC 
-                LIMIT 4";
+                $sql = "SELECT oi.order_id,u.user_name,oi.quantity,SUM(o.total_amount) AS total_amount,o.order_status
+                FROM order_item AS oi
+                JOIN orders AS o ON oi.order_id = o.order_id
+                JOIN users AS u ON o.user_id = u.user_id
+                ORDER BY oi.order_id DESC
+                
+                LIMIT 4;";
+
                 $result = $conn->query($sql);
                 ?>
                 <table>
@@ -122,8 +125,8 @@ $conn->close();
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>
                                         <td>{$row['user_name']}</td>
-                                        <td>{$row['order_quantity']}</td>
-                                        <td>\${$row['total_price']}</td>
+                                        <td>{$row['quantity']}</td>
+                                        <td>RM{$row['total_amount']}</td>
                                         <td>{$row['order_status']}</td>
                                       </tr>";
                             }

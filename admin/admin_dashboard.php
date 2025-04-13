@@ -15,17 +15,22 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$order_query = "SELECT COUNT(order_id) AS total_orders FROM `order`";
+$order_query = "SELECT COUNT(order_id) AS total_orders FROM `orders`";
 $order_result = $conn->query($order_query);
 $total_orders = $order_result->fetch_assoc()['total_orders'];
 
-$customer_query = "SELECT COUNT(user_id) AS total_user FROM user";
+$customer_query = "SELECT COUNT(user_id) AS total_user FROM users";
 $customer_result = $conn->query($customer_query);
 $total_customers = $customer_result->fetch_assoc()['total_user'];
 
-$payment_query = "SELECT COALESCE(SUM(total_price), 0) AS total_payments FROM `order`";
+$payment_query = "SELECT COALESCE(SUM(total_amount), 0) AS total_amount FROM `orders`";
 $payment_result = $conn->query($payment_query);
-$total_payments = $payment_result->fetch_assoc()['total_payments'];
+$total_payments = 0;
+if ($payment_result && $row = $payment_result->fetch_assoc()) {
+    $total_payments = $row['total_amount'];
+}
+
+
 
 $conn->close();
 ?>
@@ -37,6 +42,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../assets/css/dashboard_Style.css">
+    <link rel="stylesheet" href="../assets/css/Global_style.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -47,7 +53,7 @@ $conn->close();
             
             <div class="profile">
                 <img src="../assets/images/admin.png" alt="Admin foto">
-                <p><span class="role"><?php echo $role; ?></span></p>
+                <p><span class="admin_role"><?php echo $role; ?></span></p>
             </div>
             <nav>
                 <ul>
@@ -76,6 +82,7 @@ $conn->close();
                 <div class="card">
                     <h3>Total Payments</h3>
                     <p>$<?php echo number_format($total_payments, 2); ?></p>
+
                 </div>
             </div>
 
@@ -86,12 +93,15 @@ $conn->close();
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT o.order_id, u.user_name, p.prod_quantity, o.total_price, o.order_status 
-                        FROM `order` AS o
-                        JOIN product AS p ON o.prod_id = p.prod_id
-                        JOIN user AS u ON o.user_id = u.user_id
-                        ORDER BY o.order_id DESC 
-                        LIMIT 4";
+                $sql = "SELECT o.order_id, u.user_name, SUM(oi.quantity) AS prod_quantity, SUM(o.total_amount) AS total_amount, o.order_status 
+                FROM `orders` AS o
+                JOIN order_item AS oi ON o.order_id = oi.order_id 
+                JOIN users AS u ON o.user_id = u.user_id
+                GROUP BY o.order_id, u.user_name, o.total_amount, o.order_status
+                ORDER BY o.order_id DESC 
+                LIMIT 4";
+
+        
                 $result = $conn->query($sql);
                 ?>
                 <table>
@@ -110,7 +120,7 @@ $conn->close();
                                 echo "<tr>
                                     <td>{$row['user_name']}</td>
                                     <td>{$row['prod_quantity']}</td>
-                                    <td>\${$row['total_price']}</td>
+                                    <td>RM{$row['total_amount']}</td>
                                     <td>{$row['order_status']}</td>
                                   </tr>";
                             }

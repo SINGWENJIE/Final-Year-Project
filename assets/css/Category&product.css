@@ -1,128 +1,3 @@
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f6f9;
-}
-
-.dashboard-container {
-    display: flex;
-    height: 100vh; 
-}
-
-.sidebar {
-    width: 250px; 
-    min-height: 100vh; 
-    background-color: white;
-    color: black;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.main-content {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: rgb(241, 240, 240);
-}
-
-.logo img {
-    width: 150px;
-    margin-bottom: 20px;
-}
-
-.profile {
-    text-align: center;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #dfdfdf; 
-    width: 100%; 
-    margin-bottom: 15px;
-}
-
-.profile img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 2px solid rgb(43, 151, 117);
-    padding: 5px;
-}
-
-.profile p {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 10px 0 0;
-}
-
-.admin_role {
-    font-size: 14px;
-    background: #16a085;
-    padding: 4px 10px;
-    border-radius: 15px;
-    display: inline-block;
-    margin-top: 5px;
-    color: white;
-}
-
-nav ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-}
-
-nav ul li {
-    margin: 15px 0;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: black;
-    font-size: 16px;
-    display: block;
-    padding: 10px;
-    border-radius: 5px;
-    transition: 0.3s;
-}
-
-nav ul li a:hover {
-    background-color: rgb(33, 131, 100);
-    color: white;
-}
-
-nav ul li a img {
-    width: 24px; 
-    height: 24px;
-    transition: 0.3s;
-}
-
-.header {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.logout-btn {
-    background: #ffabab;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.logout-btn:hover {
-    background-color: red;
-}
-
-.container {
-    width: 100%;
-    margin: 20px auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
 form {
     display: flex;
     align-items: center;
@@ -174,6 +49,16 @@ button:hover {
     height: 100px;
     object-fit: cover;
 }
+/* 针对 delete 和 manage 按钮的图标进行尺寸调整 */
+.card button img {
+    width: 20px;  /* 调整图标宽度 */
+    height: 20px; /* 调整图标高度 */
+}
+
+/* 当鼠标悬停时，保持图标放大的效果 */
+.card button img:hover {
+    transform: scale(1.2); 
+}
 
 .card p {
     font-size: 22px;
@@ -182,7 +67,8 @@ button:hover {
 }
 
 .card button:not(.delete-btn) {
-    background: #16a085;
+    background-color: #e9eae9;
+    
     color: white;
     border: none;
     padding: 6px 12px;
@@ -207,27 +93,6 @@ button:hover {
     background-color: darkred;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: white;
-}
-
-th, td {
-    padding: 8px;
-    text-align: center;
-    border: 1px solid black;
-}
-
-th {
-    background: #2ad3b2;
-    color: black;
-}
-
-tr:hover {
-    background: #f1f1f1;
-}
 
 #adminForm {
     display: none;
@@ -263,3 +128,4 @@ input {
 .icon-btn:hover {
     transform: scale(1.2); 
 }
+

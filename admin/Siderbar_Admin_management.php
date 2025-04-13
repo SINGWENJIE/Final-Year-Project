@@ -48,6 +48,7 @@ $admins = $conn->query("SELECT * FROM admin");
 <head>
     <title>Admin Management</title>
     <link rel="stylesheet" href="../assets/css/Admin_Management.css">
+    <link rel="stylesheet" href="../assets/css/Global_style.css">
 </head>
 
 <body>
@@ -60,7 +61,7 @@ $admins = $conn->query("SELECT * FROM admin");
                 <img src="../assets/images/superadmin_photo.png" alt="Admin Photo">
                 <p>
                     <a href="../admin/superadmin_dashboard.php" id="roleDirect">
-                        <span class="role"><?php echo $role; ?></span>
+                        <span class="admin_role"><?php echo $role; ?></span>
                     </a>
                 </p>
             </div>
