@@ -42,36 +42,50 @@
 
             <h1>Register gogo_supermarket</h1>
             <div class="divider"></div>
+                        <h2>
+                <img src="../../image/logoname(green).png" alt="GOGO Logo">
+            </h2>
 
             <div class="input-box">
-                <!-- 添加 name="username" ✅ -->
                 <input type="text" name="username" placeholder="Username" required>
-                <i class='bx bx-user'></i>
-              </div>
+                <i class='bx bx-user left-icon'></i> <!-- 添加 left-icon 类 -->
+            </div>
             
-              <div class="input-box">
-                <!-- 添加 name="phone" ✅ -->
+            <div class="input-box">
                 <input type="tel" name="phone" placeholder="Phone Number" required>
-                <i class='bx bxs-phone'></i>
-              </div>
+                <i class='bx bxs-phone left-icon'></i>
+            </div>
             
-              <div class="input-box">
-                <!-- 添加 name="email" ✅ -->
+            <div class="input-box">
                 <input type="email" name="email" placeholder="Email" required>
-                <i class='bx bx-envelope'></i>
-              </div>
+                <i class='bx bx-envelope left-icon'></i>
+            </div>
             
-              <div class="input-box">
-                <!-- 添加 name="password" 和 id="password" ✅ -->
+            <div class="input-box">
                 <input type="password" name="password" id="password" placeholder="Password" required>
-                <i class='bx bx-lock-alt'></i>
-              </div>
+                <i class='bx bx-lock-alt left-icon'></i>
+                <i class='bx bx-hide show-hide'></i> <!-- 单独添加眼睛图标 -->
+            </div>
             
-              <div class="input-box">
-                <!-- 添加 name="confirm_password" ✅ -->
+            <div class="input-box">
                 <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-                <i class='bx bx-lock-alt'></i>
-              </div>
+                <i class='bx bx-lock-alt left-icon'></i>
+                <i class='bx bx-hide show-hide'></i>
+            </div>            
+
+            <script>
+                // JavaScript保持不变
+                document.querySelectorAll('.show-hide').forEach(icon => {
+                    icon.addEventListener('click', function() {
+                        const input = this.previousElementSibling.previousElementSibling;
+                        const isPassword = input.type === 'password';
+                        
+                        input.type = isPassword ? 'text' : 'password';
+                        this.classList.toggle('bx-hide');
+                        this.classList.toggle('bx-show');
+                    });
+                });
+                </script>
 
             <!-- ✅ 在提交按钮前添加密码规则提示 -->
             <div class="password-rules" style="margin:15px 0; color:#666; font-size:12px; text-align:left;">

@@ -47,16 +47,29 @@
             </h2>
 
             <div class="input-box">
-                <!-- 添加 name="username" ✅ -->
                 <input type="text" name="username" placeholder="Username" required>
-                <i class='bx bx-user'></i>
+                <i class='bx bx-user left-icon'></i> <!-- 左侧图标 -->
             </div>
             
             <div class="input-box">
-                <!-- 添加 name="password" ✅ -->
-                <input type="password" name="password" placeholder="Password" required>
-                <i class='bx bx-lock-alt'></i>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                <i class='bx bx-lock-alt left-icon'></i> <!-- 左侧锁图标 -->
+                <i class='bx bx-hide eye-icon'></i> <!-- 右侧眼睛图标 -->
             </div>
+
+            <script>
+                // 添加密码显示切换功能
+                document.querySelectorAll('.eye-icon').forEach(icon => {
+                    icon.addEventListener('click', function() {
+                        const input = this.previousElementSibling.previousElementSibling;
+                        const isPassword = input.type === 'password';
+                        
+                        input.type = isPassword ? 'text' : 'password';
+                        this.classList.toggle('bx-hide');
+                        this.classList.toggle('bx-show');
+                    });
+                });
+            </script>
 
             <button type="submit" class="btn">Login</button>
 

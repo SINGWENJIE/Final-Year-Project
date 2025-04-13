@@ -123,19 +123,36 @@ header {
 
 .input-box input {
     width: 100%;
-    padding: 10px;
-    padding-left: 40px;
+    padding: 10px 40px 10px 40px; /* 左右对称留出空间 */
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
 }
 
-.input-box i {
+/* 左侧图标专用样式 */
+.input-box .left-icon {
     position: absolute;
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
     color: #777;
+    pointer-events: none; /* 防止点击图标影响输入框 */
+}
+
+/* 右侧眼睛专用样式 */
+.input-box .show-hide {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #777;
+    transition: 0.3s;
+    z-index: 2; /* 确保在输入框上方 */
+}
+
+.input-box .show-hide:hover {
+    color: #333;
 }
 
 .btn {
