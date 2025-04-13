@@ -3,12 +3,12 @@ session_start();
 require_once 'db_connection.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: Login.php");
+    header("Location: ../Login/Login.php");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT * FROM user WHERE user_id = ?");
+$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();

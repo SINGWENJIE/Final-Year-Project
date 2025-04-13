@@ -139,28 +139,6 @@ header {
     color: #777;
 }
 
-.remember-forget {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.remember-forget label {
-    font-size: 14px;
-    color: #555;
-}
-
-.remember-forget a {
-    font-size: 14px;
-    color: #45ad9c;
-    text-decoration: none;
-}
-
-.remember-forget a:hover {
-    text-decoration: underline;
-}
-
 .btn {
     width: 100%;
     padding: 10px;

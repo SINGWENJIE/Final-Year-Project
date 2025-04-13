@@ -1,32 +1,54 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = new mysqli("localhost", "root", "", "gogo_supermarket");
-    
-    // 验证密码复杂度
+
+    if ($conn->connect_error) {
+        die("Database connection failed: " . $conn->connect_error);
+    }
+
+    // Validate inputs
+    $username = $conn->real_escape_string($_POST['username']);
+    $email = $conn->real_escape_string($_POST['email']);
     $password = $_POST['password'];
+    $phone = $conn->real_escape_string($_POST['phone'] ?? null);
+
+    // Password validation
     if (!preg_match('/^(?=.*[!@#$%^&*])(?=.*\d).{8,}$/', $password)) {
-        die("The password must contain at least 1 special character, 1 number, and be at least 8 characters long");
+        die("Password must contain: 1 special character, 1 number, 8+ length");
     }
 
-    // 检查重复密码
     if ($password !== $_POST['confirm_password']) {
-        die("Password not match");
+        die("Passwords do not match");
     }
 
-    // 哈希密码
-    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+    // Check for existing email or username
+    $check = $conn->prepare("SELECT email, user_name FROM users WHERE email = ? OR user_name = ?");
+    $check->bind_param("ss", $email, $username);
+    $check->execute();
+    $result = $check->get_result();
 
-    // 预处理语句防止SQL注入
-    $stmt = $conn->prepare("INSERT INTO user (user_name, email, user_password, user_phone_num) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $_POST['username'], $_POST['email'], $hashed_password, $_POST['phone']);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        header("Location: Register.html?error=" . ($row['email'] === $email ? "email_exists" : "username_exists"));
+        exit();
+    }
+
+    // Insert new user
+    $hashed_pw = password_hash($password, PASSWORD_BCRYPT);
+    $stmt = $conn->prepare("INSERT INTO users (user_name, email, user_password, user_phone_num) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $username, $email, $hashed_pw, $phone);
 
     if ($stmt->execute()) {
-        header("Location: Login.html?register=success");
+        header("Location: ../Login/Login.html?register=success");
     } else {
-        echo "Registration failde: " . $conn->error;
+        header("Location: Register.html?error=database_error");
     }
-    
+
     $stmt->close();
+    $check->close();
     $conn->close();
 }
 ?>

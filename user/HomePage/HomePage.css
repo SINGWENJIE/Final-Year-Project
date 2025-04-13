@@ -14,11 +14,13 @@ body {
 
 header {
     background-color: #45ad9c;
-    padding: 50px 20px 10px;
+    padding: 10px 20px;
     display: flex;
     flex-direction: column;
-    position: relative; /* 用于定位右上角的元素 */
+    position: relative;
+    z-index: 10; /* 加入这一行确保在前层 */
 }
+
 
 /* 右上角的 Login、Register 和 Shopping Cart */
 .auth-section {
@@ -99,10 +101,131 @@ header {
     color: rgba(0, 0, 0, 0.25);
 }
 
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin-top: 10px;
+}
 
+.nav-links li {
+    margin-left: 20px;
+}
 
+.nav-links li a {
+    font-size: 20px;
+    font-family: 'Impact', sans-serif;
+    text-decoration: none;
+    color: white;
+}
 
+.container {
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
 
+/* 外层滑动容器 */
+.slider-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 内层滑动图片排列成横排 */
+.slider {
+    display: flex;
+    width: 100%; /* 因为有3张图 */
+    transition: transform 0.5s ease-in-out;
+}
+.slider img {
+    flex: 0 0 100%;
+    width: 100%;
+    height: auto;
+}
+
+/* 导航圆点容器 */
+.slider-nav {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+/* 每个圆点 */
+.slider-nav a {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+/* 当前激活的圆点 */
+.slider-nav a.active {
+    background: white;
+}
+
+.promo-section {
+    background-color: #f0f6f8;
+    padding: 40px 0;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .promo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    max-width: 800px;
+    width: 90%;
+  }
+  
+  .promo-box {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .promo-box:hover {
+    transform: translateY(-5px);
+  }
+  
+  .promo-box img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .promo-box h3 {
+    color: #00a3a1;
+    margin-bottom: 10px;
+  }
+  
+  .promo-box p {
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .promo-box button {
+    margin-top: 10px;
+    background: #00a3a1;
+    color: #fff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  .promo-box button:hover {
+    background: #008c8a;
+  }
 
 .footer-nav {
     background-color: #45ad9c;

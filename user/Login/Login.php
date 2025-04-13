@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
 
     // 查询用户
-    $stmt = $conn->prepare("SELECT user_id, user_password FROM user WHERE user_name = ?");
+    $stmt = $conn->prepare("SELECT user_id, user_password FROM users WHERE user_name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -25,12 +25,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $result->fetch_assoc();
         if (password_verify($password, $user['user_password'])) {
             $_SESSION['user_id'] = $user['user_id'];
-            header("Location: MainPage.html");
+            header("Location: ../MainPage/MainPage.html");
         } else {
-            echo "<script>alert('Incorrect Password！'); window.location='Login.html';</script>";
+            echo "<script>alert('Incorrect Password！'); window.location='../MainPage/MainPage.html';</script>";
         }
     } else {
-        echo "<script>alert('The user does not exist.！'); window.location='Login.html';</script>";
+        echo "<script>alert('The user does not exist.！'); window.location='../MainPage/MainPage.html';</script>";
     }
     
     $stmt->close();

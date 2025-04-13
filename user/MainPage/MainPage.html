@@ -3,9 +3,8 @@
 
 <head>
     <title>GOGO | Shop Conveniently</title>
-    <link rel="icon" type="image" href="image/GOGO.png">
+    <link rel="icon" type="image" href="../../image/GOGO.png">
     <link rel="stylesheet" href="MainPage.css">
-    <link rel="stylesheet" href="MainPage.js">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
 </head>
 
@@ -13,18 +12,16 @@
     <header>
         <div class="auth-section">
             <ul class="auth-links">
-                <li><a href="Login.html">Login</a></li>
-                <li><a href="Register.html">Register</a></li>
-                <li><a href="Profile.php">Profile</a></li>
+                <li><a href="../Profile/Profile.php">Profile</a></li>
             </ul>
             <a href="ShoppingCart.html" class="shopping-cart-link">
-                <img src="image/cart.png" alt="Cart" class="shopping-cart">
+                <img src="../../image/cart.png" alt="Cart" class="shopping-cart">
             </a>
         </div>
 
         <div class="header-main">
             <a href="MainPage.html">
-                <img src="image/gogoname.png" alt="GOGO Logo">
+                <img src="../../image/gogoname.png" alt="GOGO Logo">
             </a>
             <form class="search-form">
                 <div class="search">
@@ -37,7 +34,7 @@
         <nav>
             <ul class="nav-links">
                 <li><a href="MainPage.html">Menu</a></li>
-                <li><a href="AboutUs.html">About GOGO</a></li>
+                <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
                 <li><a href="CustomerService.html">Customer Service</a></li>
             </ul>
         </nav>
@@ -67,15 +64,15 @@
     <section class="container">
         <div class="slider-wrapper">
             <div class="slider">
-                <img id="slide-1" src="image/Slide-1.png">
-                <img id="slide-2" src="image/Slide-2.jpg">
-                <img id="slide-3" src="image/Slide-3.jpg">
+                <img src="../../image/Slide-1.png" alt="广告1">
+                <img src="../../image/Slide-2.jpg" alt="广告2">
+                <img src="../../image/Slide-3.jpg" alt="广告3">
             </div>
-
+    
             <div class="slider-nav">
-                <a href="#slide-1"></a>
-                <a href="#slide-2"></a>
-                <a href="#slide-3"></a>
+                <a class="active"></a>
+                <a></a>
+                <a></a>
             </div>
         </div>
     </section>
@@ -84,7 +81,7 @@
         <div class="footer-column">
             <h4>GOGO</h4>
             <ul>
-                <li><a href="AboutUs.html">About GOGO</a></li>
+                <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
                 <li><a href="#">Policies</a></li>
                 <li><a href="#">Terms & Conditions</a></li>
             </ul>
@@ -107,7 +104,58 @@
             </ul>
         </div>
     </div>
-
 </body>
+
+<script>
+    // 修复后的核心逻辑
+    let currentIndex = 0;
+    const slider = document.querySelector('.slider');
+    const dots = document.querySelectorAll('.slider-nav a');
+    let autoSlideInterval;
+    
+    // 修正切换计算
+    function updateSlide() {
+    const translateValue = -currentIndex * (100); // 精确到小数点后两位
+    slider.style.transform = `translateX(${translateValue}%)`;
+    // 强制硬件加速优化
+    slider.style.willChange = 'transform'; 
+    }
+    
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % 3;
+        updateSlide();
+    }
+    
+    // 强化点击事件处理
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', (e) => {
+            e.preventDefault();
+            clearInterval(autoSlideInterval);
+            currentIndex = index;
+            updateSlide();
+            autoSlideInterval = setInterval(nextSlide, 5000);
+        });
+    });
+    
+    // 可靠自动播放控制
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+            currentIndex = (currentIndex + 1) % 3;
+            updateSlide();
+        }, 5000);
+    }
+    
+    // 初始化
+    startAutoSlide();
+    
+    // 优化窗口焦点管理
+    window.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(autoSlideInterval);
+        } else {
+            startAutoSlide();
+        }
+    });
+</script>
 
 </html>
