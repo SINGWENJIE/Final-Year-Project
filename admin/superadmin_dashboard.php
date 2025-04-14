@@ -89,7 +89,7 @@ $conn->close();
                 </div>
                 <div class="card">
                     <h3>Total Payments</h3>
-                    <p>$<?php echo number_format($total_payments, 2); ?></p>
+                    <p>RM <?php echo number_format($total_payments, 2); ?></p>
                 </div>
             </div>
 
@@ -100,14 +100,15 @@ $conn->close();
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT oi.order_id,u.user_name,oi.quantity,SUM(o.total_amount) AS total_amount,o.order_status
-                FROM order_item AS oi
-                JOIN orders AS o ON oi.order_id = o.order_id
+                $sql = "SELECT o.order_id, u.user_name, SUM(oi.quantity) AS prod_quantity, SUM(o.total_amount) AS total_amount, o.order_status 
+                FROM `orders` AS o
+                JOIN order_item AS oi ON o.order_id = oi.order_id 
                 JOIN users AS u ON o.user_id = u.user_id
-                ORDER BY oi.order_id DESC
-                
-                LIMIT 4;";
+                GROUP BY o.order_id, u.user_name, o.total_amount, o.order_status
+                ORDER BY o.order_id DESC 
+                LIMIT 4";
 
+        
                 $result = $conn->query($sql);
                 ?>
                 <table>
@@ -124,11 +125,11 @@ $conn->close();
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>
-                                        <td>{$row['user_name']}</td>
-                                        <td>{$row['quantity']}</td>
-                                        <td>RM{$row['total_amount']}</td>
-                                        <td>{$row['order_status']}</td>
-                                      </tr>";
+                                    <td>{$row['user_name']}</td>
+                                    <td>{$row['prod_quantity']}</td>
+                                    <td>RM{$row['total_amount']}</td>
+                                    <td>{$row['order_status']}</td>
+                                  </tr>";
                             }
                         } else {
                             echo "<tr><td colspan='4'>No recent orders</td></tr>";
@@ -139,14 +140,12 @@ $conn->close();
             </div>
         </main>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelector(".logout-btn").addEventListener("click", function() {
-                window.location.href = "../admin/logout.php";
+                window.location.href = "../admin/logout.php"; 
             });
         });
     </script>
 </body>
-
 </html>
