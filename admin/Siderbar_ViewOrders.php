@@ -2,6 +2,18 @@
 session_start();
 include '../db_connection.php';
 
+//update status
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_id']) && isset($_POST['order_status'])) {
+    $order_id = $_POST['order_id'];
+    $order_status = $_POST['order_status'];
+
+    $update_sql = "UPDATE `orders` SET order_status = '$order_status' WHERE order_id = '$order_id'";
+    if ($conn->query($update_sql) === TRUE) {
+        echo "<script>alert('Order status updated successfully');</script>";
+    } else {
+        echo "<script>alert('Failed to update order status');</script>";
+    }
+}
 //Fetch order details for a specific user
 function getOrderDetails($conn, $user_id)
 {
@@ -44,7 +56,7 @@ function getOrderDetails($conn, $user_id)
     return $order_details;
 }
 
-                            /*get order status*/
+/*get order status*/
 function getOrderStatuses($conn)
 {
     $sql_enum = "SELECT COLUMN_TYPE 
@@ -64,7 +76,7 @@ function getOrderStatuses($conn)
     }
 }                           /*get order status*/
 
-                            /*view order table*/
+/*view order table*/
 if (isset($_GET['ajax']) && isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
     $orders = getOrderDetails($conn, $user_id);
@@ -75,23 +87,23 @@ if (isset($_GET['ajax']) && isset($_GET['user_id'])) {
         echo "<table class='order-details-table'>";
         echo "<thead><tr><th>Product</th><th>Quantity</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>";
         echo "<tbody>";
-        
+
         $rowspan = count($order['items']);
         $firstRow = true;
         foreach ($order['items'] as $item) {
             echo "<tr>";
-            
+
             echo "<td>{$item['product_name']}</td>";
-            
+
             echo "<td>{$item['quantity']}</td>";
-            
+
             echo "<td>RM {$item['total_price']}</td>";
-            
+
             if ($firstRow) {
                 echo "<td rowspan='{$rowspan}'>{$order['order_status']}</td>";
                 echo "<td rowspan='{$rowspan}'>{$order['order_date']}</td>";
             }
-            
+
             echo "</tr>";
             $firstRow = false;
         }
@@ -101,8 +113,8 @@ if (isset($_GET['ajax']) && isset($_GET['user_id'])) {
     }
     exit;
 }
-                                /*view order table*/
-$orderStatuses = getOrderStatuses($conn); 
+/*view order table*/
+$orderStatuses = getOrderStatuses($conn);
 ?>
 
 
@@ -171,7 +183,7 @@ $orderStatuses = getOrderStatuses($conn);
                         </tr>
                     </thead>
                     <tbody>
-                        
+
                         <?php
                         //search fucntion
                         $search = $_GET['search'] ?? '';
@@ -181,16 +193,16 @@ $orderStatuses = getOrderStatuses($conn);
                      FROM `orders` o
                      JOIN `users` u ON o.user_id = u.user_id";
 
-                    
+
                         if ($search !== '') {
-                            $search = trim($search); 
+                            $search = trim($search);
                             $sql = "SELECT o.order_id, u.user_name, o.total_amount, o.order_status, o.order_date, o.user_id
                                     FROM `orders` o
                                     JOIN `users` u ON o.user_id = u.user_id
                                     WHERE o.order_id LIKE ? OR u.user_name LIKE ?"; //orde id and user name
                             $stmt = $conn->prepare($sql);
-                            $searchParam = "%$search%"; 
-                            $stmt->bind_param("ss", $searchParam, $searchParam); 
+                            $searchParam = "%$search%";
+                            $stmt->bind_param("ss", $searchParam, $searchParam);
                         } else {
                             $sql = "SELECT o.order_id, u.user_name, o.total_amount, o.order_status, o.order_date, o.user_id
                                     FROM `orders` o
@@ -200,16 +212,15 @@ $orderStatuses = getOrderStatuses($conn);
 
                         $stmt->execute();
                         $result = $stmt->get_result();
-                                            //search fucntion
+                        //search fucntion
 
-                                            //order table
+                        //order table
                         if ($result && $result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>";
                                 echo "<td>" . $row['order_id'] . "</td>";
                                 echo "<td>" . $row['user_name'] . "</td>";
                                 echo "<td>RM " . number_format($row['total_amount'], 2) . "</td>";
-
                                 echo "<td>";
                                 echo "<form method='POST' action='' id='statusForm_{$row['order_id']}'>";
                                 echo "<input type='hidden' name='order_id' value='" . $row['order_id'] . "'>";
@@ -221,23 +232,24 @@ $orderStatuses = getOrderStatuses($conn);
                                 echo "</select>";
                                 echo "</form>";
                                 echo "</td>";
-
                                 echo "<td>" . $row['order_date'] . "</td>";
                                 echo "<td><a href='javascript:void(0);' class='view-order-btn' onclick='showOrderDetails(" . $row['user_id'] . ")'>View Orders</a></td>";
                                 echo "</tr>";
                             }
                         }
-                                            //order table
+                        //order table
                         ?>
                     </tbody>
                 </table>
             </div>
 
             <script>
-                //change order status
                 function submitForm(orderId) {
-                    document.getElementById('statusForm_' + orderId).submit();
+                    // Submit the form when the status changes
+                    var form = document.getElementById('statusForm_' + orderId);
+                    form.submit();
                 }
+
 
                 // view order,ajax
                 function showOrderDetails(userId) {
