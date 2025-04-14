@@ -25,36 +25,32 @@ header {
 /* 右上角的 Login、Register 和 Shopping Cart */
 .auth-section {
     position: absolute;
-    top: 10px;
-    right: 20px;
+    top: 15px;  /* 微调垂直位置 */
+    right: 40px;  /* 从右边往左移 */
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    align-items: center;  /* 保持元素垂直居中 */
+    gap: 30px;  /* 控制文字链接和购物车的间距 */
 }
 
 .auth-links {
     display: flex;
     list-style: none;
-    margin-bottom: 10px; /* 让 Shopping Cart 和 Login/Register 之间有空隙 */
+    margin: 0;
+    padding: 0;
+    gap: 25px;  /* 控制文字链接之间的间距 */
 }
 
-.auth-links li {
-    margin-left: 20px;
-}
-
-.auth-links li a {
+.auth-links a {
     color: white;
     text-decoration: none;
     font-size: 18px;
-}
-
-.shopping-cart-link {
-    display: block;
+    font-family: Arial, sans-serif;  /* 根据截图添加字体 */
 }
 
 .shopping-cart {
-    width: 50px;
+    width: 40px;  /* 根据截图缩小图标 */
     height: auto;
+    margin-top: -3px;  /* 微调图标垂直对齐 */
 }
 
 /* Logo 和搜索栏 */
