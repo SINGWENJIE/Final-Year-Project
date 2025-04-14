@@ -224,6 +224,103 @@ header {
 .slider-nav a.active {
     background: white;
 }
+
+.category-carousel {
+    padding: 2rem 5%;
+}
+
+.category-section {
+    margin-bottom: 3rem;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0 1rem;
+}
+
+.category-header h2 {
+    font-size: 1.8rem;
+    color: #e74c3c;
+    margin: 0;
+}
+
+.more-btn {
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+
+.more-btn:hover {
+    background: #f0fff4;
+}
+
+.product-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: #ddd transparent;
+}
+
+/* 滚动条样式 */
+.product-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.product-scroll::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.product-card {
+    flex: 0 0 220px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.image-box {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.product-info {
+    padding: 1rem;
+}
+
+.product-name {
+    display: block;
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.product-price {
+    display: block;
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.product-price {
+    transition: transform 0.3s;
+}
+
+.product-card:hover .product-price {
+    transform: scale(1.05);
+    color: #2ecc71;
+}
   
 
 
