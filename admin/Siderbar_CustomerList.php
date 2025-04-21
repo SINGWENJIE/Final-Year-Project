@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 if (isset($_GET['toggle_status'])) {
     $id = intval($_GET['toggle_status']);
     $result = $conn->query("SELECT status FROM users WHERE user_id = $id");
-    
+
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $newStatus = ($row['status'] === 'active') ? 'inactive' : 'active';
@@ -141,7 +141,9 @@ if (isset($_GET['toggle_status'])) {
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <?php if ($_SESSION['admin_role'] === 'Admin') : ?>
+                            <th>Actions</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -151,21 +153,26 @@ if (isset($_GET['toggle_status'])) {
                             <td><?= $row['user_name']; ?></td>
                             <td><?= $row['email']; ?></td>
                             <td><?= $row['user_phone_num']; ?></td>
-                            <td><?= ucfirst($row['status']); ?></td>
-
                             <td>
-                                <a onclick="editCustomer(<?= $row['user_id']; ?>, '<?= $row['user_name']; ?>', '<?= $row['email']; ?>', '<?= $row['user_phone_num']; ?>')">
-                                    <img src="../assets/images/edit.png" alt="Edit" class="icon-btn">
-                                </a>
-                                <a href="?toggle_status=<?= $row['user_id']; ?>" 
-                                   onclick="return confirm('Change status of this user?')">
-                                    <img src="../assets/images/<?= $row['status'] === 'active' ? 'active.png' : 'inactive.png'; ?>" 
-                                         alt="Toggle Status" class="icon-btn">
-                                </a>
+                                <span class="status <?= strtolower($row['status']); ?>">
+                                    <?= ucfirst($row['status']); ?>
+                                </span>
                             </td>
+
+                            <?php if ($_SESSION['admin_role'] === 'Admin') : ?>
+                                <td>
+                                    <a onclick="editCustomer(<?= $row['user_id']; ?>, '<?= $row['user_name']; ?>', '<?= $row['email']; ?>', '<?= $row['user_phone_num']; ?>')">
+                                        <img src="../assets/images/edit.png" alt="Edit" class="icon-btn">
+                                    </a>
+                                    <a href="?toggle_status=<?= $row['user_id']; ?>" onclick="return confirm('Change status of this user?')">
+                                        <img src="../assets/images/<?= $row['status'] === 'active' ? 'active.png' : 'inactive.png'; ?>" alt="Toggle Status" class="icon-btn">
+                                    </a>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php } ?>
                 </tbody>
+
             </table>
 
             <div class="pagination">
