@@ -165,7 +165,7 @@ $orderStatuses = getOrderStatuses($conn);
 
                 <div class="search-container">
                     <form method="GET">
-                        <input type="text" name="search" placeholder="Search by name " value="<?= isset($_GET['search']) ? $_GET['search'] : '' ?>">
+                        <input type="text" name="search" placeholder="Search by name or order id" value="<?= isset($_GET['search']) ? $_GET['search'] : '' ?>">
                         <button type="submit">
                             <img src="../assets/images/search.png" alt="Search" width="20" height="20">
                         </button>

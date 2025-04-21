@@ -23,18 +23,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = mysqli_query($conn, $sql);
 
     if ($row = mysqli_fetch_assoc($result)) { 
-       
-        if ($password == $row['admin_password']) {  
-            $_SESSION['admin_name'] = $admin_name;  
-            $_SESSION['admin_role'] = ucfirst($row['admin_role']); 
-            header("Location: ../admin/admin_dashboard.php");
-            exit();
+        if ($password == $row['admin_password']) {
+            if ($row['status'] === 'active') {
+                $_SESSION['admin_name'] = $admin_name;  
+                $_SESSION['admin_role'] = ucfirst($row['admin_role']); 
+                header("Location: ../admin/admin_dashboard.php");
+                exit();
+            } else {
+                $error = "This admin account is inactive!";
+            }
         } else {
             $error = "Incorrect password!";
         }
     } else {
         $error = "Username does not exist!";
     }
+    
 }
 ?>
 
@@ -54,10 +58,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php } ?>
 
         <form action="adminlogin.php" method="POST">
-            <input type="text" name="admin_name" placeholder="Enter your ID" required>
-            <input type="password" name="admin_password" placeholder="Enter your password" required>
-            <button type="submit">Login</button>
-        </form>
+    <input type="text" name="admin_name" placeholder="Enter your ID" required>
+    <input type="password" name="admin_password" placeholder="Enter your password" required>
+    <button type="submit">Login</button>
+</form>
+
+<div style="text-align: right; margin-top: 10px;">
+    <a href="forgot_password.php" style="font-size: 14px; color: #555;">Forgot Password?</a>
+</div>
+
     </div>
 </body>
 </html>

@@ -100,15 +100,21 @@ $conn->close();
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT o.order_id, u.user_name, SUM(oi.quantity) AS prod_quantity, SUM(o.total_amount) AS total_amount, o.order_status 
-                FROM `orders` AS o
-                JOIN order_item AS oi ON o.order_id = oi.order_id 
-                JOIN users AS u ON o.user_id = u.user_id
-                GROUP BY o.order_id, u.user_name, o.total_amount, o.order_status
-                ORDER BY o.order_id DESC 
-                LIMIT 4";
+                $sql = "SELECT 
+    o.order_id, 
+    u.user_name, 
+    SUM(oi.quantity) AS prod_quantity, 
+    o.total_amount, 
+    o.order_status 
+FROM `orders` AS o
+JOIN order_item AS oi ON o.order_id = oi.order_id 
+JOIN users AS u ON o.user_id = u.user_id
+GROUP BY o.order_id, u.user_name, o.total_amount, o.order_status
+ORDER BY o.order_id DESC 
+LIMIT 4
+";
 
-        
+
                 $result = $conn->query($sql);
                 ?>
                 <table>
@@ -143,9 +149,10 @@ $conn->close();
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelector(".logout-btn").addEventListener("click", function() {
-                window.location.href = "../admin/logout.php"; 
+                window.location.href = "../admin/logout.php";
             });
         });
     </script>
 </body>
+
 </html>
