@@ -50,13 +50,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 
+if (isset($_GET['toggle_status'])) {
+    $id = intval($_GET['toggle_status']);
+    $result = $conn->query("SELECT status FROM users WHERE user_id = $id");
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $newStatus = ($row['status'] === 'active') ? 'inactive' : 'active';
+        $conn->query("UPDATE users SET status = '$newStatus' WHERE user_id = $id");
+    }
 
-if (isset($_GET['delete'])) {
-    $id = intval($_GET['delete']);
-    $conn->query("DELETE FROM users WHERE user_id = $id");
     header("Location: Siderbar_CustomerList.php");
     exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -133,6 +140,7 @@ if (isset($_GET['delete'])) {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -143,12 +151,16 @@ if (isset($_GET['delete'])) {
                             <td><?= $row['user_name']; ?></td>
                             <td><?= $row['email']; ?></td>
                             <td><?= $row['user_phone_num']; ?></td>
+                            <td><?= ucfirst($row['status']); ?></td>
+
                             <td>
                                 <a onclick="editCustomer(<?= $row['user_id']; ?>, '<?= $row['user_name']; ?>', '<?= $row['email']; ?>', '<?= $row['user_phone_num']; ?>')">
                                     <img src="../assets/images/edit.png" alt="Edit" class="icon-btn">
                                 </a>
-                                <a href="?delete=<?= $row['user_id']; ?>" onclick="return confirm('Are you sure?')">
-                                    <img src="../assets/images/delete.png" alt="Delete" class="icon-btn">
+                                <a href="?toggle_status=<?= $row['user_id']; ?>" 
+                                   onclick="return confirm('Change status of this user?')">
+                                    <img src="../assets/images/<?= $row['status'] === 'active' ? 'active.png' : 'inactive.png'; ?>" 
+                                         alt="Toggle Status" class="icon-btn">
                                 </a>
                             </td>
                         </tr>
@@ -158,17 +170,15 @@ if (isset($_GET['delete'])) {
 
             <div class="pagination">
                 <?php if ($page > 1): ?>
-                    <a href="?page=<?= $page - 1; ?>">
-                        <
-                            <?php endif; ?>
+                    <a href="?page=<?= $page - 1; ?>"> &lt; </a>
+                <?php endif; ?>
 
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <a href="?page=<?= $i; ?>" class="<?= ($i == $page) ? 'active' : ''; ?>"><?= $i; ?>
-                    </a>
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="?page=<?= $i; ?>" class="<?= ($i == $page) ? 'active' : ''; ?>"><?= $i; ?></a>
                 <?php endfor; ?>
 
                 <?php if ($page < $totalPages): ?>
-                    <a href="?page=<?= $page + 1; ?>">></a>
+                    <a href="?page=<?= $page + 1; ?>"> &gt; </a>
                 <?php endif; ?>
             </div>
 
@@ -181,7 +191,6 @@ if (isset($_GET['delete'])) {
                     document.getElementById("email").value = email; // Display email but make it readonly
                     document.getElementById("user_phone_num").value = phone;
                 }
-
 
                 function hideForm() {
                     document.getElementById("customerForm").style.display = "none";

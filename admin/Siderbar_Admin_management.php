@@ -129,11 +129,10 @@ $admins = $conn->query("SELECT * FROM admin");
                 <td><?php echo $row['admin_email']; ?></td>
                 <td><?php echo ucfirst($row['status']); ?></td>
                 <td>
-                    <!-- Edit icon -->
                     <a onclick='editAdmin(<?php echo $row["admin_id"]; ?>, <?php echo json_encode($row["admin_name"]); ?>, <?php echo json_encode($row["admin_email"]); ?>)'>
                         <img src="../assets/images/edit.png" alt="Edit" class="icon-btn">
                     </a>
-                    <!-- Toggle status with image -->
+                    
                     <a href="?toggle_status=<?php echo $row['admin_id']; ?>" 
                        onclick="return confirm('Change status of this admin?')">
                         <img src="../assets/images/<?php echo $row['status'] === 'active' ? 'active.png' : 'inactive.png'; ?>" 
