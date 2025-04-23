@@ -21,12 +21,12 @@ input[name="category_name"] {
 }
 
 button {
-    background: rgb(21, 135, 89);
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
-    padding: 10px;
+    background: transparent; 
+    border: none; 
+    padding: 0; 
+    cursor: pointer; 
 }
+
 
 button:hover {
     background-color: #7ab58d;
@@ -49,13 +49,13 @@ button:hover {
     height: 100px;
     object-fit: cover;
 }
-/* 针对 delete 和 manage 按钮的图标进行尺寸调整 */
+
 .card button img {
-    width: 20px;  /* 调整图标宽度 */
-    height: 20px; /* 调整图标高度 */
+    width: 20px; 
+    height: 20px;
 }
 
-/* 当鼠标悬停时，保持图标放大的效果 */
+
 .card button img:hover {
     transform: scale(1.2); 
 }
@@ -82,11 +82,10 @@ button:hover {
 }
 
 .delete-btn {
-    background-color: red;
-    color: white;
     padding: 5px 10px;
     border: none;
     cursor: pointer;
+    background: transparent ;
 }
 
 .delete-btn:hover {
@@ -123,9 +122,178 @@ input {
     margin: 0 5px; 
     cursor: pointer; 
     transition: transform 0.2s ease-in-out;
+    background: transparent ;
 }
 
 .icon-btn:hover {
     transform: scale(1.2); 
 }
+.product-table {
+    margin-top: 20px;
+}
+.product-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.product-table th, .product-table td {
+    padding: 10px;
+    text-align: center;
+}
+.product-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+.product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+.product-table td a, .product-table td button {
+    margin: 5px;
+}
+.add-product-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.search-box {
+    margin-bottom: 20px;
+}
+.search-box input {
+    padding: 10px;
+    width: 300px;
+    font-size: 16px;
+}
 
+.popup-form {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+.popup-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 80vh; 
+    overflow-y: auto; 
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.product-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-group input[type="file"] {
+    padding: 10px;
+}
+
+.form-group textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.form-row {
+    display: flex;
+    gap: 30px; 
+    margin-bottom: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+button.submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+}
+
+button.submit-btn:hover {
+    background-color: #45a049;
+}
+
+
+.search-container {
+    position: absolute;
+    right: 0;
+    top: 100px;
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+.search-container input {
+    padding: 8px !important;
+    width: 250px !important;
+    border-radius: 20px !important;
+    border: 2px solid #007bff !important;
+    font-size: 16px !important;
+    outline: none !important;
+    transition: all 0.3s ease-in-out !important;
+}
+
+.search-container input:focus {
+    border-color: #0056b3 !important;
+    box-shadow: 0 0 8px rgba(0, 91, 187, 0.5) !important;
+}
+
+.search-container select {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #f4f4f4;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}

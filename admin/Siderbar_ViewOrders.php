@@ -26,21 +26,21 @@ function getOrderDetails($conn, $user_id)
         $order_status = $order['order_status'];
         $order_date = $order['order_date'];
 
-        $sql_items = "SELECT oi.*, p.prod_name 
-                      FROM order_item oi 
-                      JOIN product p ON oi.prod_id = p.prod_id 
-                      WHERE oi.order_id = '$order_id'";
-        $items_result = $conn->query($sql_items);
-
+        $items_result = $conn->query("SELECT oi.*, p.prod_name 
+                                      FROM order_item oi 
+                                      JOIN product p ON oi.prod_id = p.prod_id 
+                                      WHERE oi.order_id = '$order_id'");
         $items = [];
+
         while ($item = $items_result->fetch_assoc()) {
             $product_name = $item['prod_name'];
             $quantity = $item['quantity'];
-            $price = $item['unit_price'];
+            $price = $item['unit_price'];  // unit_price is in the order_item table
             $total_price = $price * $quantity;
             $items[] = [
                 'product_name' => $product_name,
                 'quantity' => $quantity,
+                'unit_price' => $price,
                 'total_price' => number_format($total_price, 2)
             ];
         }
@@ -85,7 +85,7 @@ if (isset($_GET['ajax']) && isset($_GET['user_id'])) {
         echo "<div class='order-detail-container'>";
         echo "<h3>Order ID: {$order['order_id']}</h3>";
         echo "<table class='order-details-table'>";
-        echo "<thead><tr><th>Product</th><th>Quantity</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>";
+        echo "<thead><tr><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Status</th><th>Date</th></tr></thead>";
         echo "<tbody>";
 
         $rowspan = count($order['items']);
@@ -97,7 +97,7 @@ if (isset($_GET['ajax']) && isset($_GET['user_id'])) {
 
             echo "<td>{$item['quantity']}</td>";
 
-            echo "<td>RM {$item['total_price']}</td>";
+            echo "<td>RM {$item['unit_price']}</td>";
 
             if ($firstRow) {
                 echo "<td rowspan='{$rowspan}'>{$order['order_status']}</td>";
@@ -146,7 +146,8 @@ $orderStatuses = getOrderStatuses($conn);
                     <?php if ($_SESSION['admin_role'] === 'Super Admin') : ?>
                         <li><a href="Siderbar_Admin_management.php"><img src="../assets/images/admin_photo.png" alt=""> Admin Management</a></li>
                     <?php endif ?>
-                    <li><a href="Siderbar_Category_Product.php"><img src="../assets/images/product.png" alt=""> Category & Product</a></li>
+                    <li><a href="Siderbar_Category.php"><img src="../assets/images/category.png" alt=""> Category</a></li>
+                    <li><a href="Siderbar_Product.php"><img src="../assets/images/product.png" alt=""> Product</a></li>
                     <li><a href="Siderbar_CustomerList.php"><img src="../assets/images/customer_list.png" alt=""> Customer List</a></li>
                     <li><a href="Siderbar_ViewOrders.php"><img src="../assets/images/vieworder.png" alt=""> View Orders</a></li>
                     <li><a href="Siderbar_Delivery.php"><img src="../assets/images/delivery.png" alt=""> Delivery</a></li>

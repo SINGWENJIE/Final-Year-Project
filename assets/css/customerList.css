@@ -77,15 +77,6 @@ button:hover {
     color: black;
 }
 
-.edit-btn {
-    background-color: #f1c40f;
-    color: white;
-}
-
-.delete-btn {
-    background-color: #e74c3c;
-    color: white;
-}
 td a {
     text-decoration: none; 
     display: inline-block; 

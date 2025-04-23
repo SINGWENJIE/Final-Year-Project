@@ -58,8 +58,8 @@ $conn->close();
 
             <nav>
                 <ul>
-                    <li><a href="Siderbar_Admin_management.php"><img src="../assets/images/admin_photo.png" alt=""> Admin Management</a></li>
-                    <li><a href="Siderbar_Category_Product.php"><img src="../assets/images/product.png" alt=""> Category & Product</a></li>
+                <li><a href="Siderbar_Category.php"><img src="../assets/images/category.png" alt=""> Category</a></li>
+                    <li><a href="Siderbar_Product.php"><img src="../assets/images/product.png" alt=""> Product</a></li>
                     <li><a href="Siderbar_CustomerList.php"><img src="../assets/images/customer_list.png" alt=""> Customer List</a></li>
                     <li><a href="Siderbar_ViewOrders.php"><img src="../assets/images/vieworder.png" alt=""> View Orders</a></li>
                     <li><a href="Siderbar_Delivery.php"><img src="../assets/images/delivery.png" alt=""> Delivery</a></li>
@@ -100,19 +100,14 @@ $conn->close();
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT 
-    o.order_id, 
-    u.user_name, 
-    SUM(oi.quantity) AS prod_quantity, 
-    o.total_amount, 
-    o.order_status 
-FROM `orders` AS o
-JOIN order_item AS oi ON o.order_id = oi.order_id 
-JOIN users AS u ON o.user_id = u.user_id
-GROUP BY o.order_id, u.user_name, o.total_amount, o.order_status
-ORDER BY o.order_id DESC 
-LIMIT 4
-";
+                $sql = "SELECT o.order_id, u.user_name, SUM(oi.quantity) AS prod_quantity, o.total_amount, o.order_status 
+                FROM `orders` AS o
+                JOIN order_item AS oi ON o.order_id = oi.order_id 
+                JOIN users AS u ON o.user_id = u.user_id
+                GROUP BY o.order_id, u.user_name, o.total_amount, o.order_status
+                ORDER BY o.order_id DESC 
+                LIMIT 4
+                ";
 
 
                 $result = $conn->query($sql);
