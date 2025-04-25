@@ -64,30 +64,28 @@ $products = $conn->query($sql);
 
             <h2>Manage Products</h2>
 
-            <!-- Category Filter -->
-            <div>
-                <form method="GET" id="filter-form">
-                    <select name="category_filter" id="category_filter" onchange="this.form.submit()">
+            <!-- Category Filter + Search -->
+<div>
+    <form method="GET" id="filter-form">
+        <select name="category_filter" id="category_filter" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            <?php
+            $categories->data_seek(0);
+            while ($cat = $categories->fetch_assoc()) {
+                $selected = ($filter_category == $cat['category_id']) ? "selected" : "";
+                echo "<option value='{$cat['category_id']}' $selected>{$cat['category_name']}</option>";
+            }
+            ?>
+        </select>
 
-                        <option value="">All Categories</option>
-                        <?php
-                        $categories->data_seek(0);
-                        while ($cat = $categories->fetch_assoc()) {
-                            $selected = ($filter_category == $cat['category_id']) ? "selected" : "";
-                            echo "<option value='{$cat['category_id']}' $selected>{$cat['category_name']}</option>";
-                        }
-                        ?>
-                    </select>
-                </form>
-                <div class="search-container">
-                    <input type="text" name="search" placeholder="Search by product name" value="<?= isset($_GET['search']) ? $_GET['search'] : '' ?>">
-                    <button type="submit" style="padding: 5px 10px;">
-                        <img src="../assets/images/search.png" alt="Search" width="20" height="20">
-                    </button>
-                </div>
-                </form>
-
-            </div>
+        <div class="search-container">
+            <input type="text" name="search" placeholder="Search by product name" value="<?= htmlspecialchars($search_term) ?>">
+            <button type="submit" style="padding: 5px 10px;">
+                <img src="../assets/images/search.png" alt="Search" width="20" height="20">
+            </button>
+        </div>
+    </form>
+</div>
 
             <!-- Products Table -->
             <div class="product-table">
