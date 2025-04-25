@@ -72,7 +72,7 @@ if (isset($_GET['delete_category']) && $isAdmin) {
             <?php if ($isAdmin) : ?>
                 <form method="POST">
                     <input type="text" name="category_name" placeholder="Category Name" required>
-                    <button type="submit" name="add_category">Add Category</button>
+                    <button type="submit" name="add-product-btn">Add Category</button>
                 </form>
             <?php endif; ?>
 

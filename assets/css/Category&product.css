@@ -21,9 +21,9 @@ input[name="category_name"] {
 }
 
 button {
-    background: transparent; 
+    padding: 10px 15px;
+    background-color: #28a745;
     border: none; 
-    padding: 0; 
     cursor: pointer; 
 }
 
@@ -297,3 +297,4 @@ button.submit-btn:hover {
     transition: all 0.3s ease;
     cursor: pointer;
 }
+
