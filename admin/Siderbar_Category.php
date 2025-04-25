@@ -2,14 +2,13 @@
 session_start();
 include '../db_connection.php';
 
-// Check if user is admin or super admin
 $isAdmin = $_SESSION['admin_role'] === 'Admin';
 $isSuperAdmin = $_SESSION['admin_role'] === 'Super Admin';
 
 if (isset($_POST['add_category']) && $isAdmin) {
     $category_name = $_POST['category_name'];
     $conn->query("INSERT INTO category (category_name) VALUES ('$category_name')");
-    header("Location: ../admin/Siderbar_Category_Product.php");
+    header("Location: ../admin/Siderbar_Category.php");
     exit();
 }
 
@@ -20,7 +19,7 @@ if (isset($_GET['delete_category']) && $isAdmin) {
 
     $sql = "DELETE FROM category WHERE category_id='$category_id'";
     if ($conn->query($sql) === TRUE) {
-        echo "<script>alert('Category deleted successfully!'); window.location.href='Siderbar_Category_Product.php';</script>";
+        echo "<script>alert('Category deleted successfully!'); window.location.href='Siderbar_Category.php';</script>";
     } else {
         echo "<script>alert('Error: " . $conn->error . "');</script>";
     }
@@ -30,12 +29,14 @@ if (isset($_GET['delete_category']) && $isAdmin) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Manage Products</title>
     <link rel="stylesheet" href="../assets/css/Category&product.css">
     <link rel="stylesheet" href="../assets/css/Global_style.css">
 </head>
+
 <body>
     <div class="dashboard-container">
         <aside class="sidebar">
@@ -72,8 +73,9 @@ if (isset($_GET['delete_category']) && $isAdmin) {
             <?php if ($isAdmin) : ?>
                 <form method="POST">
                     <input type="text" name="category_name" placeholder="Category Name" required>
-                    <button type="submit" name="add-product-btn">Add Category</button>
+                    <button type="submit" name="add_category">Add Category</button>
                 </form>
+
             <?php endif; ?>
 
             <div class="container">
@@ -105,6 +107,7 @@ if (isset($_GET['delete_category']) && $isAdmin) {
         </main>
     </div>
 </body>
+
 </html>
 
 <?php $conn->close(); ?>

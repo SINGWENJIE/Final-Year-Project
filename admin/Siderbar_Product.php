@@ -2,11 +2,15 @@
 session_start();
 include '../db_connection.php';
 
-// 添加产品逻辑
+$products_per_page = 3;
+
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $products_per_page; 
+
 if (isset($_POST['add_product'])) {
     $category_id = $_POST['category_id'];
     $product_name = mysqli_real_escape_string($conn, $_POST['prod_name']);
-    $price = max(0, $_POST['prod_price']);
+    $price = floatval($_POST['prod_price']); 
     $stock = max(0, $_POST['stock']);
 
     $image = $_FILES['prod_image']['name'];
@@ -31,7 +35,6 @@ if (isset($_POST['add_product'])) {
     }
 }
 
-// 删除产品的逻辑
 if (isset($_GET['delete_product']) && isset($_GET['category_id'])) {
     $product_id = $_GET['delete_product'];
     $category_id = $_GET['category_id'];
@@ -41,7 +44,7 @@ if (isset($_GET['delete_product']) && isset($_GET['category_id'])) {
         $conn->query("DELETE FROM order_item WHERE prod_id='$product_id'");
         $conn->query("DELETE FROM product WHERE prod_id='$product_id'");
         $conn->commit();
-        echo "<script>alert('Product deleted successfully!'); window.location.href='Siderbar_Category_Product.php?category_id=$category_id';</script>";
+        echo "<script>alert('Product deleted successfully!'); window.location.href='Siderbar_Product.php?category_id=$category_id';</script>";
         exit();
     } catch (Exception $e) {
         $conn->rollback();
@@ -49,7 +52,6 @@ if (isset($_GET['delete_product']) && isset($_GET['category_id'])) {
     }
 }
 
-// 获取分类和产品数据
 $categories = $conn->query("SELECT * FROM category");
 
 $filter_category = isset($_GET['category_filter']) ? $_GET['category_filter'] : '';
@@ -64,29 +66,37 @@ if (!empty($filter_category)) $conditions[] = "p.category_id = '$filter_category
 if (!empty($search_term)) $conditions[] = "LOWER(p.prod_name) LIKE '%$search_term%'";
 if ($conditions) $sql .= " WHERE " . implode(" AND ", $conditions);
 
+$sql .= " LIMIT $offset, $products_per_page"; 
+
 $products = $conn->query($sql);
 
-// 更新产品逻辑
+$count_sql = "SELECT COUNT(*) AS total_products FROM product p";
+if (!empty($filter_category)) $count_sql .= " WHERE p.category_id = '$filter_category'";
+if (!empty($search_term)) $count_sql .= " AND LOWER(p.prod_name) LIKE '%$search_term%'";
+$count_result = $conn->query($count_sql);
+$total_products = $count_result->fetch_assoc()['total_products'];
+
+$totalPages = ceil($total_products / $products_per_page); 
+
+
 if (isset($_POST['update_product'])) {
     $id = $_POST['edit_prod_id'];
     $stock = max(0, $_POST['edit_stock']);
     $category_id = $_POST['edit_category_id'];
     $description = mysqli_real_escape_string($conn, $_POST['edit_description']);
+    $price = floatval($_POST['edit_prod_price']);
 
-    // 检查是否有订单包含此产品
     $check_order_sql = "SELECT COUNT(*) AS order_count FROM order_item WHERE prod_id = '$id'";
     $check_order_result = $conn->query($check_order_sql);
     $order_count = $check_order_result->fetch_assoc()['order_count'];
 
     if ($order_count > 0) {
-        // 如果产品已经在订单中，只能更新库存
         $update_sql = "UPDATE product 
-                       SET stock='$stock', category_id='$category_id', prod_description='$description'
+                       SET prod_price='$price', stock='$stock', category_id='$category_id', prod_description='$description'
                        WHERE prod_id='$id'";
     } else {
-        // 如果产品不在订单中，可以完全更新（如果有需要，可以把其他字段也包含进来）
         $update_sql = "UPDATE product 
-                       SET stock='$stock', category_id='$category_id', prod_description='$description'
+                       SET prod_price='$price', stock='$stock', category_id='$category_id', prod_description='$description'
                        WHERE prod_id='$id'";
     }
 
@@ -97,8 +107,6 @@ if (isset($_POST['update_product'])) {
         echo "<script>alert('Error updating product: " . $conn->error . "');</script>";
     }
 }
-
-
 
 ?>
 
@@ -151,76 +159,75 @@ if (isset($_POST['update_product'])) {
 
             <h2>Manage Products</h2>
 
-            <!-- 添加产品按钮 -->
             <button class="add-product-btn" onclick="toggleForm()">Add Product</button>
 
             <div id="add-product-form" class="popup-form" style="display:none;">
-    <div class="popup-content">
-        <span class="close-btn" onclick="toggleForm()">&times;</span>
-        <form method="POST" enctype="multipart/form-data" class="product-form">
-            <div class="form-group">
-                <label for="category_id">Category</label>
-                <select name="category_id" id="category_id" required>
-                    <option value="">Select Category</option>
-                    <?php while ($cat = $categories->fetch_assoc()) { ?>
-                        <option value="<?= $cat['category_id'] ?>"><?= $cat['category_name'] ?></option>
-                    <?php } ?>
-                </select>
-            </div>
+                <div class="popup-content">
+                    <span class="close-btn" onclick="toggleForm()">&times;</span>
+                    <form method="POST" enctype="multipart/form-data" class="product-form">
+                        <div class="form-group">
+                            <label for="category_id">Category</label>
+                            <select name="category_id" id="category_id" required>
+                                <option value="">Select Category</option>
+                                <?php while ($cat = $categories->fetch_assoc()) { ?>
+                                    <option value="<?= $cat['category_id'] ?>"><?= $cat['category_name'] ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="prod_name">Product Name</label>
-                    <input type="text" name="prod_name" id="prod_name" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prod_name">Product Name</label>
+                                <input type="text" name="prod_name" id="prod_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="prod_price">Price</label>
+                                <input type="number" name="prod_price" id="prod_price" min="0" step="0.01" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="stock">Stock</label>
+                                <input type="number" name="stock" id="stock" min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prod_image">Product Image</label>
+                            <input type="file" name="prod_image" id="prod_image" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prod_description">Product Description</label>
+                            <textarea name="prod_description" id="prod_description" required></textarea>
+                        </div>
+
+                        <button type="submit" name="add_product" class="submit-btn">Add Product</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="prod_price">Price</label>
-                    <input type="number" name="prod_price" id="prod_price" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label for="stock">Stock</label>
-                    <input type="number" name="stock" id="stock" min="0" required>
-                </div>
             </div>
 
-            <div class="form-group">
-                <label for="prod_image">Product Image</label>
-                <input type="file" name="prod_image" id="prod_image" required>
+            <div>
+                <form method="GET" id="filter-form">
+                    <select name="category_filter" id="category_filter" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        <?php
+                        $categories->data_seek(0);
+                        while ($cat = $categories->fetch_assoc()) {
+                            $selected = ($filter_category == $cat['category_id']) ? "selected" : "";
+                            echo "<option value='{$cat['category_id']}' $selected>{$cat['category_name']}</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <div class="search-container">
+                        <input type="text" name="search" placeholder="Search by product name" value="<?= htmlspecialchars($search_term) ?>">
+                        <button type="submit" style="padding: 5px 10px;">
+                            <img src="../assets/images/search.png" alt="Search" width="20" height="20">
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <div class="form-group">
-                <label for="prod_description">Product Description</label>
-                <textarea name="prod_description" id="prod_description" required></textarea>
-            </div>
-
-            <button type="submit" name="add_product" class="submit-btn">Add Product</button>
-        </form>
-    </div>
-</div>
-
-<div>
-    <form method="GET" id="filter-form">
-        <select name="category_filter" id="category_filter" onchange="this.form.submit()">
-            <option value="">All Categories</option>
-            <?php
-            $categories->data_seek(0);
-            while ($cat = $categories->fetch_assoc()) {
-                $selected = ($filter_category == $cat['category_id']) ? "selected" : "";
-                echo "<option value='{$cat['category_id']}' $selected>{$cat['category_name']}</option>";
-            }
-            ?>
-        </select>
-
-        <div class="search-container">
-            <input type="text" name="search" placeholder="Search by product name" value="<?= htmlspecialchars($search_term) ?>">
-            <button type="submit" style="padding: 5px 10px;">
-                <img src="../assets/images/search.png" alt="Search" width="20" height="20">
-            </button>
-        </div>
-    </form>
-</div>
-
-            <!-- 产品表格 -->
             <div class="product-table">
                 <table>
                     <thead>
@@ -264,6 +271,20 @@ if (isset($_POST['update_product'])) {
                     </tbody>
                 </table>
             </div>
+            
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?= $page - 1; ?>"> &lt; </a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="?page=<?= $i; ?>" class="<?= ($i == $page) ? 'active' : ''; ?>"><?= $i; ?></a>
+                <?php endfor; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <a href="?page=<?= $page + 1; ?>"> &gt; </a>
+                <?php endif; ?>
+            </div>
             <div id="edit-form" class="popup-form" style="display:none;">
                 <div class="popup-content">
                     <span class="close-btn" onclick="toggleEditForm()">&times;</span>
@@ -287,8 +308,9 @@ if (isset($_POST['update_product'])) {
                             </div>
                             <div class="form-group">
                                 <label for="edit_prod_price">Price</label>
-                                <input type="number" name="edit_prod_price" id="edit_prod_price" min="0" required>
+                                <input type="number" name="edit_prod_price" id="edit_prod_price" min="0" step="0.01" required>
                             </div>
+
                             <div class="form-group">
                                 <label for="edit_stock">Stock</label>
                                 <input type="number" name="edit_stock" id="edit_stock" min="0" required>
@@ -308,13 +330,12 @@ if (isset($_POST['update_product'])) {
 
     <script>
         function toggleForm() {
-    const form = document.getElementById('add-product-form');
-    form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'flex' : 'none';
+            const form = document.getElementById('add-product-form');
+            form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'flex' : 'none';
 
-    // 在添加产品弹窗显示时，隐藏搜索和筛选部分
-    const searchFilter = document.querySelector('.search-container');
-    searchFilter.style.display = (form.style.display === 'none') ? 'block' : 'none';
-}
+            const searchFilter = document.querySelector('.search-container');
+            searchFilter.style.display = (form.style.display === 'none') ? 'block' : 'none';
+        }
 
         function confirmDelete(productId) {
             const categoryId = <?= json_encode($filter_category ?: '') ?>;
