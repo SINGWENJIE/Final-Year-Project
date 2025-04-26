@@ -70,7 +70,7 @@ $conn->close();
                 <img src="../assets/images/logoname.png" alt="Logo">
             </div>
             <div class="profile">
-            <button class="edit-profile-btn" title="Edit Profile">
+                <button class="edit-profile-btn" title="Edit Profile">
                         <img src="../assets/images/admin_profile.png" alt="admin_profile">
                     </button>
                 <img src="../assets/images/admin.png" alt="Admin foto">
@@ -163,8 +163,8 @@ $conn->close();
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Edit Profile</h2>
-            <form method="post">
-                <label for="admin_name">Admin Name:</label>
+            <form class="edit-profile-form" method="post">
+                <label for="admin_name">Staff Name:</label>
                 <input type="text" id="admin_name" name="admin_name" value="<?php echo $admin_id; ?>" required>
                 <label for="admin_email">Admin Email:</label>
                 <input type="email" id="admin_email" name="admin_email" value="<?php echo $admin_email; ?>" readonly>
