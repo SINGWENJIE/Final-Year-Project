@@ -12,10 +12,8 @@ CREATE TABLE `address` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-
 INSERT INTO `address` (`address_id`, `user_id`, `recipient_name`, `street_address`, `city`, `state`, `postal_code`, `is_default`, `phone_number`, `note`) VALUES
 (1, 3, 'qiaoxuan', 'No. 5, Jalan Bukit', 'Kuala Lumpur', 'ixora', '50000', 1, '0123456789', NULL);
-
 
 
 CREATE TABLE `admin` (
@@ -47,6 +45,7 @@ CREATE TABLE `cart` (
 ) ;
 
 
+
 CREATE TABLE `cart_items` (
   `CART_ITEM_ID` int(11) NOT NULL,
   `CART_ID` int(11) NOT NULL,
@@ -62,6 +61,7 @@ CREATE TABLE `category` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+
 INSERT INTO `category` (`category_id`, `category_name`) VALUES
 (7, 'Bakery&Breakfast'),
 (5, 'Beauty&Personal Care'),
@@ -73,7 +73,6 @@ INSERT INTO `category` (`category_id`, `category_name`) VALUES
 (3, 'Ice Cream'),
 (2, 'Snacks'),
 (9, 'Vegetables');
-
 
 
 CREATE TABLE `delivery` (
@@ -89,7 +88,6 @@ CREATE TABLE `delivery` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
--------------------------------------------------------------------------------------------------------------
 CREATE TABLE `feedback` (
   `feedback_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -104,8 +102,6 @@ CREATE TABLE `feedback` (
   `response_date` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--------------------------------------------------------------------------------------------------------------
-
 
 CREATE TABLE `orders` (
   `order_id` int(11) NOT NULL,
@@ -116,13 +112,9 @@ CREATE TABLE `orders` (
   `total_amount` decimal(12,2) NOT NULL,
   `discount_amount` decimal(10,2) DEFAULT 0.00,
   `delivery_fee` decimal(10,2) DEFAULT 5.00,
-  `order_status` enum('pending','processing','shipped','delivered','cancelled','refunded') DEFAULT 'pending',
+  `order_status` enum('pending','processing','shipped','delivered') DEFAULT 'pending',
   `admin_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-INSERT INTO `orders` (`order_id`, `user_id`, `shipping_address_id`, `order_date`, `subtotal`, `total_amount`, `discount_amount`, `delivery_fee`, `order_status`, `admin_id`) VALUES
-(1004, 3, 1, '2025-04-23 07:37:36', 0.00, 28.00, 0.00, 0.00, 'processing', NULL);
 
 
 CREATE TABLE `order_item` (
@@ -132,12 +124,6 @@ CREATE TABLE `order_item` (
   `quantity` int(11) NOT NULL,
   `order_item_price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-
-INSERT INTO `order_item` (`order_item_id`, `order_id`, `prod_id`, `quantity`, `order_item_price`) VALUES
-(7, 1004, 5, 2, 14.00);
-
 
 
 CREATE TABLE `payment` (
@@ -163,12 +149,15 @@ CREATE TABLE `product` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+
 INSERT INTO `product` (`prod_id`, `prod_name`, `category_id`, `prod_price`, `prod_description`, `prod_quantity`, `prod_image`, `stock`) VALUES
 (5, 'Lays Classic Potato Chips 170g', 2, 13.98, 'Lay\'s potato chips continue to be made with quality, homegrown Canadian potatoes.', 0, 'lays.png', 200),
 (6, 'broccoli', 9, 6.50, 'this is a broccoli come form Japan', 0, 'broccoli_commodity-page.png', 80),
 (8, 'massimo', 7, 3.60, 'this is massimo', 0, 'massimo.webp', 200),
 (10, 'wall\'s', 3, 3.50, 'this is walls ice cream\r\n', 0, 'walls.jpeg', 200),
-(12, 'Cola', 12, 2.90, 'one cola can buy you happy', 0, 'images.jpeg', 100);
+(12, 'Cola', 12, 2.90, 'one cola can buy you happy', 0, 'images.jpeg', 100),
+(13, 'Massimo Chiffon [Mocha Flavor]', 7, 3.20, 'Massimo Chiffon In A Cup 35g Cupcake Kek Classic Cheese Mocha', 0, 'masimo[pandan].png', 50),
+(14, 'Clorox Clean-Up Spray', 4, 14.00, 'Clorox Clean-Up All Purpose Cleaner Spray with Bleach, Spray Bottle, Original, 32 oz', 0, 'clorox[cleanup_spray].png', 100);
 
 
 
@@ -181,7 +170,6 @@ CREATE TABLE `promo_code` (
   `MAX_USES` int(11) DEFAULT NULL,
   `USES_COUNT` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 
 CREATE TABLE `users` (
@@ -197,13 +185,11 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-
 INSERT INTO `users` (`user_id`, `user_name`, `email`, `user_password`, `user_phone_num`, `user_created_at`, `admin_id`, `birth_date`, `status`) VALUES
 (3, 'qiaoxuan', 'qiaoxuan@gmail.com', '', '0167371239', '2025-04-12 11:46:40', NULL, NULL, 'active'),
 (5, 'siqi', 'siqi@gmail.com', '', '23124', '2025-04-12 11:53:04', NULL, NULL, 'active');
 
-
------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE `user_voucher` (
   `user_voucher_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -233,14 +219,19 @@ CREATE TABLE `voucher` (
 
 -----------------------------------------------------------------------------------------------------------------------------
 
-
 CREATE TABLE `wishlist` (
   `wishlist_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `prod_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
------------------------------------------------------------------------------------------------------------------------------
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `address`
+--
 ALTER TABLE `address`
   ADD PRIMARY KEY (`address_id`),
   ADD KEY `idx_user` (`user_id`),
@@ -251,7 +242,8 @@ ALTER TABLE `address`
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`admin_id`),
-  ADD UNIQUE KEY `admin_email` (`admin_email`);
+  ADD UNIQUE KEY `admin_email` (`admin_email`),
+  ADD UNIQUE KEY `admin_email_2` (`admin_email`);
 
 --
 -- Indexes for table `cart`
@@ -440,7 +432,7 @@ ALTER TABLE `payment`
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
-  MODIFY `prod_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `prod_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `users`
