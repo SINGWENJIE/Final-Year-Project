@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Redirect to login if not authenticated
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 // Database connection
 $servername = "localhost";
 $username = "root";
@@ -32,6 +40,10 @@ $products_result = $conn->query($sql);
 </head>
 <body>
     <header>
+        <div class="user-info">
+            Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
         <h1>Our Products</h1>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search products...">

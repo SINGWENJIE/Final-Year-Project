@@ -18,7 +18,30 @@ header {
     padding: 1.5rem;
     text-align: center;
     margin-bottom: 2rem;
+    position: relative; /* Add this for user-info positioning */
+    padding-bottom: 2rem; /* Add space for user info */
 }
+
+.user-info {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: white;
+    font-weight: bold;
+}
+
+.logout-btn {
+    color: white;
+    margin-left: 1rem;
+    text-decoration: none;
+    font-weight: normal;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    text-decoration: underline;
+}
+
 
 header h1 {
     margin-bottom: 1rem;

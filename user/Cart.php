@@ -1,62 +1,54 @@
 <?php
+// Start session and check if user is logged in
 session_start();
-require_once 'db_connection.php';
+require_once 'db_connection.php'; // Your database connection file
 
-// Initialize cart if not exists
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
+// Get user ID from session
+$user_id = $_SESSION['user_id'] ?? null;
 
-// Handle quantity updates
-if (isset($_POST['update_cart'])) {
-    foreach ($_POST['quantity'] as $product_id => $quantity) {
-        if ($quantity <= 0) {
-            unset($_SESSION['cart'][$product_id]);
-        } else {
-            $_SESSION['cart'][$product_id] = $quantity;
-        }
-    }
-}
-
-// Handle remove item
-if (isset($_GET['remove'])) {
-    $product_id = intval($_GET['remove']);
-    if (isset($_SESSION['cart'][$product_id])) {
-        unset($_SESSION['cart'][$product_id]);
-    }
-    header("Location: cart.php");
+if (!$user_id) {
+    header("Location: login.php");
     exit();
 }
 
-// Fetch cart products
+// Get cart items for the user
 $cart_items = [];
 $subtotal = 0;
+$delivery_fee = 5.00; // Fixed delivery fee as requested
 
-if (!empty($_SESSION['cart'])) {
-    $product_ids = implode(',', array_keys($_SESSION['cart']));
-    $sql = "SELECT * FROM product WHERE prod_id IN ($product_ids)";
-    $result = $conn->query($sql);
+// Get user's cart
+$cart_query = "SELECT c.CART_ID FROM cart c WHERE c.user_id = ?";
+$cart_stmt = $conn->prepare($cart_query);
+$cart_stmt->bind_param("i", $user_id);
+$cart_stmt->execute();
+$cart_result = $cart_stmt->get_result();
+
+if ($cart_result->num_rows > 0) {
+    $cart = $cart_result->fetch_assoc();
+    $cart_id = $cart['CART_ID'];
     
-    while ($product = $result->fetch_assoc()) {
-        $quantity = $_SESSION['cart'][$product['prod_id']];
-        $total_price = $product['prod_price'] * $quantity;
-        $subtotal += $total_price;
-        
-        $cart_items[] = [
-            'product' => $product,
-            'quantity' => $quantity,
-            'total_price' => $total_price
-        ];
+    // Get cart items with product details
+    $items_query = "SELECT ci.*, p.prod_name, p.prod_price, p.prod_image 
+                    FROM cart_items ci 
+                    JOIN product p ON ci.prod_id = p.prod_id 
+                    WHERE ci.CART_ID = ?";
+    $items_stmt = $conn->prepare($items_query);
+    $items_stmt->bind_param("i", $cart_id);
+    $items_stmt->execute();
+    $items_result = $items_stmt->get_result();
+    
+    while ($item = $items_result->fetch_assoc()) {
+        $cart_items[] = $item;
+        $subtotal += $item['prod_price'] * $item['QUANTITY'];
     }
 }
 
-// Delivery fee
-$delivery_fee = 5.00;
-$grand_total = $subtotal + $delivery_fee;
+// Calculate total
+$total = $subtotal + $delivery_fee;
 
-// Fetch related products
-$related_sql = "SELECT * FROM product ORDER BY RAND() LIMIT 3";
-$related_result = $conn->query($related_sql);
+// Get related products (you might want to customize this query)
+$related_products_query = "SELECT * FROM product ORDER BY RAND() LIMIT 4";
+$related_products_result = $conn->query($related_products_query);
 ?>
 
 <!DOCTYPE html>
@@ -64,105 +56,91 @@ $related_result = $conn->query($related_sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - Supermarket</title>
+    <title>Your Shopping Cart - Supermarket</title>
     <link rel="stylesheet" href="../user_assets/css/cart.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <?php include 'includes/navbar.php'; ?>
-    
+    <header>
+        <div class="container">
+            <h1>Supermarket</h1>
+            <nav>
+                <a href="product_list.php">Products</a>
+                <a href="wishlist.php">Wishlist</a>
+                <a href="cart.php">Cart</a>
+            </nav>
+        </div>
+    </header>
+
     <main class="container">
-        <h1 class="my-4">Your Shopping Cart</h1>
+        <h1>Your Shopping Cart</h1>
         
         <?php if (empty($cart_items)): ?>
             <div class="empty-cart">
-                <i class="fas fa-shopping-cart"></i>
                 <p>Your cart is empty</p>
-                <a href="product_list.php" class="btn btn-primary">Continue Shopping</a>
+                <a href="product_list.php" class="continue-shopping">Continue Shopping</a>
             </div>
         <?php else: ?>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="cart-items">
-                        <form method="post">
-                            <?php foreach ($cart_items as $item): ?>
-                                <div class="cart-item">
-                                    <div class="item-image">
-                                        <img src="../assets/uploads/<?php echo $item['product']['prod_image']; ?>" 
-                                             alt="<?php echo $item['product']['prod_name']; ?>">
-                                    </div>
-                                    <div class="item-details">
-                                        <h3><?php echo $item['product']['prod_name']; ?></h3>
-                                        <div class="price">RM <?php echo number_format($item['product']['prod_price'], 2); ?></div>
-                                        <div class="quantity-control">
-                                            <input type="number" name="quantity[<?php echo $item['product']['prod_id']; ?>]" 
-                                                   value="<?php echo $item['quantity']; ?>" min="1" 
-                                                   max="<?php echo $item['product']['stock']; ?>">
-                                            <a href="cart.php?remove=<?php echo $item['product']['prod_id']; ?>" class="remove-item">
-                                                <i class="fas fa-trash"></i> Remove
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="item-total">
-                                        RM <?php echo number_format($item['total_price'], 2); ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
+            <div class="cart-content">
+                <div class="cart-items">
+                    <?php foreach ($cart_items as $item): ?>
+                    <div class="cart-item">
+                        <div class="item-image">
+                            <img src="../assets/uploads/<?php echo htmlspecialchars($item['prod_image']); ?>" alt="<?php echo htmlspecialchars($item['prod_name']); ?>">
+                        </div>
+                        <div class="item-details">
+                            <h3><?php echo htmlspecialchars($item['prod_name']); ?></h3>
+                            <div class="price">RM <?php echo number_format($item['prod_price'], 2); ?></div>
                             
-                            <div class="cart-actions">
-                                <a href="product_list.php" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left"></i> Continue Shopping
-                                </a>
-                                <button type="submit" name="update_cart" class="btn btn-outline-primary">
-                                    <i class="fas fa-sync-alt"></i> Update Cart
-                                </button>
+                            <div class="item-actions">
+                                <div class="quantity-controls">
+                                    <button class="quantity-minus" data-id="<?php echo $item['prod_id']; ?>">-</button>
+                                    <input type="number" class="quantity" value="<?php echo $item['QUANTITY']; ?>" min="1" data-id="<?php echo $item['prod_id']; ?>">
+                                    <button class="quantity-plus" data-id="<?php echo $item['prod_id']; ?>">+</button>
+                                </div>
+                                <button class="remove-item" data-id="<?php echo $item['prod_id']; ?>">Remove</button>
                             </div>
-                        </form>
+                        </div>
                     </div>
+                    <?php endforeach; ?>
                 </div>
                 
-                <div class="col-md-4">
-                    <div class="order-summary">
-                        <h3>Order Summary</h3>
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span>RM <?php echo number_format($subtotal, 2); ?></span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Delivery Fee</span>
-                            <span>RM <?php echo number_format($delivery_fee, 2); ?></span>
-                        </div>
-                        <div class="summary-total">
-                            <span>Total</span>
-                            <span>RM <?php echo number_format($grand_total, 2); ?></span>
-                        </div>
-                        
-                        <div class="promo-code">
-                            <h4>Promo Code</h4>
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Enter promo code">
-                                <button class="btn btn-outline-secondary" type="button">Apply</button>
-                            </div>
-                        </div>
-                        
-                        <a href="checkout.php" class="btn btn-primary btn-checkout">
-                            Proceed to Checkout
-                        </a>
+                <div class="order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>RM <?php echo number_format($subtotal, 2); ?></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span>RM <?php echo number_format($delivery_fee, 2); ?></span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span>RM <?php echo number_format($total, 2); ?></span>
+                    </div>
+                    
+                    <div class="promo-code">
+                        <h3>Promo Code</h3>
+                        <input type="text" placeholder="Enter promo code" id="promo-code-input">
+                        <button id="apply-promo">Apply</button>
+                    </div>
+                    
+                    <div class="cart-actions">
+                        <a href="product_list.php" class="continue-shopping">Continue Shopping</a>
+                        <a href="checkout.php" class="checkout-btn">Proceed to Checkout</a>
                     </div>
                 </div>
             </div>
             
-            <?php if ($related_result->num_rows > 0): ?>
+            <?php if ($related_products_result->num_rows > 0): ?>
             <section class="related-products">
                 <h2>You Might Also Like</h2>
                 <div class="related-grid">
-                    <?php while($related = $related_result->fetch_assoc()): ?>
+                    <?php while($related = $related_products_result->fetch_assoc()): ?>
                     <div class="related-item">
                         <a href="product_details.php?id=<?php echo $related['prod_id']; ?>">
-                            <img src="../assets/uploads/<?php echo $related['prod_image']; ?>" 
-                                 alt="<?php echo $related['prod_name']; ?>">
-                            <h3><?php echo $related['prod_name']; ?></h3>
+                            <img src="../assets/uploads/<?php echo htmlspecialchars($related['prod_image']); ?>" alt="<?php echo htmlspecialchars($related['prod_name']); ?>">
+                            <h3><?php echo htmlspecialchars($related['prod_name']); ?></h3>
                             <div class="price">RM <?php echo number_format($related['prod_price'], 2); ?></div>
                         </a>
                     </div>
@@ -172,10 +150,11 @@ $related_result = $conn->query($related_sql);
             <?php endif; ?>
         <?php endif; ?>
     </main>
-    
-    <?php include 'includes/footer.php'; ?>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <footer>
+        <p>&copy; 2023 Supermarket. All rights reserved.</p>
+    </footer>
+
     <script src="../user_assets/js/cart.js"></script>
 </body>
 </html>
