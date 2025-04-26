@@ -23,18 +23,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = isset($_POST['admin_id']) ? intval($_POST['admin_id']) : 0;
     $admin_name = $_POST['admin_name'];
     $email = $_POST['admin_email'];
-    $password = !empty($_POST['admin_password']) ? $_POST['admin_password'] : "password"; 
+    $password = !empty($_POST['admin_password']) ? $_POST['admin_password'] : "password";
 
     $check_query = "SELECT * FROM admin WHERE admin_email = '$email'";
     $check_result = $conn->query($check_query);
 
-    if ($check_result->num_rows > 0 && $id == 0) { 
+    if ($check_result->num_rows > 0 && $id == 0) {
         echo "<script>alert('Email already exists! Please use another one.'); window.location.href='../admin/Siderbar_Admin_management.php';</script>";
         exit();
     }
 
     if ($id > 0) {
-        $sql = "UPDATE admin SET admin_name='$admin_name', admin_email='$email' WHERE admin_id=$id";
+        $sql = "UPDATE admin SET admin_name='$admin_name' WHERE admin_id=$id";
     } else {
         $sql = "INSERT INTO admin (admin_name, admin_email, admin_password, admin_role) 
                 VALUES ('$admin_name', '$email', '$password', 'admin')";
@@ -76,16 +76,16 @@ $admins = $conn->query("SELECT * FROM admin");
                 </p>
             </div>
             <nav>
-            <ul>
-            <?php if ($_SESSION['admin_role'] === 'Super Admin') : ?>
-                    <li><a href="Siderbar_Admin_management.php"><img src="../assets/images/admin_photo.png" alt=""> Admin Management</a></li>
-                <?php endif ?>
-                <li><a href="Siderbar_Category.php"><img src="../assets/images/category.png" alt=""> Category</a></li>
-                <li><a href="Siderbar_Product.php"><img src="../assets/images/product.png" alt=""> Product</a></li>
-                <li><a href="Siderbar_CustomerList.php"><img src="../assets/images/customer_list.png" alt=""> Customer List</a></li>
-                <li><a href="Siderbar_ViewOrders.php"><img src="../assets/images/vieworder.png" alt=""> View Orders</a></li>
-                <li><a href="Siderbar_Delivery.php"><img src="../assets/images/delivery.png" alt=""> Delivery</a></li>
-                <li><a href="Siderbar_Reports.php"><img src="../assets/images/report.png" alt=""> Reports</a></li>
+                <ul>
+                    <?php if ($_SESSION['admin_role'] === 'Super Admin') : ?>
+                        <li><a href="Siderbar_Admin_management.php"><img src="../assets/images/admin_photo.png" alt=""> Admin Management</a></li>
+                    <?php endif ?>
+                    <li><a href="Siderbar_Category.php"><img src="../assets/images/category.png" alt=""> Category</a></li>
+                    <li><a href="Siderbar_Product.php"><img src="../assets/images/product.png" alt=""> Product</a></li>
+                    <li><a href="Siderbar_CustomerList.php"><img src="../assets/images/customer_list.png" alt=""> Customer List</a></li>
+                    <li><a href="Siderbar_ViewOrders.php"><img src="../assets/images/vieworder.png" alt=""> View Orders</a></li>
+                    <li><a href="Siderbar_Delivery.php"><img src="../assets/images/delivery.png" alt=""> Delivery</a></li>
+                    <li><a href="Siderbar_Reports.php"><img src="../assets/images/report.png" alt=""> Reports</a></li>
                 </ul>
             </nav>
         </aside>
@@ -103,8 +103,9 @@ $admins = $conn->query("SELECT * FROM admin");
                     <h3 id="formTitle">Add New Admin</h3>
                     <form method="POST">
                         <input type="hidden" id="adminId" name="admin_id">
-                        <label>Admin Name:</label> <input type="text" id="admin_name" name="admin_name" required><br>
-                        <label>Email:</label> <input type="email" id="admin_email" name="admin_email" required><br>
+                        <label>Staff Name:</label> <input type="text" id="admin_name" name="admin_name" required><br>
+                        <label>Email:</label>
+                        <input type="email" id="admin_email" name="admin_email" disabled><br>
 
                         <div id="passwordField">
                             <label>Password:</label>
@@ -117,35 +118,35 @@ $admins = $conn->query("SELECT * FROM admin");
                 </div>
 
                 <table>
-    <thead>
-        <tr>
-            <th>Admin Name</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php while ($row = $admins->fetch_assoc()) { ?>
-            <tr>
-                <td><?php echo $row['admin_name']; ?></td>
-                <td><?php echo $row['admin_email']; ?></td>
-                <td><?php echo ucfirst($row['status']); ?></td>
-                <td>
-                    <a onclick='editAdmin(<?php echo $row["admin_id"]; ?>, <?php echo json_encode($row["admin_name"]); ?>, <?php echo json_encode($row["admin_email"]); ?>)'>
-                        <img src="../assets/images/edit.png" alt="Edit" class="icon-btn">
-                    </a>
-                    
-                    <a href="?toggle_status=<?php echo $row['admin_id']; ?>" 
-                       onclick="return confirm('Change status of this admin?')">
-                        <img src="../assets/images/<?php echo $row['status'] === 'active' ? 'active.png' : 'inactive.png'; ?>" 
-                             alt="Toggle Status" class="icon-btn">
-                    </a>
-                </td>
-            </tr>
-        <?php } ?>
-    </tbody>
-</table>
+                    <thead>
+                        <tr>
+                            <th>Admin Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $admins->fetch_assoc()) { ?>
+                            <tr>
+                                <td><?php echo $row['admin_name']; ?></td>
+                                <td><?php echo $row['admin_email']; ?></td>
+                                <td><?php echo ucfirst($row['status']); ?></td>
+                                <td>
+                                    <a onclick='editAdmin(<?php echo $row["admin_id"]; ?>, <?php echo json_encode($row["admin_name"]); ?>, <?php echo json_encode($row["admin_email"]); ?>)'>
+                                        <img src="../assets/images/edit.png" alt="Edit" class="icon-btn">
+                                    </a>
+
+                                    <a href="?toggle_status=<?php echo $row['admin_id']; ?>"
+                                        onclick="return confirm('Change status of this admin?')">
+                                        <img src="../assets/images/<?php echo $row['status'] === 'active' ? 'active.png' : 'inactive.png'; ?>"
+                                            alt="Toggle Status" class="icon-btn">
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
 
 
 
@@ -161,7 +162,7 @@ $admins = $conn->query("SELECT * FROM admin");
             document.getElementById("admin_name").value = "";
             document.getElementById("admin_email").value = "";
             document.getElementById("admin_password").value = "";
-            document.getElementById("passwordField").style.display = "block"; 
+            document.getElementById("passwordField").style.display = "block";
         }
 
         function editAdmin(id, admin_name, admin_email) {
@@ -170,7 +171,8 @@ $admins = $conn->query("SELECT * FROM admin");
             document.getElementById("adminId").value = id;
             document.getElementById("admin_name").value = admin_name;
             document.getElementById("admin_email").value = admin_email;
-            document.getElementById("passwordField").style.display = "none"; 
+            document.getElementById("admin_email").disabled = true;
+            document.getElementById("passwordField").style.display = "none";
         }
 
         function hideForm() {

@@ -84,10 +84,11 @@ if (isset($_GET['delete_category']) && $isAdmin) {
                 while ($row = $categories->fetch_assoc()) { ?>
                     <div class="card">
                         <p><?= $row['category_name'] ?></p>
-                        <?php if ($isAdmin) : ?>
-                            <button onclick="window.location.href='../admin/Siderbar_Product.php?category_id=<?= $row['category_id'] ?>'">
+                        
+                            <button onclick="window.location.href='../admin/Siderbar_Product.php?category_filter=<?= $row['category_id'] ?>'">
                                 <img src="../assets/images/manage.png" alt="Manage Products" class="icon-btn">
                             </button>
+                            <?php if ($isAdmin) : ?>
                             <button onclick="confirmDeleteCategory(<?= $row['category_id'] ?>)">
                                 <img src="../assets/images/delete.png" alt="Delete" class="icon-btn">
                             </button>

@@ -3,44 +3,50 @@ session_start();
 include '../db_connection.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-   
-    $admin_name = mysqli_real_escape_string($conn, $_POST['admin_name']);
+
+    $admin_input = mysqli_real_escape_string($conn, $_POST['admin_input']);
     $password = $_POST['admin_password'];
 
-    $superadmin = [
-        "admin_name" => "superadmin", 
-        "admin_password" => "password" 
-    ];
-
-    if ($admin_name == $superadmin['admin_name'] && $password == $superadmin['admin_password']) {
-        $_SESSION['admin_name'] = "superAdmin"; 
+    if ($admin_input == "superadmin" && $password == "password") {
+        $_SESSION['admin_name'] = "SuperAdmin"; 
         $_SESSION['admin_role'] = "Super Admin";
+        
         header("Location: ../admin/superadmin_dashboard.php");
         exit();
     }
 
-    $sql = "SELECT * FROM admin WHERE admin_name = '$admin_name'";
-    $result = mysqli_query($conn, $sql);
+    $sql = "SELECT * FROM admin WHERE admin_email = '$admin_input'";
+    $result = mysqli_query($conn, $sql); 
 
-    if ($row = mysqli_fetch_assoc($result)) { 
-        if ($password == $row['admin_password']) {
-            if ($row['status'] === 'active') {
-                $_SESSION['admin_name'] = $admin_name;  
-                $_SESSION['admin_role'] = ucfirst($row['admin_role']); 
-                header("Location: ../admin/admin_dashboard.php");
-                exit();
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        
+        if ($row) {
+            if ($password == $row['admin_password']) {
+                if ($row['status'] === 'active') {
+                    $_SESSION['admin_email'] = $admin_input;
+                    $_SESSION['admin_role'] = ucfirst($row['admin_role']);
+                    $_SESSION['admin_name'] = $row['admin_name'];
+                    echo "<pre>";
+            print_r($_SESSION);
+            echo "</pre>";
+                    header("Location: ../admin/admin_dashboard.php");
+                    exit();
+                } else {
+                    $error = "This admin account is inactive!";
+                }
             } else {
-                $error = "This admin account is inactive!";
+                $error = "Incorrect password!";
             }
         } else {
-            $error = "Incorrect password!";
+            $error = "Email does not exist!";
         }
     } else {
-        $error = "Username does not exist!";
+        $error = "Error with the query!";
     }
-    
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php } ?>
 
         <form action="adminlogin.php" method="POST">
-    <input type="text" name="admin_name" placeholder="Enter your ID" required>
+    <input type="text" name="admin_input" placeholder="Enter your email or superadmin name" required>
     <input type="password" name="admin_password" placeholder="Enter your password" required>
     <button type="submit">Login</button>
 </form>

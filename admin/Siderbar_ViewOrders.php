@@ -35,12 +35,12 @@ function getOrderDetails($conn, $user_id)
         while ($item = $items_result->fetch_assoc()) {
             $product_name = $item['prod_name'];
             $quantity = $item['quantity'];
-            $price = $item['unit_price'];  // unit_price is in the order_item table
+            $price = $item['order_item_price'];  
             $total_price = $price * $quantity;
             $items[] = [
                 'product_name' => $product_name,
                 'quantity' => $quantity,
-                'unit_price' => $price,
+                'order_item_price' => $price,
                 'total_price' => number_format($total_price, 2)
             ];
         }
@@ -97,7 +97,7 @@ if (isset($_GET['ajax']) && isset($_GET['user_id'])) {
 
             echo "<td>{$item['quantity']}</td>";
 
-            echo "<td>RM {$item['unit_price']}</td>";
+            echo "<td>RM {$item['order_item_price']}</td>";
 
             if ($firstRow) {
                 echo "<td rowspan='{$rowspan}'>{$order['order_status']}</td>";

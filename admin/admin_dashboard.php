@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['admin_name']) || $_SESSION['admin_role'] !== "Admin") {
+if (!isset($_SESSION['admin_email']) || $_SESSION['admin_role'] !== "Admin") {
     header("Location: ../admin/adminlogin.php");
     exit();
 }

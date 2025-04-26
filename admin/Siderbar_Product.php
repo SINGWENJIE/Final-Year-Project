@@ -54,6 +54,7 @@ if (isset($_GET['delete_product']) && isset($_GET['category_id'])) {
 
 $categories = $conn->query("SELECT * FROM category");
 
+
 $filter_category = isset($_GET['category_filter']) ? $_GET['category_filter'] : '';
 $search_term = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
 
