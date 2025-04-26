@@ -160,3 +160,44 @@ nav ul li a img {
     width: 20px;
     height: 20px;
 }
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+
+.save-btn {
+    padding: 10px 16px;
+    background-color: #0db99f;
+    border: none;
+    border-radius: 8px;
+    color: white;
+
+}
+
+.save-btn:hover {
+    background-color: #10dfc0;
+
+}
