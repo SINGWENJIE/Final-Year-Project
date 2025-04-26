@@ -65,9 +65,11 @@ $products_result = $conn->query($sql);
                     }
                     ?>
                     <div class="product-card" data-category="<?php echo $row['category_id']; ?>">
-                        <div class="product-image">
-                            <img src="../assets/uploads/<?php echo $row['prod_image']; ?>" alt="<?php echo $row['prod_name']; ?>">
-                        </div>
+                        <a href="product_details.php?id=<?php echo $row['prod_id']; ?>" class="product-link">
+                            <div class="product-image">
+                                <img src="../assets/uploads/<?php echo $row['prod_image']; ?>" alt="<?php echo $row['prod_name']; ?>">
+                            </div>
+                        </a>
                         <div class="product-info">
                             <h3><?php echo $row['prod_name']; ?></h3>
                             <p class="price">RM <?php echo number_format($row['prod_price'], 2); ?></p>
