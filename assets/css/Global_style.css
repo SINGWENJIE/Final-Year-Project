@@ -39,6 +39,7 @@ body {
     border-bottom: 2px solid #dfdfdf; 
     width: 100%; 
     margin-bottom: 15px;
+
 }
 
 .profile img {
@@ -63,6 +64,7 @@ body {
     display: inline-block;
     margin-top: 5px;
     color: white;
+    position: relative; 
 }
 
 nav ul {
@@ -121,4 +123,40 @@ nav ul li a img {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); 
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+}
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.edit-profile-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    position: absolute; 
+    top: 183px;
+    left: 35px; 
+    margin: 10px;
+}
+
+.edit-profile-btn img {
+    width: 20px;
+    height: 20px;
 }

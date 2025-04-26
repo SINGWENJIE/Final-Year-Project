@@ -2,17 +2,36 @@
 session_start();
 
 if (!isset($_SESSION['admin_email']) || $_SESSION['admin_role'] !== "Admin") {
-    header("Location: ../admin/adminlogin.php");
+    header("Location: adminlogin.php");
     exit();
 }
-
 $role = $_SESSION['admin_role'];
 $admin_id = $_SESSION['admin_name'];
+$admin_email = $_SESSION['admin_email'];
 
 $conn = new mysqli("localhost", "root", "", "gogo_supermarket");
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $admin_name = $_POST['admin_name'];
+    $admin_password = $_POST['admin_password'];
+
+    if (!empty($admin_password)) {
+        $update_query = "UPDATE admin SET admin_name = '$admin_name', admin_password = '$admin_password' WHERE admin_email = '$admin_email'";
+    } else {
+        $update_query = "UPDATE admin SET admin_name = '$admin_name' WHERE admin_email = '$admin_email'";
+    }
+
+    if ($conn->query($update_query)) {
+        $_SESSION['admin_name'] = $admin_name;
+        header("Location: admin_dashboard.php?status=success");
+        exit();
+    } else {
+        echo "Error: " . $conn->error;
+    }
 }
 
 $order_query = "SELECT COUNT(order_id) AS total_orders FROM `orders`";
@@ -29,8 +48,6 @@ $total_payments = 0;
 if ($payment_result && $row = $payment_result->fetch_assoc()) {
     $total_payments = $row['total_amount'];
 }
-
-
 
 $conn->close();
 ?>
@@ -52,14 +69,20 @@ $conn->close();
             <div class="logo">
                 <img src="../assets/images/logoname.png" alt="Logo">
             </div>
-
             <div class="profile">
+            <button class="edit-profile-btn" title="Edit Profile">
+                        <img src="../assets/images/admin_profile.png" alt="admin_profile">
+                    </button>
                 <img src="../assets/images/admin.png" alt="Admin foto">
-                <p><span class="admin_role"><?php echo $role; ?></span></p>
+                <p>
+                    <span class="admin_role"><?php echo $role; ?></span>
+                    
+
+                </p>
             </div>
             <nav>
                 <ul>
-                <li><a href="Siderbar_Category.php"><img src="../assets/images/category.png" alt=""> Category</a></li>
+                    <li><a href="Siderbar_Category.php"><img src="../assets/images/category.png" alt=""> Category</a></li>
                     <li><a href="Siderbar_Product.php"><img src="../assets/images/product.png" alt=""> Product</a></li>
                     <li><a href="Siderbar_CustomerList.php"><img src="../assets/images/customer_list.png" alt=""> Customer List</a></li>
                     <li><a href="Siderbar_ViewOrders.php"><img src="../assets/images/vieworder.png" alt=""> View Orders</a></li>
@@ -85,7 +108,6 @@ $conn->close();
                 <div class="card">
                     <h3>Total Payments</h3>
                     <p>RM <?php echo number_format($total_payments, 2); ?></p>
-
                 </div>
             </div>
 
@@ -135,12 +157,38 @@ $conn->close();
             </div>
         </main>
     </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Profile</h2>
+            <form method="post">
+                <label for="admin_name">Admin Name:</label>
+                <input type="text" id="admin_name" name="admin_name" value="<?php echo $admin_id; ?>" required>
+                <label for="admin_email">Admin Email:</label>
+                <input type="email" id="admin_email" name="admin_email" value="<?php echo $admin_email; ?>" readonly>
+
+                <label for="admin_password">New Password:</label>
+                <input type="password" id="admin_password" name="admin_password">
+
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelector(".logout-btn").addEventListener("click", function() {
-                window.location.href = "../admin/logout.php";
-            });
-        });
+        document.querySelector(".logout-btn").onclick = function() {
+            location.href = "../admin/logout.php";
+        };
+
+        document.querySelector(".edit-profile-btn").onclick = function() {
+            document.getElementById("profileModal").style.display = "block";
+        };
+
+        document.querySelector(".close").onclick = function() {
+            document.getElementById("profileModal").style.display = "none";
+        };
     </script>
 </body>
 

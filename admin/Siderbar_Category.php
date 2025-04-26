@@ -84,7 +84,6 @@ if (isset($_GET['delete_category']) && $isAdmin) {
                 while ($row = $categories->fetch_assoc()) { ?>
                     <div class="card">
                         <p><?= $row['category_name'] ?></p>
-                        
                             <button onclick="window.location.href='../admin/Siderbar_Product.php?category_filter=<?= $row['category_id'] ?>'">
                                 <img src="../assets/images/manage.png" alt="Manage Products" class="icon-btn">
                             </button>
