@@ -69,11 +69,11 @@ $products_result = $conn->query($sql);
         <div class="products-container" id="productsContainer">
             <?php
             if ($products_result->num_rows > 0) {
+                echo "<div class='product-row'>";
                 $count = 0;
                 while($row = $products_result->fetch_assoc()) {
-                    if ($count % 5 == 0) {
-                        if ($count != 0) echo "</div>";
-                        echo "<div class='product-row'>";
+                    if ($count > 0 && $count % 5 == 0){
+                        echo "</div><div class='product-row'>"; // Start new row every 5 products
                     }
                     ?>
                     <div class="product-card" data-category="<?php echo $row['category_id']; ?>">
@@ -103,7 +103,6 @@ $products_result = $conn->query($sql);
             } else {
                 echo "<p>No products found.</p>";
             }
-            $conn->close();
             ?>
         </div>
     </main>

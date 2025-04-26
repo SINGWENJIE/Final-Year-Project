@@ -34,16 +34,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function filterByCategory() {
         const selectedCategory = categoryFilter.value;
+        const productsContainer = document.getElementById('productsContainer');
+        const visibleProducts = [];
         
+        // First collect all visible products
         productCards.forEach(card => {
             const cardCategory = card.getAttribute('data-category');
             
             if (selectedCategory === '' || cardCategory === selectedCategory) {
-                card.style.display = 'flex'; // Changed from 'block' to 'flex'
+                visibleProducts.push(card);
+                card.style.display = 'flex';
             } else {
                 card.style.display = 'none';
             }
         });
+        
+        // Now reorganize into rows of 5
+        productsContainer.innerHTML = ''; // Clear current content
+        
+        for (let i = 0; i < visibleProducts.length; i += 5) {
+            const row = document.createElement('div');
+            row.className = 'product-row';
+            
+            // Add up to 5 products to this row
+            for (let j = 0; j < 5 && (i + j) < visibleProducts.length; j++) {
+                row.appendChild(visibleProducts[i + j]);
+            }
+            
+            productsContainer.appendChild(row);
+        }
     }
 
     // Quantity controls using event delegation
