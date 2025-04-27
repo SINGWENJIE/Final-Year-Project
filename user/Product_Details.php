@@ -63,7 +63,7 @@ if ($result->num_rows > 0) {
             <nav>
                 <a href="product_list.php"><i class="fas fa-store"></i> Products</a>
                 <a href="#"><i class="fas fa-heart"></i> Wishlist</a>
-                <a href="#"><i class="fas fa-shopping-cart"></i> Cart</a>
+                <a href="cart.php"><i class="fas fa-shopping-cart"></i> Cart</a>
                 <span class="user-info">
                     <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                     <a href="logout.php" class="logout-btn">Logout</a>
