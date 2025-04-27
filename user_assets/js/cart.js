@@ -96,7 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 quantity: quantity
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 // Update the displayed total for this item
@@ -113,8 +118,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            showToast('An error occurred. Please try again.', 'error');
             console.error('Error:', error);
+            showToast('An error occurred. Please try again.', 'error');
+            // Revert the quantity change
+            document.querySelector(`.quantity-input[data-id="${cartItemId}"]`).value = quantity - 1;
         });
     }
     
