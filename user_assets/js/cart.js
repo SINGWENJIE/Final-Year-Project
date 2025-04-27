@@ -1,128 +1,97 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Quantity controls
-    document.querySelectorAll('.quantity-minus').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const quantityInput = document.querySelector(`.quantity[data-id="${productId}"]`);
-            let value = parseInt(quantityInput.value);
-            if (value > 1) {
-                quantityInput.value = value - 1;
-                updateCartItem(productId, quantityInput.value);
-            }
-        });
-    });
+    // Update item totals when quantity changes
+    const quantityInputs = document.querySelectorAll('.quantity-input');
     
-    document.querySelectorAll('.quantity-plus').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const quantityInput = document.querySelector(`.quantity[data-id="${productId}"]`);
-            let value = parseInt(quantityInput.value);
-            quantityInput.value = value + 1;
-            updateCartItem(productId, quantityInput.value);
-        });
-    });
-    
-    // Quantity input change
-    document.querySelectorAll('.quantity').forEach(input => {
+    quantityInputs.forEach(input => {
         input.addEventListener('change', function() {
-            const productId = this.getAttribute('data-id');
-            let value = parseInt(this.value);
-            if (value < 1) {
+            const cartItem = this.closest('.cart-item');
+            const price = parseFloat(cartItem.querySelector('.item-price').textContent.replace('RM ', ''));
+            const quantity = parseInt(this.value);
+            const totalElement = cartItem.querySelector('.item-total');
+            
+            // Validate quantity
+            const max = parseInt(this.getAttribute('max')) || 999;
+            if (quantity < 1) {
                 this.value = 1;
-                value = 1;
+            } else if (quantity > max) {
+                this.value = max;
+                showToast(`Maximum quantity is ${max}`);
             }
-            updateCartItem(productId, value);
+            
+            // Update total
+            const total = price * quantity;
+            totalElement.textContent = 'RM ' + total.toFixed(2);
         });
     });
     
-    // Remove item
-    document.querySelectorAll('.remove-item').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            if (confirm('Are you sure you want to remove this item from your cart?')) {
-                removeCartItem(productId);
+    // Show confirmation before removing item
+    const removeButtons = document.querySelectorAll('.remove-btn');
+    
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productName = this.closest('.cart-item').querySelector('h3').textContent;
+            
+            if (confirm(`Are you sure you want to remove "${productName}" from your cart?`)) {
+                window.location.href = this.getAttribute('href');
             }
         });
     });
     
-    // Apply promo code
-    document.getElementById('apply-promo')?.addEventListener('click', function() {
-        const promoCode = document.getElementById('promo-code-input').value;
-        if (promoCode.trim() === '') {
-            alert('Please enter a promo code');
-            return;
-        }
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
         
-        applyPromoCode(promoCode);
-    });
-    
-    // Functions for cart operations
-    function updateCartItem(productId, quantity) {
-        fetch('update_cart.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `product_id=${productId}&quantity=${quantity}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Refresh the page to update totals
-                window.location.reload();
-            } else {
-                alert(data.error || 'Failed to update cart');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to update cart');
-        });
-    }
-    
-    function removeCartItem(productId) {
-        fetch('remove_from_cart.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `product_id=${productId}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Refresh the page
-                window.location.reload();
-            } else {
-                alert(data.error || 'Failed to remove item');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to remove item');
-        });
-    }
-    
-    function applyPromoCode(promoCode) {
-        fetch('apply_promo.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `promo_code=${promoCode}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Promo code applied successfully!');
-                window.location.reload();
-            } else {
-                alert(data.error || 'Failed to apply promo code');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to apply promo code');
-        });
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
     }
 });
+
+// Add toast notification styles dynamically
+const toastStyles = document.createElement('style');
+toastStyles.textContent = `
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+}
+
+.toast-notification.show {
+    opacity: 1;
+}
+
+.toast-notification.success {
+    background-color: #27ae60;
+}
+
+.toast-notification.error {
+    background-color: #e74c3c;
+}
+
+.toast-notification.info {
+    background-color: #3498db;
+}
+`;
+document.head.appendChild(toastStyles);
