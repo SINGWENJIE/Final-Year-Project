@@ -10,40 +10,64 @@ require '../db_connection.php';
 
 if (isset($_POST['send_otp'])) {
     $email = htmlspecialchars($_POST['admin_email']);
-    $_SESSION['admin_email'] = $email;
 
-    $otp = rand(100000, 999999);
-    $_SESSION['otp'] = $otp;
-    $_SESSION['otp_created_time'] = time();
+//check the email in admin_email or no 
+    $check_email_query = "SELECT * FROM admin WHERE admin_email = '$email'";
+    $result = $conn->query($check_email_query);
 
-    $subject = "Your OTP Code";
-    $message = "Hello,We are GoGo Supermarket.Your OTP Code is: $otp\n\n";
+    if ($result->num_rows == 0) {
+        $error = "Email not found in admin records.";
 
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'qiaoxuanp@gmail.com';
-        $mail->Password = 'cguc amid omyn lxcs';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+    } else {
+        $_SESSION['admin_email'] = $email;
 
-        $mail->setFrom('qiaoxuanp@gmail.com', 'qiaoxuan');
-        $mail->addAddress($email);
-        $mail->addReplyTo('qiaoxuanp@gmail.com', 'qiaoxuan');
+        $otp = rand(100000, 999999);
+        $_SESSION['otp'] = $otp;
+        $_SESSION['otp_created_time'] = time();
 
-        $mail->isHTML(false);
-        $mail->Subject = $subject;
-        $mail->Body    = $message;
+        $subject = "Your OTP Code";
+        $message = "Hello,
 
-        $mail->send();
-        $_SESSION['otp_sent'] = true;
-        $msg = "OTP has been sent to your email.";
-    } catch (Exception $e) {
-        $error = "Failed to send OTP. Mailer Error: {$mail->ErrorInfo}";
+We are GoGo Supermarket. You have requested to reset your password.
+
+Your One-Time Password (OTP) is: $otp
+
+Please enter this OTP within 60 second to proceed with resetting your password. 
+For your account security, do not share this OTP with anyone.
+
+If you did not request this, please ignore this email or contact our support team immediately.
+
+Thank you,
+GoGo Supermarket Team";
+
+
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'qiaoxuanp@gmail.com';
+            $mail->Password = 'cguc amid omyn lxcs';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+
+            $mail->setFrom('qiaoxuanp@gmail.com', 'qiaoxuan');
+            $mail->addAddress($email);
+            $mail->addReplyTo('qiaoxuanp@gmail.com', 'qiaoxuan');
+
+            $mail->isHTML(false);
+            $mail->Subject = $subject;
+            $mail->Body    = $message;
+
+            $mail->send();
+            $_SESSION['otp_sent'] = true;
+            $msg = "OTP has been sent to your email.";
+        } catch (Exception $e) {
+            $error = "Failed to send OTP. Mailer Error: {$mail->ErrorInfo}";
+        }
     }
 }
+
 
 if (isset($_POST['verify_otp'])) {
     $user_otp = $_POST['otp'];
