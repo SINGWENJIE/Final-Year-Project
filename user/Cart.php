@@ -45,9 +45,8 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Calculate delivery fee and total
-$delivery_fee = 5.00; // Default delivery fee
-$total = $subtotal + $delivery_fee;
+// Calculate total to subtotal
+$total = $subtotal;
 
 // Check for empty cart
 $is_cart_empty = empty($cart_items);
@@ -166,18 +165,10 @@ $is_cart_empty = empty($cart_items);
                         <span>Subtotal (<?php echo $item_count; ?> items)</span>
                         <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
                     </div>
-                    <div class="summary-row">
-                        <span>Delivery Fee</span>
-                        <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
-                    </div>
                     <div class="summary-divider"></div>
                     <div class="summary-row total">
                         <span>Total</span>
                         <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
-                    </div>
-                    <div class="coupon-section">
-                        <input type="text" placeholder="Enter promo code" class="coupon-input">
-                        <button class="apply-coupon">Apply</button>
                     </div>
                     <button class="checkout-btn">Proceed to Checkout</button>
                     <a href="product_list.php" class="continue-shopping">

@@ -63,19 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Apply coupon code
-    const applyCouponBtn = document.querySelector('.apply-coupon');
-    if (applyCouponBtn) {
-        applyCouponBtn.addEventListener('click', function() {
-            const couponCode = document.querySelector('.coupon-input').value.trim();
-            if (couponCode) {
-                applyCoupon(couponCode);
-            } else {
-                showToast('Please enter a coupon code', 'error');
-            }
-        });
-    }
-    
     // Proceed to checkout
     const checkoutBtn = document.querySelector('.checkout-btn');
     if (checkoutBtn) {
@@ -204,46 +191,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Apply coupon via AJAX
-    function applyCoupon(couponCode) {
-        const applyBtn = document.querySelector('.apply-coupon');
-        const originalHTML = applyBtn.innerHTML;
-        applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
-        applyBtn.disabled = true;
-        
-        fetch('apply_coupon.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                coupon_code: couponCode
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateCartSummary(data.cart);
-                showToast('Coupon applied successfully!', 'success');
-            } else {
-                showToast(data.message || 'Failed to apply coupon', 'error');
-            }
-        })
-        .catch(error => {
-            showToast('An error occurred. Please try again.', 'error');
-            console.error('Error:', error);
-        })
-        .finally(() => {
-            applyBtn.innerHTML = originalHTML;
-            applyBtn.disabled = false;
-        });
-    }
-    
     // Update cart summary section
     function updateCartSummary(cartData) {
         if (cartData) {
             document.querySelector('.subtotal').textContent = `RM ${parseFloat(cartData.subtotal).toFixed(2)}`;
-            document.querySelector('.delivery-fee').textContent = `RM ${parseFloat(cartData.delivery_fee).toFixed(2)}`;
             document.querySelector('.total-amount').textContent = `RM ${parseFloat(cartData.total).toFixed(2)}`;
             
             // Update item count in summary
