@@ -3,17 +3,17 @@ CREATE TABLE `address` (
   `user_id` int(11) NOT NULL,
   `recipient_name` varchar(100) NOT NULL,
   `street_address` varchar(255) NOT NULL,
-  `city` varchar(100) NOT NULL,
-  `state` varchar(100) NOT NULL,
+  `city` enum('MELAKA TENGAH','ALOR GAJAH','JASIN') NOT NULL,
+  `state` enum('MALACCA') NOT NULL,
   `postal_code` varchar(20) NOT NULL,
   `is_default` tinyint(1) DEFAULT 0,
-  `phone_number` varchar(20) NOT NULL,
+  `phone_number` varchar(15) NOT NULL,
   `note` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 INSERT INTO `address` (`address_id`, `user_id`, `recipient_name`, `street_address`, `city`, `state`, `postal_code`, `is_default`, `phone_number`, `note`) VALUES
-(1, 3, 'qiaoxuan', 'No. 5, Jalan Bukit', 'Kuala Lumpur', 'ixora', '50000', 1, '0123456789', NULL);
+(1, 3, 'qiaoxuan', 'No. 5, Jalan Bukit', '', '', '50000', 1, '0123456789', NULL);
 
 
 CREATE TABLE `admin` (
@@ -27,13 +27,11 @@ CREATE TABLE `admin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-
 INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `admin_password`, `admin_phone_num`, `admin_role`, `status`) VALUES
 (7, 'qiaoxuan', 'qiaoxuanp@gmail.com', 'password', NULL, 'admin', 'active'),
 (8, 'changhao', 'changhao@gmail.com', 'password', NULL, 'admin', 'active'),
 (9, 'weixin', 'weixin@gmail.com', 'password', NULL, 'admin', 'active'),
 (10, 'CHEW', 'CHEW@gmail.com', 'password', NULL, 'admin', 'active');
-
 
 
 CREATE TABLE `cart` (
@@ -45,6 +43,10 @@ CREATE TABLE `cart` (
 ) ;
 
 
+INSERT INTO `cart` (`CART_ID`, `user_id`, `SESSION_ID`, `CREATED_AT`, `UPDATED_AT`) VALUES
+(2, 14, NULL, '2025-04-27 10:39:49', '2025-04-27 10:39:49'),
+(3, 17, NULL, '2025-04-28 04:20:00', '2025-04-28 04:20:00');
+
 
 CREATE TABLE `cart_items` (
   `CART_ITEM_ID` int(11) NOT NULL,
@@ -54,12 +56,17 @@ CREATE TABLE `cart_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+INSERT INTO `cart_items` (`CART_ITEM_ID`, `CART_ID`, `prod_id`, `QUANTITY`) VALUES
+(3, 2, 14, 1),
+(4, 2, 5, 1),
+(6, 2, 13, 1),
+(7, 3, 5, 4);
+
 
 CREATE TABLE `category` (
   `category_id` int(11) NOT NULL,
   `category_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 
 
 INSERT INTO `category` (`category_id`, `category_name`) VALUES
@@ -80,7 +87,7 @@ CREATE TABLE `delivery` (
   `order_id` int(11) NOT NULL,
   `tracking_number` varchar(100) DEFAULT NULL,
   `delivery_status` enum('processing','out_for_delivery','delivered') DEFAULT 'processing',
-  `carrier` varchar(50) DEFAULT 'STANDARD DELIVERY',
+  `carrier` enum('STANDARD DELIVERY','EXPRESS DELIVERY') DEFAULT 'STANDARD DELIVERY',
   `estimated_delivery_date` date DEFAULT NULL,
   `actual_delivery_date` date DEFAULT NULL,
   `notes` text DEFAULT NULL,
@@ -110,7 +117,7 @@ CREATE TABLE `orders` (
   `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `subtotal` decimal(10,2) NOT NULL,
   `total_amount` decimal(12,2) NOT NULL,
-  `discount_amount` decimal(10,2) DEFAULT 0.00,
+  `DISCOUNT_AMOUNT` decimal(10,2) DEFAULT 0.00,
   `delivery_fee` decimal(10,2) DEFAULT 5.00,
   `order_status` enum('pending','processing','shipped','delivered') DEFAULT 'pending',
   `admin_id` int(11) DEFAULT NULL
@@ -149,7 +156,6 @@ CREATE TABLE `product` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-
 INSERT INTO `product` (`prod_id`, `prod_name`, `category_id`, `prod_price`, `prod_description`, `prod_quantity`, `prod_image`, `stock`) VALUES
 (5, 'Lays Classic Potato Chips 170g', 2, 13.98, 'Lay\'s potato chips continue to be made with quality, homegrown Canadian potatoes.', 0, 'lays.png', 200),
 (6, 'broccoli', 9, 6.50, 'this is a broccoli come form Japan', 0, 'broccoli_commodity-page.png', 80),
@@ -158,7 +164,6 @@ INSERT INTO `product` (`prod_id`, `prod_name`, `category_id`, `prod_price`, `pro
 (12, 'Cola', 12, 2.90, 'one cola can buy you happy', 0, 'images.jpeg', 100),
 (13, 'Massimo Chiffon [Mocha Flavor]', 7, 3.20, 'Massimo Chiffon In A Cup 35g Cupcake Kek Classic Cheese Mocha', 0, 'masimo[pandan].png', 50),
 (14, 'Clorox Clean-Up Spray', 4, 14.00, 'Clorox Clean-Up All Purpose Cleaner Spray with Bleach, Spray Bottle, Original, 32 oz', 0, 'clorox[cleanup_spray].png', 100);
-
 
 
 CREATE TABLE `promo_code` (
@@ -170,6 +175,10 @@ CREATE TABLE `promo_code` (
   `MAX_USES` int(11) DEFAULT NULL,
   `USES_COUNT` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+INSERT INTO `promo_code` (`CODE`, `DISCOUNT_AMOUNT`, `MIN_ORDER`, `VALID_FROM`, `VALID_TO`, `MAX_USES`, `USES_COUNT`) VALUES
+('WELCOME10', 10.00, 50.00, '2025-04-28', '2025-06-01', NULL, 0);
 
 
 CREATE TABLE `users` (
@@ -187,37 +196,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `user_name`, `email`, `user_password`, `user_phone_num`, `user_created_at`, `admin_id`, `birth_date`, `status`) VALUES
 (3, 'qiaoxuan', 'qiaoxuan@gmail.com', '', '0167371239', '2025-04-12 11:46:40', NULL, NULL, 'active'),
-(5, 'siqi', 'siqi@gmail.com', '', '23124', '2025-04-12 11:53:04', NULL, NULL, 'active');
+(13, 'CHEW', 'kcchew1975@gmail.com', '$2y$10$QktaoxvRJNQztZV3ahCFq.o.RkZtOL0b.uBHFnGo1t6BO983lYeo2', '01120565146', '2025-04-26 10:04:40', NULL, NULL, 'active'),
+(14, 'SIOW', 'SIOW0927@gmail.com', '$2y$10$W1/GyC0aTPc4IB6EwCGwgOLp0pOIyqnHpTgj/58km1/7xLQygA7IW', '011-205-65146', '2025-04-26 04:30:24', NULL, NULL, 'active'),
+(16, 'POEA', 'POEA@gmail.com', '$2y$10$cZUktvzESnuhrtH/lUzuMOzFpWGoWQNCna88OkHfjx/mZ5TQqjSXi', '011-205-65146', '2025-04-27 00:27:53', NULL, NULL, 'active'),
+(17, 'SING', 'SING123@gmail.com', '$2y$10$jy7OFMnYc54856pgbCPQketBKDD1xXayNKsR3AxOddY/edlY2In/q', '011-205-65146', '2025-04-27 22:13:34', NULL, NULL, 'active');
 
-----------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE `user_voucher` (
-  `user_voucher_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `voucher_id` int(11) NOT NULL,
-  `claimed_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `used_at` timestamp NULL DEFAULT NULL,
-  `order_id` int(11) DEFAULT NULL,
-  `is_used` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-CREATE TABLE `voucher` (
-  `voucher_id` int(11) NOT NULL,
-  `code` varchar(50) NOT NULL,
-  `discount_type` enum('percentage','fixed_amount','free_shipping') NOT NULL,
-  `discount_value` decimal(10,2) NOT NULL,
-  `min_order_amount` decimal(10,2) DEFAULT 0.00,
-  `valid_from` timestamp NOT NULL DEFAULT current_timestamp(),
-  `valid_to` timestamp NOT NULL DEFAULT (current_timestamp() + interval 30 day),
-  `max_uses` int(11) DEFAULT NULL,
-  `current_uses` int(11) DEFAULT 0,
-  `is_active` tinyint(1) DEFAULT 1,
-  `voucher_name` varchar(100) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `admin_id` int(11) NOT NULL COMMENT 'Admin who created voucher'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
------------------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE `wishlist` (
   `wishlist_id` int(11) NOT NULL,
@@ -225,7 +208,7 @@ CREATE TABLE `wishlist` (
   `prod_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Indexes for dumped tables
 --
 
@@ -339,24 +322,6 @@ ALTER TABLE `users`
   ADD KEY `idx_admin` (`admin_id`);
 
 --
--- Indexes for table `user_voucher`
---
-ALTER TABLE `user_voucher`
-  ADD PRIMARY KEY (`user_voucher_id`),
-  ADD KEY `idx_user` (`user_id`),
-  ADD KEY `idx_voucher` (`voucher_id`),
-  ADD KEY `order_id` (`order_id`);
-
---
--- Indexes for table `voucher`
---
-ALTER TABLE `voucher`
-  ADD PRIMARY KEY (`voucher_id`),
-  ADD UNIQUE KEY `code` (`code`),
-  ADD KEY `idx_validity` (`valid_from`,`valid_to`),
-  ADD KEY `admin_id` (`admin_id`);
-
---
 -- Indexes for table `wishlist`
 --
 ALTER TABLE `wishlist`
@@ -390,7 +355,7 @@ ALTER TABLE `cart`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `CART_ITEM_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `CART_ITEM_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -438,19 +403,7 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `user_voucher`
---
-ALTER TABLE `user_voucher`
-  MODIFY `user_voucher_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `voucher`
---
-ALTER TABLE `voucher`
-  MODIFY `voucher_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
@@ -523,20 +476,6 @@ ALTER TABLE `payment`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`);
-
---
--- Constraints for table `user_voucher`
---
-ALTER TABLE `user_voucher`
-  ADD CONSTRAINT `user_voucher_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `user_voucher_ibfk_2` FOREIGN KEY (`voucher_id`) REFERENCES `voucher` (`voucher_id`),
-  ADD CONSTRAINT `user_voucher_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`);
-
---
--- Constraints for table `voucher`
---
-ALTER TABLE `voucher`
-  ADD CONSTRAINT `voucher_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`);
 
 --
 -- Constraints for table `wishlist`

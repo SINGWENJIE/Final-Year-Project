@@ -1,28 +1,19 @@
-DATABASE NAME: gogo_supermarket
-
 CREATE TABLE `address` (
-  `address_id` int(11) NOT NULL,           --ADDRESS ID
-  `user_id` int(11) NOT NULL,              --USER ID
-  `recipient_name` varchar(100) NOT NULL,  --RECIPIENT NAME
-  `street_address` varchar(255) NOT NULL,  --STREET ADDRESS [NO7, JALAN CS 8]
-  `city` varchar(100) NOT NULL,            --CITY [KLANG]
-  `state` varchar(100) NOT NULL,           --STATE [SELANGOR]
-  `postal_code` varchar(20) NOT NULL,      --POSTAL CODE [75250]
-  `country` varchar(100) NOT NULL DEFAULT 'Malaysia', --!DELETE
-  `is_default` tinyint(1) DEFAULT 0,       --DEFAULT: TRUE, This address will be automatically selected during checkout
-  `phone_number` varchar(20) NOT NULL      --!DELETE
-  --ADD ['note' TEXT, --Add delivery instructions]
-);
+  `address_id` int(11) NOT NULL,--ADDRESS ID
+  `user_id` int(11) NOT NULL,--USER ID [FOREIGN KEY BY USER TABLE]
+  `recipient_name` varchar(100) NOT NULL,--RECIPIENT NAME
+  `street_address` varchar(255) NOT NULL,--STREET ADDRESS [NO7, JALAN CS 8]
+  `city` varchar(100) NOT NULL,--CITY [MELAKA TENGAH / ALOR GAJAH / JASIN]
+  `state` varchar(100) NOT NULL,--STATE [MALACCA]
+  `postal_code` varchar(20) NOT NULL,--POSTAL CODE [75250]
+  `is_default` tinyint(1) DEFAULT 0,--DEFAULT: TRUE, This address will be automatically selected during checkout
+  `phone_number` varchar(20) NOT NULL,--MALAYSIA PHONE NUMBER IS VARCHAR(15)
+  `note` text DEFAULT NULL--ADD DELIVERY INSTRUCTIONS
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---CHANGE (SQL)
-[ALTER TABLE `address`
-  ADD `note` TEXT AFTER `phone_number`,
-  DROP COLUMN `country`;
-]
 
-INSERT INTO `address` (`address_id`, `user_id`, `recipient_name`, `street_address`, `city`, `state`, `postal_code`, `country`, `is_default`, `phone_number`) VALUES
-(1, 3, 'qiaoxuan', 'No. 5, Jalan Bukit', 'Kuala Lumpur', 'ixora', '50000', 'Malaysia', 1, '0123456789');
-
+INSERT INTO `address` (`address_id`, `user_id`, `recipient_name`, `street_address`, `city`, `state`, `postal_code`, `is_default`, `phone_number`, `note`) VALUES
+(1, 3, 'qiaoxuan', 'No. 5, Jalan Bukit', 'Kuala Lumpur', 'ixora', '50000', 1, '0123456789', NULL);
 
 
 CREATE TABLE `admin` (
@@ -33,63 +24,42 @@ CREATE TABLE `admin` (
   `admin_phone_num` varchar(20) DEFAULT NULL,
   `admin_role` enum('superadmin','admin') NOT NULL DEFAULT 'admin',
   `status` enum('active','inactive') DEFAULT 'active'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 
 INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `admin_password`, `admin_phone_num`, `admin_role`, `status`) VALUES
 (7, 'qiaoxuan', 'qiaoxuanp@gmail.com', 'password', NULL, 'admin', 'active'),
 (8, 'changhao', 'changhao@gmail.com', 'password', NULL, 'admin', 'active'),
-(9, 'weixin', 'weixin@gmail.com', 'password', NULL, 'admin', 'active');
+(9, 'weixin', 'weixin@gmail.com', 'password', NULL, 'admin', 'active'),
+(10, 'CHEW', 'CHEW@gmail.com', 'password', NULL, 'admin', 'active');
 
 
---! CHANGE THE CART AND CART ITEM TABLE FOLLOW NEWDATA-----------------------------------------------------
+
 CREATE TABLE `cart` (
-  `cart_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `is_active` tinyint(1) DEFAULT 1
-);
+  `CART_ID` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,-- NULL for GUEST USER
+  `SESSION_ID` varchar(100) DEFAULT NULL,-- For GUEST CART
+  `CREATED_AT` timestamp NOT NULL DEFAULT current_timestamp(),
+  `UPDATED_AT` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ;
 
 
-CREATE TABLE `cart_item` (
-  `cart_item_id` int(11) NOT NULL,
-  `cart_id` int(11) NOT NULL,
-  `prod_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL DEFAULT 1,
-  `added_at` timestamp NOT NULL DEFAULT current_timestamp()
-);
 
---DELETE AND CHANGE TO 
-CREATE TABLE CART (
-    CART_ID INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NULL,  -- NULL for GUEST USER
-    SESSION_ID VARCHAR(100) NULL,  -- For GUEST CART
-    CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UPDATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT chk_user_or_session 
-       CHECK( (user_id IS NOT NULL AND SESSION_ID IS NULL) 
-       OR (user_id IS NULL AND SESSION_ID IS NOT NULL) ),
-    UNIQUE KEY uq_cart_session (SESSION_ID)
-);
+CREATE TABLE `cart_items` (
+  `CART_ITEM_ID` int(11) NOT NULL,
+  `CART_ID` int(11) NOT NULL,--CART ID [FOREIGN KEY BY CART TABLE]
+  `prod_id` int(11) NOT NULL,--PROD ID [FOREIGN KEY BY PRODUCT TABLE]
+  `QUANTITY` int(11) NOT NULL DEFAULT 1 CHECK (`QUANTITY` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE CART_ITEMS (
-    CART_ITEM_ID INT AUTO_INCREMENT PRIMARY KEY,
-    CART_ID INT NOT NULL,  --FOREIGN KEY BY CART TABLE
-    prod_id INT NOT NULL,  --FOREIGN KEY BY PRODUCT TABLE
-    QUANTITY INT NOT NULL DEFAULT 1 CHECK (QUANTITY > 0),
-    FOREIGN KEY (CART_ID) REFERENCES CART(CART_ID) ON DELETE CASCADE,
-    FOREIGN KEY (prod_id) REFERENCES product(prod_id) ON DELETE CASCADE,
-    UNIQUE KEY (CART_ID, prod_id)  -- Prevent duplicate products in cart
-);
 
------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE `category` (
-  `category_id` int(11) NOT NULL,        --CATEGORY ID
-  `category_name` varchar(100) NOT NULL  --CATEGORY NAME
-);
+  `category_id` int(11) NOT NULL,--CATEGORY ID
+  `category_name` varchar(100) NOT NULL--CATEGORY NAME
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 
 INSERT INTO `category` (`category_id`, `category_name`) VALUES
@@ -105,36 +75,19 @@ INSERT INTO `category` (`category_id`, `category_name`) VALUES
 (9, 'Vegetables');
 
 
-
 CREATE TABLE `delivery` (
-  `delivery_id` int(11) NOT NULL,    --DELIVERY ID
-  `order_id` int(11) NOT NULL,       --ORDER ID [FOREIGN KEY BY ORDER TABLE]
-  `tracking_number` varchar(100) DEFAULT NULL, --DELIVERY TRACKING NUMBER
-  `delivery_status` enum('processing','shipped','in_transit','out_for_delivery','delivered','returned','failed') DEFAULT 'processing',  --DELIVERY STATUS: PROCESSING / OUT FOR DELIVERY / DELIVERED
-  `carrier_name` varchar(100) DEFAULT NULL,  --CARRIER (CHANGE THE "CARRIER NAME" TO "CARRIER" VARCHAR(50) DEFAULT 'STANDARD DELIVERY')
-  `estimated_delivery_date` date DEFAULT NULL,  --ETIMATED DELIVERY
-  `actual_delivery_date` date DEFAULT NULL,     --ACTUAL DELIVERY
-  `notes` text DEFAULT NULL,                    --DELIVERY NOTE
-  `admin_id` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),                               --!DELETE
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), --!DELETE
-  `shipping_method` varchar(100) DEFAULT NULL                                                --!DELETE
-);
+  `delivery_id` int(11) NOT NULL,--DELIVERY ID
+  `order_id` int(11) NOT NULL,--ORDER ID [FOREIGN KEY BY ORDER TABLE]
+  `tracking_number` varchar(100) DEFAULT NULL,--DELIVERY TRACKING NUMBER
+  `delivery_status` enum('processing','out_for_delivery','delivered') DEFAULT 'processing',--DELIVERY STATUS: PROCESSING / OUT OF DELIVERY / DELIVERED
+  `carrier` varchar(50) DEFAULT 'STANDARD DELIVERY',--GOT 'STANDARD DELIVERY' IS RM5.00 AND 'EXPRESS DELIVERY' IS RM10.00
+  `estimated_delivery_date` date DEFAULT NULL,
+  `actual_delivery_date` date DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `admin_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---CHANGE (SQL)
-[ ALTER TABLE `delivery`
-  MODIFY `delivery_status` ENUM('processing', 'out_for_delivery', 'delivered') DEFAULT 'processing';
 
-  ALTER TABLE `delivery`
-  CHANGE `carrier_name` `carrier` VARCHAR(50) DEFAULT 'STANDARD DELIVERY';
-
-  ALTER TABLE `delivery`
-  DROP COLUMN `created_at`,
-  DROP COLUMN `updated_at`,
-  DROP COLUMN `shipping_method`;
-]
-
---! AFTER SEE HOW TO DO----------------------------------------------------------------------------------
 CREATE TABLE `feedback` (
   `feedback_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -147,115 +100,54 @@ CREATE TABLE `feedback` (
   `admin_id` int(11) DEFAULT NULL,
   `admin_response` text DEFAULT NULL,
   `response_date` timestamp NULL DEFAULT NULL
-);
----------------------------------------------------------------------------------------------------------
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 CREATE TABLE `orders` (
-  `order_id` int(11) NOT NULL,                                 --ORDER ID
-  `user_id` int(11) NOT NULL,                                  --USER ID [FOREIGN KEY BY USERS TABLE]
-  `shipping_address_id` int(11) NOT NULL,                      --ADDRESS ID [FOREIGN KEY BY ADDRESS TABLE]
-  `order_date` timestamp NOT NULL DEFAULT current_timestamp(), --ORDER DATE
-  `total_amount` decimal(12,2) NOT NULL,                       --TOTAL AMOUNT = SUBTOTAL + DELIVERY FEE - DISCOUNT
-  `discount_amount` decimal(10,2) DEFAULT 0.00,                --DISCOUNT
-  `shipping_cost` decimal(10,2) DEFAULT 0.00,                  --DELIVERY FEE [CHANGE "SHIPPING COST" TO "DELIVERY FEE"]
-  `tax_amount` decimal(10,2) DEFAULT 0.00,                     --!DELETE
-  `final_amount` decimal(12,2) NOT NULL,                       --!DELETE
-  `order_status` enum('pending','processing','shipped','delivered','cancelled','refunded') DEFAULT 'pending', --ORDER STATUS: PENDING / PROCESSING / SHIPPED / DELIVERED
-  `notes` text DEFAULT NULL,                                   --!DELETE
-  `admin_id` int(11) DEFAULT NULL,                             --ADMIN ID [FOREIGN KEY BY ADMIN TABLE]
-  `expected_delivery_date` date DEFAULT NULL,                  --!DELETE
-  `status_updated_at` timestamp NULL DEFAULT NULL,             --!DELETE
-  `cancellation_reason` text DEFAULT NULL                      --!DELETE
-  --ADD ['Subtotal' DECIMAL(10,2) NOT NULL]
-);
-
---CHANGE (SQL)
-[ ALTER TABLE `orders`
-  CHANGE `shipping_cost` `delivery_fee` DECIMAL(10,2) DEFAULT 5.00;
-
-  ALTER TABLE `orders`
-  DROP COLUMN `tax_amount`,
-  DROP COLUMN `final_amount`,
-  DROP COLUMN `notes`,
-  DROP COLUMN `expected_delivery_date`,
-  DROP COLUMN `status_updated_at`,
-  DROP COLUMN `cancellation_reason`;
-
-  ALTER TABLE `orders`
-  ADD `subtotal` DECIMAL(10,2) NOT NULL AFTER `order_date`;
-]
-
-INSERT INTO `orders` (`order_id`, `user_id`, `shipping_address_id`, `order_date`, `total_amount`, `discount_amount`, `shipping_cost`, `tax_amount`, `final_amount`, `order_status`, `notes`, `admin_id`, `expected_delivery_date`, `status_updated_at`, `cancellation_reason`) VALUES
-(1004, 3, 1, '2025-04-23 07:37:36', 28.00, 0.00, 0.00, 0.00, 28.00, 'processing', NULL, NULL, NULL, NULL, NULL);
+  `order_id` int(11) NOT NULL,--ORDER ID
+  `user_id` int(11) NOT NULL,--USER ID [FOREIGN KEY BY USERS TABLE]
+  `shipping_address_id` int(11) NOT NULL,--ADDRESS ID [FOREIGN KEY BY ADDRESS TABLE]
+  `order_date` timestamp NOT NULL DEFAULT current_timestamp(),--ORDER DATE
+  `subtotal` decimal(10,2) NOT NULL,--PRODUCT PRICE TOTAL
+  `total_amount` decimal(12,2) NOT NULL,--TOTAL AMOUNT = SUBTOTAL + DELIVERY FEE - DISCOUNT_AMOUNT
+  `DISCOUNT_AMOUNT` decimal(10,2) DEFAULT 0.00,--DISCOUNT: SAME AS PROMO_CODE TABLE
+  `delivery_fee` decimal(10,2) DEFAULT 5.00,--DELIVERY FEE GOT TWO 1.STANDARD DELIVERY 'RM5.00' / 2.EXPRESS DELIVERY 'RM10.00'
+  `order_status` enum('pending','processing','shipped','delivered') DEFAULT 'pending',----ORDER STATUS: PENDING / PROCESSING / SHIPPED / DELIVERED
+  `admin_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 CREATE TABLE `order_item` (
-  `order_item_id` int(11) NOT NULL,              --ORDER ITEM ID
-  `order_id` int(11) NOT NULL,                   --ORDER ID [FOREIGN KEY BY ORDER TABLE]
-  `prod_id` int(11) NOT NULL,                    --PRODUCT ID [FOREIGN KEY BY PRODUCT TABLE]
-  `quantity` int(11) NOT NULL,                   --ORDER ITEM QUANTITY
-  `unit_price` decimal(10,2) NOT NULL,           --ORDER ITEM PRICE [CHANGE "UNIT PRICE" TO "ORDER_ITEM_PRICE"]
-  `discount_amount` decimal(10,2) DEFAULT 0.00,  --!DELETE
-  `subtotal` decimal(12,2) NOT NULL,             --!DELETE
-  `product_name` varchar(255) NOT NULL,          --!DELETE
-  `product_image` varchar(255) DEFAULT NULL,     --!DELETE
-  `product_description` text DEFAULT NULL        --!DELETE
-);
-
---CHANGE(SQL)
-[ ALTER TABLE `order_item`
-  CHANGE `unit_price` `order_item_price` DECIMAL(10,2) NOT NULL;
-
-  ALTER TABLE `order_item`
-  DROP COLUMN `discount_amount`,
-  DROP COLUMN `subtotal`,
-  DROP COLUMN `product_name`,
-  DROP COLUMN `product_image`,
-  DROP COLUMN `product_description`;
-]
-
-
-INSERT INTO `order_item` (`order_item_id`, `order_id`, `prod_id`, `quantity`, `unit_price`, `discount_amount`, `subtotal`, `product_name`, `product_image`, `product_description`) VALUES
-(7, 1004, 5, 2, 14.00, 0.00, 0.00, '', NULL, NULL);
+  `order_item_id` int(11) NOT NULL,--ORDER ITEM ID
+  `order_id` int(11) NOT NULL,--ORDER ID [FOREIGN KEY BY ORDER TABLE]
+  `prod_id` int(11) NOT NULL,--PRODUCT ID [FOREIGN KEY BY PRODUCT TABLE]
+  `quantity` int(11) NOT NULL,--ORDER ITEM QUANTITY
+  `order_item_price` decimal(10,2) NOT NULL--ORDER ITEM PRICE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 CREATE TABLE `payment` (
-  `payment_id` int(11) NOT NULL,                 --PAYMENT ID
-  `order_id` int(11) NOT NULL,                   --ORDER ID [FOREIGN KEY BY ORDER TABLE]
-  `amount` decimal(12,2) NOT NULL,               --PAYMENT AMOUNT
-  `payment_method` enum('credit_card','debit_card','paypal','bank_transfer','cash_on_delivery','ewallet','buy_now_pay_later') NOT NULL, --PAYMENT METHOD: CREDIT DEBIT CARD / TNGEWALLET / CASH ON DELIVERY
-  `transaction_id` varchar(100) DEFAULT NULL,    --TRANSACTION ID
-  `payment_status` enum('pending','completed','failed','refunded','partially_refunded') DEFAULT 'pending',  --PAYMENT STATUS: COMPLETE, AFTER USER PLACE ORDER, PAYMENT STATUS DIRECTLY SHOW COMPLETED
-  `payment_date` timestamp NULL DEFAULT NULL,    --PAYMENT DATE
-  `receipt_url` varchar(255) DEFAULT NULL,       --!DELETE
-  `payment_details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`payment_details`)), --DELETE
-  `failure_reason` text DEFAULT NULL             --!DELETE
-);
-
---CHANGE(SQL)
-[ ALTER TABLE `payment`
-  DROP COLUMN `receipt_url`,
-  DROP COLUMN `payment_details`,
-  DROP COLUMN `failure_reason`;
-
-  ALTER TABLE `payment`
-  MODIFY `payment_method` ENUM('credit_card', 'debit_card', 'tng_ewallet', 'cash_on_delivery') NOT NULL;
-
-  ALTER TABLE `payment`
-  MODIFY `payment_status` ENUM('completed') DEFAULT 'completed';
-]
+  `payment_id` int(11) NOT NULL,--PAYMENT ID
+  `order_id` int(11) NOT NULL,--ORDER ID [FOREIGN KEY BY ORDER TABLE]
+  `amount` decimal(12,2) NOT NULL,--PAYMENT AMOUNT
+  `payment_method` enum('credit_card','debit_card','tng_ewallet','cash_on_delivery') NOT NULL,--PAYMENT METHOD: CREDIT DEBIT CARD / TNGEWALLET / CASH ON DELIVERY
+  `transaction_id` varchar(255) DEFAULT NULL,--TRANSACTION ID
+  `payment_status` enum('completed') DEFAULT 'completed',--PAYMENT STATUS: COMPLETE (AFTER USER PLACE ORDER, PAYMENT STATUS DIRECTLY SHOW COMPLETED)
+  `payment_date` timestamp NULL DEFAULT NULL--PAYMENT DATE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 CREATE TABLE `product` (
-  `prod_id` int(11) NOT NULL,                   --PRODUCT ID
-  `prod_name` varchar(255) NOT NULL,            --PRODUCT NAME
-  `category_id` int(11) NOT NULL,               --CATEGORY ID [FOREIGN KEY BY CATEGORY TABLE]
-  `prod_price` decimal(10,2) NOT NULL,          --PRODUCT PRICE
-  `prod_description` text DEFAULT NULL,         --PRODUCT DESCRIPTION
-  `prod_quantity` int(11) NOT NULL DEFAULT 0,   --可有可无, 再看！
-  `prod_image` varchar(255) DEFAULT NULL,       --PRODUCT IMAGE
-  `stock` int(11) DEFAULT NULL                  --PRODUCT STOCK
-);
+  `prod_id` int(11) NOT NULL,--PRODUCT ID
+  `prod_name` varchar(255) NOT NULL,--PRODUCT NAME
+  `category_id` int(11) NOT NULL,--CATEGORY ID [FOREIGN KEY BY CATEGORY TABLE]
+  `prod_price` decimal(10,2) NOT NULL,--PRODUCT PRICE
+  `prod_description` text DEFAULT NULL,--PRODUCT DESCRIPTION
+  `prod_quantity` int(11) NOT NULL DEFAULT 0,--可有可无, 再看！
+  `prod_image` varchar(255) DEFAULT NULL,--PRODUCT IMAGE
+  `stock` int(11) DEFAULT NULL--PRODUCT STOCK
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 
 INSERT INTO `product` (`prod_id`, `prod_name`, `category_id`, `prod_price`, `prod_description`, `prod_quantity`, `prod_image`, `stock`) VALUES
@@ -263,125 +155,46 @@ INSERT INTO `product` (`prod_id`, `prod_name`, `category_id`, `prod_price`, `pro
 (6, 'broccoli', 9, 6.50, 'this is a broccoli come form Japan', 0, 'broccoli_commodity-page.png', 80),
 (8, 'massimo', 7, 3.60, 'this is massimo', 0, 'massimo.webp', 200),
 (10, 'wall\'s', 3, 3.50, 'this is walls ice cream\r\n', 0, 'walls.jpeg', 200),
-(12, 'Cola', 12, 2.90, 'one cola can buy you happy', 0, 'images.jpeg', 100);
+(12, 'Cola', 12, 2.90, 'one cola can buy you happy', 0, 'images.jpeg', 100),
+(13, 'Massimo Chiffon [Mocha Flavor]', 7, 3.20, 'Massimo Chiffon In A Cup 35g Cupcake Kek Classic Cheese Mocha', 0, 'masimo[pandan].png', 50),
+(14, 'Clorox Clean-Up Spray', 4, 14.00, 'Clorox Clean-Up All Purpose Cleaner Spray with Bleach, Spray Bottle, Original, 32 oz', 0, 'clorox[cleanup_spray].png', 100);
 
 
---!DELETE-----------------------------------------------------------------------------------------------------
-CREATE TABLE `promotion` (
-  `promotion_id` int(11) NOT NULL,         
-  `prod_id` int(11) DEFAULT NULL,          
-  `category_id` int(11) DEFAULT NULL,
-  `promo_code` varchar(50) NOT NULL,
-  `discount_type` enum('percentage','fixed_amount','buy_x_get_y') NOT NULL DEFAULT 'percentage',
-  `discount_value` decimal(10,2) NOT NULL,
-  `start_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `end_date` timestamp NOT NULL DEFAULT (current_timestamp() + interval 30 day),
-  `promo_status` enum('active','inactive','expired') DEFAULT 'active',
-  `max_uses` int(11) DEFAULT NULL,
-  `current_uses` int(11) DEFAULT 0,
-  `min_order_amount` decimal(10,2) DEFAULT 0.00,
-  `admin_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `promo_name` varchar(100) NOT NULL,
-  `promo_description` text DEFAULT NULL
-);
 
---CHANGE PROMOTION TABLE TO 
-CREATE TABLE PROMO_CODE (
-  CODE VARCHAR(20) PRIMARY KEY,          -- e.g. "RM5OFF"
-  DISCOUNT_AMOUNT DECIMAL(10,2) NOT NULL,-- e.g. 5.00 (RM5 discount)
-  MIN_ORDER DECIMAL(10,2) DEFAULT 0,     -- e.g. 50.00 (min RM50 purchase)
-  VALID_FROM DATE NOT NULL,              -- Start date
-  VALID_TO DATE NOT NULL,                -- Expiry date
-  MAX_USES INT DEFAULT NULL,             -- NULL = unlimited uses
-  USES_COUNT INT DEFAULT 0               -- Track redemption count
-);
+CREATE TABLE `promo_code` (
+  `CODE` varchar(20) NOT NULL,-- e.g. "RM5OFF"
+  `DISCOUNT_AMOUNT` decimal(10,2) NOT NULL,-- e.g. 5.00 (RM5 discount)
+  `MIN_ORDER` decimal(10,2) DEFAULT 0.00,-- e.g. 50.00 (min RM50 purchase)
+  `VALID_FROM` date NOT NULL,-- Start date
+  `VALID_TO` date NOT NULL,-- Expiry date
+  `MAX_USES` int(11) DEFAULT NULL,-- NULL = unlimited uses
+  `USES_COUNT` int(11) DEFAULT 0 -- Track redemption count
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-----------------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,                --USER ID
-  `user_name` varchar(100) NOT NULL,         --USER NAME
-  `email` varchar(255) NOT NULL,             --USER EMAIL
-  `user_password` varchar(255) NOT NULL,     --USER PASSWORD
-  `password_reset_token` varchar(255) DEFAULT NULL,  --!DELETE
-  `token_expiry` timestamp NULL DEFAULT NULL,        --!DELETE
-  `user_phone_num` varchar(20) DEFAULT NULL, --USER PHONE NUMBER (VARCHER CHANGE TO 15)
-  `user_created_at` timestamp NOT NULL DEFAULT current_timestamp(),  --USER CREATED TIME
-  `user_updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), --!DELETE
-  `last_login` timestamp NULL DEFAULT NULL,  --!DELETE
+  `user_id` int(11) NOT NULL,--USER ID
+  `user_name` varchar(100) NOT NULL,--USER NAME
+  `email` varchar(255) NOT NULL,--USER EMAIL
+  `user_password` varchar(255) NOT NULL,--USER PASSWORD
+  `user_phone_num` varchar(15) DEFAULT NULL,--USER PHONE NUMBER (MALAYSIA PHONE NUMBER IS VARCHAR(15))
+  `user_created_at` timestamp NOT NULL DEFAULT current_timestamp(),--USER CREATED TIME
   `admin_id` int(11) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT 1,          --!DELETE
-  `email_verified` tinyint(1) DEFAULT 0,     --!DELETE
-  `birth_date` date DEFAULT NULL,            --USER BIRTH_DATE          
-  `address` varchar(255) DEFAULT NULL,       --!DELETE
-  `status` varchar(20) DEFAULT 'active'      --USER STATUS [FOR ADMIN CONTROL]
-);
-
---CHANGE(SQL)
-[ ALTER TABLE `users`
-  CHANGE `user_phone_num` `user_phone_num` VARCHAR(15) DEFAULT NULL;
-
-  ALTER TABLE `users`
-  DROP COLUMN `password_reset_token`,
-  DROP COLUMN `token_expiry`,
-  DROP COLUMN `user_updated_at`,
-  DROP COLUMN `last_login`,
-  DROP COLUMN `is_active`,
-  DROP COLUMN `email_verified`,
-  DROP COLUMN `address`;
-]
-
-INSERT INTO `users` (`user_id`, `user_name`, `email`, `user_password`, `password_reset_token`, `token_expiry`, `user_phone_num`, `user_created_at`, `user_updated_at`, `last_login`, `admin_id`, `is_active`, `email_verified`, `birth_date`, `address`, `status`) VALUES
-(3, 'qiaoxuan', 'qiaoxuan@gmail.com', '', NULL, NULL, '0167371239', '2025-04-12 11:46:40', '2025-04-21 06:58:11', NULL, NULL, 1, 0, NULL, NULL, 'active'),
-(5, 'siqi', 'siqi@gmail.com', '', NULL, NULL, '23124', '2025-04-12 11:53:04', '2025-04-12 11:53:04', NULL, NULL, 1, 0, NULL, NULL, 'active');
-
---!DELETE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE `user_voucher` (
-  `user_voucher_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `voucher_id` int(11) NOT NULL,
-  `claimed_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `used_at` timestamp NULL DEFAULT NULL,
-  `order_id` int(11) DEFAULT NULL,
-  `is_used` tinyint(1) DEFAULT 0
+  `birth_date` date DEFAULT NULL,--USER BIRTH_DATE
+  `status` varchar(20) DEFAULT 'active' --USER STATUS [FOR ADMIN CONTROL]
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-
-CREATE TABLE `voucher` (
-  `voucher_id` int(11) NOT NULL,
-  `code` varchar(50) NOT NULL,
-  `discount_type` enum('percentage','fixed_amount','free_shipping') NOT NULL,
-  `discount_value` decimal(10,2) NOT NULL,
-  `min_order_amount` decimal(10,2) DEFAULT 0.00,
-  `valid_from` timestamp NOT NULL DEFAULT current_timestamp(),
-  `valid_to` timestamp NOT NULL DEFAULT (current_timestamp() + interval 30 day),
-  `max_uses` int(11) DEFAULT NULL,
-  `current_uses` int(11) DEFAULT 0,
-  `is_active` tinyint(1) DEFAULT 1,
-  `voucher_name` varchar(100) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `admin_id` int(11) NOT NULL COMMENT 'Admin who created voucher'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---------------------------------------------------------------------------------------------------------------
+INSERT INTO `users` (`user_id`, `user_name`, `email`, `user_password`, `user_phone_num`, `user_created_at`, `admin_id`, `birth_date`, `status`) VALUES
+(3, 'qiaoxuan', 'qiaoxuan@gmail.com', '', '0167371239', '2025-04-12 11:46:40', NULL, NULL, 'active'),
+(5, 'siqi', 'siqi@gmail.com', '', '23124', '2025-04-12 11:53:04', NULL, NULL, 'active');
 
 
 CREATE TABLE `wishlist` (
-  `wishlist_id` int(11) NOT NULL,                              --WISHLIST ID
-  `user_id` int(11) NOT NULL,                                  --USER ID [FOREIGN KEY BY USER TABLE]
-  `prod_id` int(11) NOT NULL,                                  --PROD ID [FOREIGN KEY BY PRODUCT TABLE]
-  `added_at` timestamp NOT NULL DEFAULT current_timestamp()    --!DELETE
-);
-
---CHANGE(SQL)
-[
-  ALTER TABLE `wishlist`
-  DROP COLUMN `added_at`;
-]
-
----------------------------------------------------------------------------------------------------------------
+  `wishlist_id` int(11) NOT NULL,--WISHLIST ID
+  `user_id` int(11) NOT NULL,--USER ID [FOREIGN KEY BY USER TABLE]
+  `prod_id` int(11) NOT NULL--PROD ID [FOREIGN KEY BY PRODUCT TABLE]
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -400,21 +213,23 @@ ALTER TABLE `address`
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`admin_id`),
-  ADD UNIQUE KEY `admin_email` (`admin_email`);
+  ADD UNIQUE KEY `admin_email` (`admin_email`),
+  ADD UNIQUE KEY `admin_email_2` (`admin_email`);
 
 --
 -- Indexes for table `cart`
 --
 ALTER TABLE `cart`
-  ADD PRIMARY KEY (`cart_id`),
-  ADD KEY `idx_user` (`user_id`);
+  ADD PRIMARY KEY (`CART_ID`),
+  ADD UNIQUE KEY `uq_cart_session` (`SESSION_ID`),
+  ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `cart_item`
+-- Indexes for table `cart_items`
 --
-ALTER TABLE `cart_item`
-  ADD PRIMARY KEY (`cart_item_id`),
-  ADD UNIQUE KEY `cart_id` (`cart_id`,`prod_id`),
+ALTER TABLE `cart_items`
+  ADD PRIMARY KEY (`CART_ITEM_ID`),
+  ADD UNIQUE KEY `CART_ID` (`CART_ID`,`prod_id`),
   ADD KEY `prod_id` (`prod_id`);
 
 --
@@ -481,15 +296,10 @@ ALTER TABLE `product`
   ADD KEY `category_id` (`category_id`);
 
 --
--- Indexes for table `promotion`
+-- Indexes for table `promo_code`
 --
-ALTER TABLE `promotion`
-  ADD PRIMARY KEY (`promotion_id`),
-  ADD UNIQUE KEY `promo_code` (`promo_code`),
-  ADD KEY `idx_product` (`prod_id`),
-  ADD KEY `idx_category` (`category_id`),
-  ADD KEY `idx_dates` (`start_date`,`end_date`),
-  ADD KEY `admin_id` (`admin_id`);
+ALTER TABLE `promo_code`
+  ADD PRIMARY KEY (`CODE`);
 
 --
 -- Indexes for table `users`
@@ -539,25 +349,25 @@ ALTER TABLE `address`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `CART_ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `cart_item`
+-- AUTO_INCREMENT for table `cart_items`
 --
-ALTER TABLE `cart_item`
-  MODIFY `cart_item_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `cart_items`
+  MODIFY `CART_ITEM_ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `category`
 --
 ALTER TABLE `category`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `delivery`
@@ -593,13 +403,7 @@ ALTER TABLE `payment`
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
-  MODIFY `prod_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `promotion`
---
-ALTER TABLE `promotion`
-  MODIFY `promotion_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `prod_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -642,11 +446,11 @@ ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `cart_item`
+-- Constraints for table `cart_items`
 --
-ALTER TABLE `cart_item`
-  ADD CONSTRAINT `cart_item_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `cart` (`cart_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `cart_item_ibfk_2` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`);
+ALTER TABLE `cart_items`
+  ADD CONSTRAINT `cart_items_ibfk_1` FOREIGN KEY (`CART_ID`) REFERENCES `cart` (`CART_ID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `cart_items_ibfk_2` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `delivery`
@@ -684,14 +488,6 @@ ALTER TABLE `order_item`
 --
 ALTER TABLE `payment`
   ADD CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`);
-
---
--- Constraints for table `promotion`
---
-ALTER TABLE `promotion`
-  ADD CONSTRAINT `promotion_ibfk_1` FOREIGN KEY (`prod_id`) REFERENCES `product` (`prod_id`),
-  ADD CONSTRAINT `promotion_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`),
-  ADD CONSTRAINT `promotion_ibfk_3` FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`);
 
 --
 -- Constraints for table `users`
