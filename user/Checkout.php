@@ -70,21 +70,6 @@ if (empty($cart_items)) {
 $delivery_fee = 5.00; // Default delivery fee
 $total = $subtotal + $delivery_fee;
 
-// Get available vouchers
-$voucher_sql = "SELECT v.* FROM voucher v
-                JOIN user_voucher uv ON v.voucher_id = uv.voucher_id
-                WHERE uv.user_id = $user_id AND uv.is_used = 0 
-                AND v.valid_from <= NOW() AND v.valid_to >= NOW()
-                AND (v.max_uses IS NULL OR v.current_uses < v.max_uses)
-                AND v.is_active = 1";
-$voucher_result = $conn->query($voucher_sql);
-$vouchers = [];
-if ($voucher_result->num_rows > 0) {
-    while($row = $voucher_result->fetch_assoc()) {
-        $vouchers[] = $row;
-    }
-}
-
 $conn->close();
 ?>
 
