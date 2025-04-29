@@ -41,96 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Apply voucher button functionality
-    const applyVoucherBtn = document.getElementById('applyVoucher');
-    if (applyVoucherBtn) {
-        applyVoucherBtn.addEventListener('click', function() {
-            const voucherCode = document.getElementById('voucher_code').value.trim();
-            
-            if (!voucherCode) {
-                showToast('Please enter a voucher code', 'error');
-                return;
-            }
-            
-            // In a real application, you would validate the voucher with the server
-            // Here we'll simulate a successful application
-            const voucherDiscount = document.querySelector('.voucher-discount');
-            const discountAmount = document.querySelector('.discount-amount');
-            const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
-            const deliveryFee = parseFloat(document.querySelector('.delivery-fee').textContent.replace('RM ', ''));
-            const totalAmount = document.querySelector('.total-amount');
-            
-            // Simulate different voucher types
-            if (voucherCode.toUpperCase() === 'FREESHIP') {
-                // Free shipping voucher
-                const newDeliveryFee = 0.00;
-                const newTotal = subtotal + newDeliveryFee;
-                
-                document.querySelector('.delivery-fee').textContent = 'RM ' + newDeliveryFee.toFixed(2);
-                voucherDiscount.style.display = 'flex';
-                discountAmount.textContent = '-RM ' + deliveryFee.toFixed(2);
-                totalAmount.textContent = 'RM ' + newTotal.toFixed(2);
-                
-                showToast('Free shipping applied!', 'success');
-            } else if (voucherCode.toUpperCase() === '10OFF') {
-                // 10% off voucher
-                const discount = subtotal * 0.10;
-                const newTotal = (subtotal - discount) + deliveryFee;
-                
-                voucherDiscount.style.display = 'flex';
-                discountAmount.textContent = '-RM ' + discount.toFixed(2);
-                totalAmount.textContent = 'RM ' + newTotal.toFixed(2);
-                
-                showToast('10% discount applied!', 'success');
-            } else if (voucherCode.toUpperCase() === '5RM') {
-                // RM5 off voucher
-                const discount = 5.00;
-                const newTotal = (subtotal - discount) + deliveryFee;
-                
-                voucherDiscount.style.display = 'flex';
-                discountAmount.textContent = '-RM ' + discount.toFixed(2);
-                totalAmount.textContent = 'RM ' + (newTotal > 0 ? newTotal.toFixed(2) : '0.00');
-                
-                showToast('RM5 discount applied!', 'success');
-            } else {
-                showToast('Invalid voucher code', 'error');
-            }
-        });
-    }
-    
-    // Apply selected voucher from available vouchers
-    document.querySelectorAll('input[name="selected_voucher"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                const voucherId = this.value;
-                const voucherOption = document.querySelector(`.voucher-option[data-id="${voucherId}"]`);
-                
-                if (voucherOption) {
-                    const voucherName = voucherOption.querySelector('h4').textContent;
-                    const voucherTerms = voucherOption.querySelector('.voucher-terms').textContent;
-                    
-                    // In a real application, you would get the voucher details from the server
-                    // Here we'll simulate applying the selected voucher
-                    const voucherDiscount = document.querySelector('.voucher-discount');
-                    const discountAmount = document.querySelector('.discount-amount');
-                    const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
-                    const deliveryFee = parseFloat(document.querySelector('.delivery-fee').textContent.replace('RM ', ''));
-                    const totalAmount = document.querySelector('.total-amount');
-                    
-                    // Simulate applying a 10% discount voucher
-                    const discount = subtotal * 0.10;
-                    const newTotal = (subtotal - discount) + deliveryFee;
-                    
-                    voucherDiscount.style.display = 'flex';
-                    discountAmount.textContent = '-RM ' + discount.toFixed(2);
-                    totalAmount.textContent = 'RM ' + newTotal.toFixed(2);
-                    
-                    showToast(`${voucherName} applied!`, 'success');
-                }
-            }
-        });
-    });
-    
     // Form validation before submission
     const checkoutForm = document.getElementById('checkoutForm');
     if (checkoutForm) {
@@ -255,4 +165,47 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.total-amount').textContent = 'RM ' + newTotal.toFixed(2);
         });
     });
-});
+
+    document.getElementById('applyPromo').addEventListener('click', function() {
+        const promoCode = document.getElementById('promo_code').value.trim();
+        const formData = new FormData();
+        formData.append('promo_code', promoCode);
+        formData.append('apply_promo', '1');
+    
+        fetch('', { // Empty string means submit to same page
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(() => {
+            // Reload to see updated prices
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+    
+        // Update delivery fee calculation to consider promo codes
+        document.querySelectorAll('input[name="delivery_method"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const deliveryFeeElement = document.querySelector('.delivery-fee');
+                const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
+                let deliveryFee = 5.00; // Standard delivery
+                
+                if (this.value === 'express') {
+                    deliveryFee = 10.00; // Express delivery
+                }
+                
+                deliveryFeeElement.textContent = 'RM ' + deliveryFee.toFixed(2);
+                
+                // Recalculate total if promo is applied
+                const discountRow = document.querySelector('.summary-row.promo-discount');
+                if (discountRow) {
+                    const discount = parseFloat(discountRow.querySelector('.discount-amount').textContent.replace('-RM ', ''));
+                    const newTotal = (subtotal - discount) + deliveryFee;
+                    document.querySelector('.total-amount').textContent = 'RM ' + newTotal.toFixed(2);
+                }
+            });
+        });
+    });

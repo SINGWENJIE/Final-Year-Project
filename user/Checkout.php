@@ -70,6 +70,47 @@ if (empty($cart_items)) {
 $delivery_fee = 5.00; // Default delivery fee
 $total = $subtotal + $delivery_fee;
 
+// Promo code validation
+$promo_error = '';
+$promo_success = '';
+$applied_promo = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_promo'])) {
+    $promo_code = trim($_POST['promo_code']);
+    
+    if (!empty($promo_code)) {
+        // Check promo code against database
+        $promo_sql = "SELECT * FROM promo_code 
+                      WHERE CODE = ? 
+                      AND VALID_FROM <= CURDATE() 
+                      AND VALID_TO >= CURDATE() 
+                      AND (MAX_USES IS NULL OR USES_COUNT < MAX_USES)";
+        $stmt = $conn->prepare($promo_sql);
+        $stmt->bind_param("s", $promo_code);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $applied_promo = $result->fetch_assoc();
+            
+            // Check minimum order amount
+            if ($subtotal >= $applied_promo['MIN_ORDER']) {
+                $promo_success = "Promo code applied successfully!";
+                
+                // Calculate discount
+                $discount_amount = $applied_promo['DISCOUNT_AMOUNT'];
+                $total = $subtotal + $delivery_fee - $discount_amount;
+            } else {
+                $promo_error = "Minimum order amount of RM" . $applied_promo['MIN_ORDER'] . " required for this promo.";
+            }
+        } else {
+            $promo_error = "Invalid or expired promo code";
+        }
+    } else {
+        $promo_error = "Please enter a promo code";
+    }
+}
+
 $conn->close();
 ?>
 
@@ -143,10 +184,12 @@ $conn->close();
                                     <span>Delivery Fee</span>
                                     <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
                                 </div>
-                                <div class="summary-row voucher-discount" style="display: none;">
-                                    <span>Voucher Discount</span>
-                                    <span class="discount-amount">-RM 0.00</span>
+                                <?php if (!empty($applied_promo)): ?>
+                                <div class="summary-row promo-discount">
+                                    <span>Promo Discount (<?php echo $applied_promo['CODE']; ?>)</span>
+                                    <span class="discount-amount">-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?></span>
                                 </div>
+                                <?php endif; ?>
                                 <div class="summary-divider"></div>
                                 <div class="summary-row total">
                                     <span>Total</span>
@@ -311,14 +354,22 @@ $conn->close();
                         </div>
                     </section>
                     
-                    <!-- Voucher Section -->
+                    <!-- Promo Code Section -->
                     <section class="checkout-section">
-                        <h2><i class="fas fa-tag"></i> Apply Voucher</h2>
-                        <div class="voucher-section">
-                            <div class="voucher-input">
-                                <input type="text" id="voucher_code" name="voucher_code" placeholder="Enter voucher code">
-                                <button type="button" id="applyVoucher" class="btn">Apply</button>
-                            </div>
+                        <h2><i class="fas fa-tag"></i> Promo Code</h2>
+                        <div class="promo-section">
+                                <div class="promo-input">
+                                    <input type="text" id="promo_code" name="promo_code" 
+                                        placeholder="Enter promo code" 
+                                        value="<?php echo isset($_POST['promo_code']) ? htmlspecialchars($_POST['promo_code']) : ''; ?>">
+                                    <button type="submit" name="apply_promo" class="btn">Apply</button>
+                                </div>
+                                <?php if (!empty($promo_error)): ?>
+                                    <div class="promo-message error"><?php echo $promo_error; ?></div>
+                                <?php endif; ?>
+                                <?php if (!empty($promo_success)): ?>
+                                    <div class="promo-message success"><?php echo $promo_success; ?></div>
+                                <?php endif; ?>
                         </div>
                     </section>
                     
