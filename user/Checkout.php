@@ -112,12 +112,55 @@ $conn->close();
         <div class="checkout-layout">
             <div class="checkout-form">
                 <form id="checkoutForm" action="process_order.php" method="POST">
+                    <!-- Order Summary -->
+                    <section class="checkout-section">
+                        <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+                        <div class="order-summary">
+                            <div class="summary-items">
+                                <?php foreach ($cart_items as $item): ?>
+                                <div class="summary-item">
+                                    <div class="item-image">
+                                        <img src="../assets/uploads/<?php echo htmlspecialchars($item['prod_image']); ?>" 
+                                             alt="<?php echo htmlspecialchars($item['prod_name']); ?>">
+                                    </div>
+                                    <div class="item-details">
+                                        <h4><?php echo htmlspecialchars($item['prod_name']); ?></h4>
+                                        <p>Qty: <?php echo $item['QUANTITY']; ?></p>
+                                    </div>
+                                    <div class="item-price">
+                                        RM <?php echo number_format($item['total_price'], 2); ?>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            
+                            <div class="summary-totals">
+                                <div class="summary-row">
+                                    <span>Subtotal (<?php echo $item_count; ?> items)</span>
+                                    <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Delivery Fee</span>
+                                    <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
+                                </div>
+                                <div class="summary-row voucher-discount" style="display: none;">
+                                    <span>Voucher Discount</span>
+                                    <span class="discount-amount">-RM 0.00</span>
+                                </div>
+                                <div class="summary-divider"></div>
+                                <div class="summary-row total">
+                                    <span>Total</span>
+                                    <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
                     <!-- Delivery Information -->
                     <section class="checkout-section">
-                        <h2><i class="fas fa-truck"></i>Delivery Information</h2>
+                        <h2><i class="fas fa-truck"></i> Delivery Information</h2>
                         
                         <div class="address-selection">
-                            <h3>Select Delivery Address</h3>
                             <div class="address-options">
                                 <?php foreach ($addresses as $address): ?>
                                 <div class="address-option">
@@ -149,7 +192,6 @@ $conn->close();
                         
                         <!-- New Address Form (hidden by default) -->
                         <div class="new-address-form" id="newAddressForm" style="display: none;">
-                            <h3>Add New Address</h3>
                             <div class="form-group">
                                 <label for="recipient_name">Recipient Name</label>
                                 <input type="text" id="recipient_name" name="recipient_name" required>
@@ -271,90 +313,11 @@ $conn->close();
                     
                     <!-- Voucher Section -->
                     <section class="checkout-section">
-                        <h2><i class="fas fa-tag"></i> Vouchers</h2>
+                        <h2><i class="fas fa-tag"></i> Apply Voucher</h2>
                         <div class="voucher-section">
                             <div class="voucher-input">
                                 <input type="text" id="voucher_code" name="voucher_code" placeholder="Enter voucher code">
                                 <button type="button" id="applyVoucher" class="btn">Apply</button>
-                            </div>
-                            <div class="available-vouchers">
-                                <h3>Your Available Vouchers</h3>
-                                <?php if (!empty($vouchers)): ?>
-                                    <div class="voucher-options">
-                                        <?php foreach ($vouchers as $voucher): ?>
-                                            <div class="voucher-option" data-id="<?php echo $voucher['voucher_id']; ?>">
-                                                <input type="radio" name="selected_voucher" id="voucher_<?php echo $voucher['voucher_id']; ?>" 
-                                                       value="<?php echo $voucher['voucher_id']; ?>">
-                                                <label for="voucher_<?php echo $voucher['voucher_id']; ?>">
-                                                    <div class="voucher-details">
-                                                        <h4><?php echo htmlspecialchars($voucher['voucher_name']); ?></h4>
-                                                        <p>
-                                                            <?php 
-                                                            if ($voucher['discount_type'] == 'percentage') {
-                                                                echo $voucher['discount_value'] . '% off';
-                                                            } elseif ($voucher['discount_type'] == 'fixed_amount') {
-                                                                echo 'RM' . $voucher['discount_value'] . ' off';
-                                                            } else {
-                                                                echo 'Free Shipping';
-                                                            }
-                                                            ?>
-                                                        </p>
-                                                        <p class="voucher-terms">
-                                                            Min. spend RM<?php echo number_format($voucher['min_order_amount'], 2); ?> • 
-                                                            Valid until <?php echo date('d M Y', strtotime($voucher['valid_to'])); ?>
-                                                        </p>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php else: ?>
-                                    <p>You don't have any available vouchers.</p>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    <!-- Order Summary -->
-                    <section class="checkout-section order-summary-section">
-                        <h2><i class="fas fa-receipt"></i> Order Summary</h2>
-                        <div class="order-summary">
-                            <div class="summary-items">
-                                <?php foreach ($cart_items as $item): ?>
-                                <div class="summary-item">
-                                    <div class="item-image">
-                                        <img src="../assets/uploads/<?php echo htmlspecialchars($item['prod_image']); ?>" 
-                                             alt="<?php echo htmlspecialchars($item['prod_name']); ?>">
-                                    </div>
-                                    <div class="item-details">
-                                        <h4><?php echo htmlspecialchars($item['prod_name']); ?></h4>
-                                        <p>Qty: <?php echo $item['QUANTITY']; ?></p>
-                                    </div>
-                                    <div class="item-price">
-                                        RM <?php echo number_format($item['total_price'], 2); ?>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                            
-                            <div class="summary-totals">
-                                <div class="summary-row">
-                                    <span>Subtotal (<?php echo $item_count; ?> items)</span>
-                                    <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
-                                </div>
-                                <div class="summary-row">
-                                    <span>Delivery Fee</span>
-                                    <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
-                                </div>
-                                <div class="summary-row voucher-discount" style="display: none;">
-                                    <span>Voucher Discount</span>
-                                    <span class="discount-amount">-RM 0.00</span>
-                                </div>
-                                <div class="summary-divider"></div>
-                                <div class="summary-row total">
-                                    <span>Total</span>
-                                    <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
-                                </div>
                             </div>
                         </div>
                     </section>
