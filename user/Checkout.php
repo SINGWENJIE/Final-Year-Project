@@ -407,27 +407,18 @@ $conn->close();
                     <section class="checkout-section">
                         <h2><i class="fas fa-tag"></i> Promo Code</h2>
                         <div class="promo-section">
-                            <?php if ($applied_promo): ?>
-                                <div class="applied-promo">
-                                    <span>Applied: <?php echo $applied_promo['CODE']; ?> (-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?>)</span>
-                                    <a href="checkout.php?remove_promo=1" class="remove-promo">Remove</a>
-                                </div>
-                            <?php else: ?>
-                                <form method="post" action="checkout.php">
-                                    <div class="promo-input">
-                                        <input type="text" id="promo_code" name="promo_code" 
-                                               placeholder="Enter promo code" 
-                                               value="<?php echo isset($_POST['promo_code']) ? htmlspecialchars($_POST['promo_code']) : ''; ?>">
-                                        <button type="submit" name="apply_promo" class="btn">Apply</button>
-                                    </div>
-                                    <?php if (!empty($promo_error)): ?>
-                                        <div class="promo-message error"><?php echo $promo_error; ?></div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($promo_success)): ?>
-                                        <div class="promo-message success"><?php echo $promo_success; ?></div>
-                                    <?php endif; ?>
-                                </form>
-                            <?php endif; ?>
+                        <?php if (isset($_SESSION['applied_promo'])): ?>
+                        <div class="applied-promo">
+                            <span>Applied: <?php echo $_SESSION['applied_promo']['code']; ?> (-RM <?php echo number_format($_SESSION['applied_promo']['amount'], 2); ?>)</span>
+                            <a href="checkout.php?remove_promo=1" class="remove-promo">Remove</a>
+                        </div>
+                        <?php else: ?>
+                        <div class="promo-input">
+                            <input type="text" id="promoCode" name="promoCode" placeholder="Enter Promo Code">
+                            <button type="button" onclick="applyPromo()" class="btn">Apply</button>
+                        </div>
+                        <p id="discountInfo" class="promo-message"></p>
+                        <?php endif; ?>
                         </div>
                     </section>
                     <div class="checkout-actions">
@@ -462,172 +453,231 @@ $conn->close();
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show/hide new address form
-            const newAddressRadio = document.getElementById('new_address');
-            const newAddressForm = document.getElementById('newAddressForm');
-            
-            if (newAddressRadio && newAddressForm) {
-                newAddressRadio.addEventListener('change', function() {
-                    if (this.checked) {
-                        newAddressForm.style.display = 'block';
-                    }
-                });
-                
-                // Hide new address form if another address is selected
-                document.querySelectorAll('input[name="shipping_address"]').forEach(radio => {
-                    if (radio.id !== 'new_address') {
-                        radio.addEventListener('change', function() {
-                            newAddressForm.style.display = 'none';
-                        });
-                    }
-                });
-            }
-            
-            // Show/hide credit card form based on payment method
-            const creditCardForm = document.getElementById('creditCardForm');
-            if (creditCardForm) {
-                function toggleCreditCardForm() {
-                    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
-                    if (selectedMethod === 'credit_card' || selectedMethod === 'debit_card') {
-                        creditCardForm.style.display = 'block';
-                    } else {
-                        creditCardForm.style.display = 'none';
-                    }
-                }
-                
-                // Initial toggle
-                toggleCreditCardForm();
-                
-                // Toggle when payment method changes
-                document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-                    radio.addEventListener('change', toggleCreditCardForm);
-                });
-            }
-            
-            // Update delivery fee when delivery method changes
-            document.querySelectorAll('input[name="delivery_method"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const deliveryFeeElement = document.querySelector('.delivery-fee');
-                    const deliveryFeeInput = document.getElementById('delivery_fee');
-                    let deliveryFee = 5.00; // Standard delivery
-                    
-                    if (this.value === 'express') {
-                        deliveryFee = 10.00; // Express delivery
-                    }
-                    
-                    // Update display
-                    deliveryFeeElement.textContent = 'RM ' + deliveryFee.toFixed(2);
-                    
-                    // Update hidden input
-                    deliveryFeeInput.value = deliveryFee;
-                    
-                    // Recalculate total
-                    const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
-                    const discountRow = document.querySelector('.summary-row.promo-discount');
-                    let discount = 0;
-                    
-                    if (discountRow) {
-                        discount = parseFloat(discountRow.querySelector('.discount-amount').textContent.replace('-RM ', ''));
-                    }
-                    
-                    const newTotal = (subtotal - discount) + deliveryFee;
-                    document.querySelector('.total-amount').textContent = 'RM ' + newTotal.toFixed(2);
-                });
-            });
-            
-            // Form validation before submission
-            const checkoutForm = document.getElementById('checkoutForm');
-            if (checkoutForm) {
-                checkoutForm.addEventListener('submit', function(e) {
-                    // In a real application, you would do more thorough validation
-                    const selectedAddress = document.querySelector('input[name="shipping_address"]:checked');
-                    
-                    if (!selectedAddress) {
-                        e.preventDefault();
-                        showToast('Please select a delivery address', 'error');
-                        return;
-                    }
-                    
-                    if (selectedAddress.value === 'new') {
-                        // Validate new address fields
-                        const recipientName = document.getElementById('recipient_name').value.trim();
-                        const streetAddress = document.getElementById('street_address').value.trim();
-                        const city = document.getElementById('city').value.trim();
-                        const state = document.getElementById('state').value.trim();
-                        const postalCode = document.getElementById('postal_code').value.trim();
-                        const phoneNumber = document.getElementById('phone_number').value.trim();
-                        
-                        if (!recipientName || !streetAddress || !city || !state || !postalCode || !phoneNumber) {
-                            e.preventDefault();
-                            showToast('Please fill in all required address fields', 'error');
-                            return;
-                        }
-                    }
-                    
-                    const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-                    
-                    if ((paymentMethod === 'credit_card' || paymentMethod === 'debit_card') && 
-                        !validateCreditCard()) {
-                        e.preventDefault();
-                        return;
-                    }
-                    
-                    // If everything is valid, show a success message
-                    showToast('Order placed successfully!', 'success');
-                });
-            }
-            
-            // Credit card validation
-            function validateCreditCard() {
-                const cardNumber = document.getElementById('card_number').value.trim();
-                const expiryDate = document.getElementById('expiry_date').value.trim();
-                const cvv = document.getElementById('cvv').value.trim();
-                const cardName = document.getElementById('card_name').value.trim();
-                
-                if (!cardNumber || !expiryDate || !cvv || !cardName) {
-                    showToast('Please fill in all credit card details', 'error');
-                    return false;
-                }
-                
-                // Simple validation for demo purposes
-                if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
-                    showToast('Please enter a valid 16-digit card number', 'error');
-                    return false;
-                }
-                
-                if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-                    showToast('Please enter expiry date in MM/YY format', 'error');
-                    return false;
-                }
-                
-                if (!/^\d{3,4}$/.test(cvv)) {
-                    showToast('Please enter a valid CVV (3 or 4 digits)', 'error');
-                    return false;
-                }
-                
-                return true;
-            }
-            
-            // Toast notification function
-            function showToast(message, type) {
-                const toast = document.createElement('div');
-                toast.className = `toast-notification ${type}`;
-                toast.textContent = message;
-                document.body.appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.classList.add('show');
-                }, 100);
-                
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(toast);
-                    }, 300);
-                }, 3000);
+    document.addEventListener('DOMContentLoaded', function() {
+    // Define valid promo codes
+    const validPromoCodes = {
+        "PROMOCODE": 20.00,
+        "WELCOME10": 10.00,
+        "CHEW": 20.00,
+        "RM5OFF": 5.00,
+        "DISCOUNT10": 10.00,
+        "SAVE5": 5.00
+    };
+
+    let discount = <?php echo isset($_SESSION['applied_promo']) ? $_SESSION['applied_promo']['amount'] : 0; ?>;
+    
+    // Show/hide new address form
+    const newAddressRadio = document.getElementById('new_address');
+    const newAddressForm = document.getElementById('newAddressForm');
+    
+    if (newAddressRadio && newAddressForm) {
+        newAddressRadio.addEventListener('change', function() {
+            if (this.checked) {
+                newAddressForm.style.display = 'block';
             }
         });
+        
+        // Hide new address form if another address is selected
+        document.querySelectorAll('input[name="shipping_address"]').forEach(radio => {
+            if (radio.id !== 'new_address') {
+                radio.addEventListener('change', function() {
+                    newAddressForm.style.display = 'none';
+                });
+            }
+        });
+    }
+    
+    // Show/hide credit card form based on payment method
+    const creditCardForm = document.getElementById('creditCardForm');
+    if (creditCardForm) {
+        function toggleCreditCardForm() {
+            const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            if (selectedMethod === 'credit_card' || selectedMethod === 'debit_card') {
+                creditCardForm.style.display = 'block';
+            } else {
+                creditCardForm.style.display = 'none';
+            }
+        }
+        
+        // Initial toggle
+        toggleCreditCardForm();
+        
+        // Toggle when payment method changes
+        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+            radio.addEventListener('change', toggleCreditCardForm);
+        });
+    }
+    
+    // Update delivery fee when delivery method changes
+    document.querySelectorAll('input[name="delivery_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const deliveryFeeElement = document.querySelector('.delivery-fee');
+            const deliveryFeeInput = document.getElementById('delivery_fee');
+            let deliveryFee = 5.00; // Standard delivery
+            
+            if (this.value === 'express') {
+                deliveryFee = 10.00; // Express delivery
+            }
+            
+            // Update display
+            deliveryFeeElement.textContent = 'RM ' + deliveryFee.toFixed(2);
+            
+            // Update hidden input
+            deliveryFeeInput.value = deliveryFee;
+            
+            // Recalculate total
+            updateOrderTotal();
+        });
+    });
+    
+    // Promo code application
+    window.applyPromo = function() {
+        const promoCode = document.getElementById("promoCode").value.trim().toUpperCase();
+        const discountInfo = document.getElementById("discountInfo");
+        
+        if (validPromoCodes.hasOwnProperty(promoCode)) {
+            // Valid promo code
+            discount = validPromoCodes[promoCode];
+            discountInfo.innerText = `Promo Applied: ${promoCode} (-RM ${discount.toFixed(2)})`;
+            discountInfo.style.color = "green";
+            discountInfo.className = "promo-message success";
+            
+            // Save to session via AJAX
+            fetch('save_promo.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `code=${promoCode}&amount=${discount}`
+            });
+            
+            // Update order total
+            updateOrderTotal();
+        } else {
+            // Invalid promo code
+            discount = 0;
+            discountInfo.innerText = "❌ Invalid or expired promo code!";
+            discountInfo.style.color = "red";
+            discountInfo.className = "promo-message error";
+            updateOrderTotal();
+        }
+    };
+    
+    // Function to update order total
+    function updateOrderTotal() {
+        const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
+        const deliveryFee = parseFloat(document.querySelector('.delivery-fee').textContent.replace('RM ', ''));
+        const total = (subtotal - discount) + deliveryFee;
+        
+        document.querySelector('.total-amount').textContent = 'RM ' + total.toFixed(2);
+        
+        // Update discount display if exists
+        const discountRow = document.querySelector('.summary-row.promo-discount');
+        if (discountRow) {
+            if (discount > 0) {
+                discountRow.style.display = 'flex';
+                discountRow.querySelector('.discount-amount').textContent = `-RM ${discount.toFixed(2)}`;
+            } else {
+                discountRow.style.display = 'none';
+            }
+        }
+    }
+    
+    // Form validation before submission
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            // In a real application, you would do more thorough validation
+            const selectedAddress = document.querySelector('input[name="shipping_address"]:checked');
+            
+            if (!selectedAddress) {
+                e.preventDefault();
+                showToast('Please select a delivery address', 'error');
+                return;
+            }
+            
+            if (selectedAddress.value === 'new') {
+                // Validate new address fields
+                const recipientName = document.getElementById('recipient_name').value.trim();
+                const streetAddress = document.getElementById('street_address').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const state = document.getElementById('state').value.trim();
+                const postalCode = document.getElementById('postal_code').value.trim();
+                const phoneNumber = document.getElementById('phone_number').value.trim();
+                
+                if (!recipientName || !streetAddress || !city || !state || !postalCode || !phoneNumber) {
+                    e.preventDefault();
+                    showToast('Please fill in all required address fields', 'error');
+                    return;
+                }
+            }
+            
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            
+            if ((paymentMethod === 'credit_card' || paymentMethod === 'debit_card') && 
+                !validateCreditCard()) {
+                e.preventDefault();
+                return;
+            }
+            
+            // If everything is valid, show a success message
+            showToast('Order placed successfully!', 'success');
+        });
+    }
+    
+    // Credit card validation
+    function validateCreditCard() {
+        const cardNumber = document.getElementById('card_number').value.trim();
+        const expiryDate = document.getElementById('expiry_date').value.trim();
+        const cvv = document.getElementById('cvv').value.trim();
+        const cardName = document.getElementById('card_name').value.trim();
+        
+        if (!cardNumber || !expiryDate || !cvv || !cardName) {
+            showToast('Please fill in all credit card details', 'error');
+            return false;
+        }
+        
+        // Simple validation for demo purposes
+        if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
+            showToast('Please enter a valid 16-digit card number', 'error');
+            return false;
+        }
+        
+        if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+            showToast('Please enter expiry date in MM/YY format', 'error');
+            return false;
+        }
+        
+        if (!/^\d{3,4}$/.test(cvv)) {
+            showToast('Please enter a valid CVV (3 or 4 digits)', 'error');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Toast notification function
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Initialize order total
+    updateOrderTotal();
+    });
     </script>
 </body>
 </html>

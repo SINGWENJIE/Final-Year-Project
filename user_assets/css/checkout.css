@@ -451,6 +451,43 @@ header nav a.active {
     color: #27ae60;
 }
 
+.promo-input {
+    display: flex;
+    gap: 10px;
+}
+
+.promo-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #8b5e3b;
+    border-radius: 5px;
+}
+
+.promo-message {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.applied-promo {
+    background-color: #e6ffed;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-promo {
+    color: #d62300;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.remove-promo:hover {
+    text-decoration: underline;
+}
+
 /* Order Summary */
 .order-summary {
     background-color: #f8f9fa;
