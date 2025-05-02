@@ -190,26 +190,26 @@ $conn->close();
                             </div>
                             
                             <div class="summary-totals">
-    <div class="summary-row">
-        <span>Subtotal (<?php echo $item_count; ?> items)</span>
-        <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
-    </div>
-    <div class="summary-row">
-        <span>Delivery Fee</span>
-        <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
-    </div>
-    <?php if ($applied_promo): ?>
-    <div class="summary-row promo-discount">
-        <span>Promo Discount (<?php echo $applied_promo['CODE']; ?>)</span>
-        <span class="discount-amount">-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?></span>
-    </div>
-    <?php endif; ?>
-    <div class="summary-divider"></div>
-    <div class="summary-row total">
-        <span>Total</span>
-        <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
-    </div>
-</div>
+                                <div class="summary-row">
+                                <span>Subtotal (<?php echo $item_count; ?> items)</span>
+                                <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Delivery Fee</span>
+                                <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
+                            </div>
+                            <?php if ($applied_promo): ?>
+                            <div class="summary-row promo-discount">
+                                <span>Promo Discount (<?php echo $applied_promo['CODE']; ?>)</span>
+                                <span class="discount-amount">-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?></span>
+                            </div>
+                            <?php endif; ?>
+                            <div class="summary-divider"></div>
+                            <div class="summary-row total">
+                                <span>Total</span>
+                                <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
+                            </div>
+                        </div>
                     </section>
                     
                     <!-- Delivery Information -->
