@@ -76,28 +76,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_promo'])) {
     $promo_code = trim($_POST['promo_code']);
     
     if (!empty($promo_code)) {
-        // Check promo code against database
+        // Improved promo code validation
         $promo_sql = "SELECT * FROM promo_code 
-                      WHERE CODE = ? 
-                      AND VALID_FROM <= CURDATE() 
-                      AND VALID_TO >= CURDATE() 
-                      AND (MAX_USES IS NULL OR USES_COUNT < MAX_USES)";
+                      WHERE CODE = ?
+                      AND (VALID_FROM <= CURDATE() OR VALID_FROM = '0000-00-00')
+                      AND (VALID_TO >= CURDATE() OR VALID_TO = '0000-00-00')
+                      AND (MAX_USES IS NULL OR USES_COUNT < MAX_USES)
+                      AND (MIN_ORDER IS NULL OR MIN_ORDER <= ?)";
+        
         $stmt = $conn->prepare($promo_sql);
-        $stmt->bind_param("s", $promo_code);
+        $stmt->bind_param("sd", $promo_code, $subtotal);
         $stmt->execute();
         $result = $stmt->get_result();
         
         if ($result->num_rows > 0) {
             $applied_promo = $result->fetch_assoc();
             $_SESSION['applied_promo'] = $applied_promo;
-            $promo_success = "Promo code applied successfully!";
+            $promo_success = "Promo code applied successfully! Discount: RM" . $applied_promo['DISCOUNT_AMOUNT'];
         } else {
-            $promo_error = "Invalid or expired promo code";
+            $promo_error = "Invalid promo code or minimum order not met";
             unset($_SESSION['applied_promo']);
             $applied_promo = null;
         }
     } else {
         $promo_error = "Please enter a promo code";
+    }
+} else {
+    // Debugging - check why the code didn't work
+    $debug_sql = "SELECT * FROM promo_code WHERE CODE = ?";
+    $debug_stmt = $conn->prepare($debug_sql);
+    $debug_stmt->bind_param("s", $promo_code);
+    $debug_stmt->execute();
+    $debug_result = $debug_stmt->get_result();
+    
+    if ($debug_result->num_rows > 0) {
+        $debug_row = $debug_result->fetch_assoc();
+        $reasons = [];
+        
+        // Check validity dates
+        if ($debug_row['VALID_FROM'] != '0000-00-00' && strtotime($debug_row['VALID_FROM']) > time()) {
+            $reasons[] = "code not valid yet (starts " . $debug_row['VALID_FROM'];
+        }
+        if ($debug_row['VALID_TO'] != '0000-00-00' && strtotime($debug_row['VALID_TO']) < time()) {
+            $reasons[] = "code expired (ended " . $debug_row['VALID_TO'];
+        }
+        
+        // Check minimum order
+        if ($debug_row['MIN_ORDER'] > 0 && $subtotal < $debug_row['MIN_ORDER']) {
+            $reasons[] = "minimum order not met (need RM" . $debug_row['MIN_ORDER'] . ")";
+        }
+        
+        // Check usage limits
+        if ($debug_row['MAX_USES'] > 0 && $debug_row['USES_COUNT'] >= $debug_row['MAX_USES']) {
+            $reasons[] = "usage limit reached";
+        }
+        
+        if (!empty($reasons)) {
+            $promo_error .= " - " . implode(", ", $reasons);
+        }
     }
 }
 
@@ -425,7 +461,6 @@ $conn->close();
         </div>
     </footer>
 
-    <script src="../user_assets/js/checkout.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Show/hide new address form
