@@ -231,11 +231,11 @@ $conn->close();
                                     <span class="discount-amount">-RM <?php echo isset($_SESSION['applied_promo']) ? number_format($_SESSION['applied_promo']['amount'], 2) : '0.00'; ?></span>
                                 </div>
                                 <div class="summary-divider"></div>
-    <div class="summary-row total">
-        <span>Total</span>
-        <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
-    </div>
-</div>
+                                <div class="summary-row total">
+                                    <span>Total</span>
+                                    <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
+                                </div>
+                            </div>
                     </section>
                     
                     <!-- Delivery Information -->
