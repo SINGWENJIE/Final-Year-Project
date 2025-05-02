@@ -66,15 +66,12 @@ if (empty($cart_items)) {
     exit();
 }
 
-// Calculate delivery fee and total
-$delivery_fee = 5.00; // Default delivery fee
-$total = $subtotal + $delivery_fee;
-
-// Promo code validation
+// Initialize variables
 $promo_error = '';
 $promo_success = '';
-$applied_promo = null;
+$applied_promo = $_SESSION['applied_promo'] ?? null;
 
+// Handle promo code application
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_promo'])) {
     $promo_code = trim($_POST['promo_code']);
     
@@ -92,24 +89,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_promo'])) {
         
         if ($result->num_rows > 0) {
             $applied_promo = $result->fetch_assoc();
-            
-            // Check minimum order amount
-            if ($subtotal >= $applied_promo['MIN_ORDER']) {
-                $promo_success = "Promo code applied successfully!";
-                
-                // Calculate discount
-                $discount_amount = $applied_promo['DISCOUNT_AMOUNT'];
-                $total = $subtotal + $delivery_fee - $discount_amount;
-            } else {
-                $promo_error = "Minimum order amount of RM" . $applied_promo['MIN_ORDER'] . " required for this promo.";
-            }
+            $_SESSION['applied_promo'] = $applied_promo;
+            $promo_success = "Promo code applied successfully!";
         } else {
             $promo_error = "Invalid or expired promo code";
+            unset($_SESSION['applied_promo']);
+            $applied_promo = null;
         }
     } else {
         $promo_error = "Please enter a promo code";
     }
 }
+
+// Handle promo code removal
+if (isset($_GET['remove_promo'])) {
+    unset($_SESSION['applied_promo']);
+    $applied_promo = null;
+    header("Location: checkout.php");
+    exit();
+}
+
+// Calculate delivery fee
+$delivery_method = isset($_POST['delivery_method']) ? $_POST['delivery_method'] : 'standard';
+$delivery_fee = ($delivery_method == 'express') ? 10.00 : 5.00;
+
+// Calculate discount
+$discount_amount = 0;
+if ($applied_promo && $subtotal >= $applied_promo['MIN_ORDER']) {
+    $discount_amount = $applied_promo['DISCOUNT_AMOUNT'];
+}
+
+// Calculate total
+$total = $subtotal + $delivery_fee - $discount_amount;
 
 $conn->close();
 ?>
@@ -153,6 +164,9 @@ $conn->close();
         <div class="checkout-layout">
             <div class="checkout-form">
                 <form id="checkoutForm" action="process_order.php" method="POST">
+                    <!-- Hidden field for delivery fee -->
+                    <input type="hidden" name="delivery_fee" id="delivery_fee" value="<?php echo $delivery_fee; ?>">
+                    
                     <!-- Order Summary -->
                     <section class="checkout-section">
                         <h2><i class="fas fa-receipt"></i> Order Summary</h2>
@@ -176,27 +190,26 @@ $conn->close();
                             </div>
                             
                             <div class="summary-totals">
-                                <div class="summary-row">
-                                    <span>Subtotal (<?php echo $item_count; ?> items)</span>
-                                    <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
-                                </div>
-                                <div class="summary-row">
-                                    <span>Delivery Fee</span>
-                                    <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
-                                </div>
-                                <?php if (!empty($applied_promo)): ?>
-                                <div class="summary-row promo-discount">
-                                    <span>Promo Discount (<?php echo $applied_promo['CODE']; ?>)</span>
-                                    <span class="discount-amount">-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?></span>
-                                </div>
-                                <?php endif; ?>
-                                <div class="summary-divider"></div>
-                                <div class="summary-row total">
-                                    <span>Total</span>
-                                    <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
-                                </div>
-                            </div>
-                        </div>
+    <div class="summary-row">
+        <span>Subtotal (<?php echo $item_count; ?> items)</span>
+        <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
+    </div>
+    <div class="summary-row">
+        <span>Delivery Fee</span>
+        <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
+    </div>
+    <?php if ($applied_promo): ?>
+    <div class="summary-row promo-discount">
+        <span>Promo Discount (<?php echo $applied_promo['CODE']; ?>)</span>
+        <span class="discount-amount">-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?></span>
+    </div>
+    <?php endif; ?>
+    <div class="summary-divider"></div>
+    <div class="summary-row total">
+        <span>Total</span>
+        <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
+    </div>
+</div>
                     </section>
                     
                     <!-- Delivery Information -->
@@ -279,22 +292,22 @@ $conn->close();
                         <h2><i class="fas fa-shipping-fast"></i> Delivery Method</h2>
                         <div class="delivery-options">
                             <div class="delivery-option">
-                                <input type="radio" name="delivery_method" id="standard_delivery" value="standard" checked required>
+                                <input type="radio" name="delivery_method" id="standard_delivery" value="standard" <?php echo $delivery_method == 'standard' ? 'checked' : ''; ?> required>
                                 <label for="standard_delivery">
                                     <div class="delivery-details">
                                         <h3>Standard Delivery</h3>
                                         <p>Delivery within 2-3 business days</p>
-                                        <p class="delivery-fee">RM 5.00</p>
+                                        <p class="delivery-fee-text">RM 5.00</p>
                                     </div>
                                 </label>
                             </div>
                             <div class="delivery-option">
-                                <input type="radio" name="delivery_method" id="express_delivery" value="express">
+                                <input type="radio" name="delivery_method" id="express_delivery" value="express" <?php echo $delivery_method == 'express' ? 'checked' : ''; ?>>
                                 <label for="express_delivery">
                                     <div class="delivery-details">
                                         <h3>Express Delivery</h3>
                                         <p>Next business day delivery</p>
-                                        <p class="delivery-fee">RM 10.00</p>
+                                        <p class="delivery-fee-text">RM 10.00</p>
                                     </div>
                                 </label>
                             </div>
@@ -358,21 +371,29 @@ $conn->close();
                     <section class="checkout-section">
                         <h2><i class="fas fa-tag"></i> Promo Code</h2>
                         <div class="promo-section">
-                                <div class="promo-input">
-                                    <input type="text" id="promo_code" name="promo_code" 
-                                        placeholder="Enter promo code" 
-                                        value="<?php echo isset($_POST['promo_code']) ? htmlspecialchars($_POST['promo_code']) : ''; ?>">
-                                    <button type="submit" name="apply_promo" class="btn">Apply</button>
+                            <?php if ($applied_promo): ?>
+                                <div class="applied-promo">
+                                    <span>Applied: <?php echo $applied_promo['CODE']; ?> (-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?>)</span>
+                                    <a href="checkout.php?remove_promo=1" class="remove-promo">Remove</a>
                                 </div>
-                                <?php if (!empty($promo_error)): ?>
-                                    <div class="promo-message error"><?php echo $promo_error; ?></div>
-                                <?php endif; ?>
-                                <?php if (!empty($promo_success)): ?>
-                                    <div class="promo-message success"><?php echo $promo_success; ?></div>
-                                <?php endif; ?>
+                            <?php else: ?>
+                                <form method="post" action="checkout.php">
+                                    <div class="promo-input">
+                                        <input type="text" id="promo_code" name="promo_code" 
+                                               placeholder="Enter promo code" 
+                                               value="<?php echo isset($_POST['promo_code']) ? htmlspecialchars($_POST['promo_code']) : ''; ?>">
+                                        <button type="submit" name="apply_promo" class="btn">Apply</button>
+                                    </div>
+                                    <?php if (!empty($promo_error)): ?>
+                                        <div class="promo-message error"><?php echo $promo_error; ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($promo_success)): ?>
+                                        <div class="promo-message success"><?php echo $promo_success; ?></div>
+                                    <?php endif; ?>
+                                </form>
+                            <?php endif; ?>
                         </div>
                     </section>
-                    
                     <div class="checkout-actions">
                         <a href="cart.php" class="btn btn-back"><i class="fas fa-arrow-left"></i> Back to Cart</a>
                         <button type="submit" class="btn btn-primary" id="placeOrderBtn">
@@ -405,5 +426,173 @@ $conn->close();
     </footer>
 
     <script src="../user_assets/js/checkout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show/hide new address form
+            const newAddressRadio = document.getElementById('new_address');
+            const newAddressForm = document.getElementById('newAddressForm');
+            
+            if (newAddressRadio && newAddressForm) {
+                newAddressRadio.addEventListener('change', function() {
+                    if (this.checked) {
+                        newAddressForm.style.display = 'block';
+                    }
+                });
+                
+                // Hide new address form if another address is selected
+                document.querySelectorAll('input[name="shipping_address"]').forEach(radio => {
+                    if (radio.id !== 'new_address') {
+                        radio.addEventListener('change', function() {
+                            newAddressForm.style.display = 'none';
+                        });
+                    }
+                });
+            }
+            
+            // Show/hide credit card form based on payment method
+            const creditCardForm = document.getElementById('creditCardForm');
+            if (creditCardForm) {
+                function toggleCreditCardForm() {
+                    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+                    if (selectedMethod === 'credit_card' || selectedMethod === 'debit_card') {
+                        creditCardForm.style.display = 'block';
+                    } else {
+                        creditCardForm.style.display = 'none';
+                    }
+                }
+                
+                // Initial toggle
+                toggleCreditCardForm();
+                
+                // Toggle when payment method changes
+                document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+                    radio.addEventListener('change', toggleCreditCardForm);
+                });
+            }
+            
+            // Update delivery fee when delivery method changes
+            document.querySelectorAll('input[name="delivery_method"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const deliveryFeeElement = document.querySelector('.delivery-fee');
+                    const deliveryFeeInput = document.getElementById('delivery_fee');
+                    let deliveryFee = 5.00; // Standard delivery
+                    
+                    if (this.value === 'express') {
+                        deliveryFee = 10.00; // Express delivery
+                    }
+                    
+                    // Update display
+                    deliveryFeeElement.textContent = 'RM ' + deliveryFee.toFixed(2);
+                    
+                    // Update hidden input
+                    deliveryFeeInput.value = deliveryFee;
+                    
+                    // Recalculate total
+                    const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
+                    const discountRow = document.querySelector('.summary-row.promo-discount');
+                    let discount = 0;
+                    
+                    if (discountRow) {
+                        discount = parseFloat(discountRow.querySelector('.discount-amount').textContent.replace('-RM ', ''));
+                    }
+                    
+                    const newTotal = (subtotal - discount) + deliveryFee;
+                    document.querySelector('.total-amount').textContent = 'RM ' + newTotal.toFixed(2);
+                });
+            });
+            
+            // Form validation before submission
+            const checkoutForm = document.getElementById('checkoutForm');
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', function(e) {
+                    // In a real application, you would do more thorough validation
+                    const selectedAddress = document.querySelector('input[name="shipping_address"]:checked');
+                    
+                    if (!selectedAddress) {
+                        e.preventDefault();
+                        showToast('Please select a delivery address', 'error');
+                        return;
+                    }
+                    
+                    if (selectedAddress.value === 'new') {
+                        // Validate new address fields
+                        const recipientName = document.getElementById('recipient_name').value.trim();
+                        const streetAddress = document.getElementById('street_address').value.trim();
+                        const city = document.getElementById('city').value.trim();
+                        const state = document.getElementById('state').value.trim();
+                        const postalCode = document.getElementById('postal_code').value.trim();
+                        const phoneNumber = document.getElementById('phone_number').value.trim();
+                        
+                        if (!recipientName || !streetAddress || !city || !state || !postalCode || !phoneNumber) {
+                            e.preventDefault();
+                            showToast('Please fill in all required address fields', 'error');
+                            return;
+                        }
+                    }
+                    
+                    const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+                    
+                    if ((paymentMethod === 'credit_card' || paymentMethod === 'debit_card') && 
+                        !validateCreditCard()) {
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    // If everything is valid, show a success message
+                    showToast('Order placed successfully!', 'success');
+                });
+            }
+            
+            // Credit card validation
+            function validateCreditCard() {
+                const cardNumber = document.getElementById('card_number').value.trim();
+                const expiryDate = document.getElementById('expiry_date').value.trim();
+                const cvv = document.getElementById('cvv').value.trim();
+                const cardName = document.getElementById('card_name').value.trim();
+                
+                if (!cardNumber || !expiryDate || !cvv || !cardName) {
+                    showToast('Please fill in all credit card details', 'error');
+                    return false;
+                }
+                
+                // Simple validation for demo purposes
+                if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
+                    showToast('Please enter a valid 16-digit card number', 'error');
+                    return false;
+                }
+                
+                if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+                    showToast('Please enter expiry date in MM/YY format', 'error');
+                    return false;
+                }
+                
+                if (!/^\d{3,4}$/.test(cvv)) {
+                    showToast('Please enter a valid CVV (3 or 4 digits)', 'error');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            // Toast notification function
+            function showToast(message, type) {
+                const toast = document.createElement('div');
+                toast.className = `toast-notification ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 300);
+                }, 3000);
+            }
+        });
+    </script>
 </body>
 </html>
