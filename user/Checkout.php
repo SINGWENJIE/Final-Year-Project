@@ -149,14 +149,6 @@ if (isset($_GET['remove_promo'])) {
 $delivery_method = isset($_POST['delivery_method']) ? $_POST['delivery_method'] : 'standard';
 $delivery_fee = ($delivery_method == 'express') ? 10.00 : 5.00;
 
-// Calculate discount
-$discount_amount = 0;
-if ($applied_promo && $subtotal >= $applied_promo['MIN_ORDER']) {
-    $discount_amount = $applied_promo['DISCOUNT_AMOUNT'];
-}
-
-// Calculate total
-$total = $subtotal + $delivery_fee - $discount_amount;
 
 $conn->close();
 ?>
@@ -227,25 +219,23 @@ $conn->close();
                             
                             <div class="summary-totals">
                                 <div class="summary-row">
-                                <span>Subtotal (<?php echo $item_count; ?> items)</span>
-                                <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
-                            </div>
-                            <div class="summary-row">
-                                <span>Delivery Fee</span>
-                                <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
-                            </div>
-                            <?php if ($applied_promo): ?>
-                            <div class="summary-row promo-discount">
-                                <span>Promo Discount (<?php echo $applied_promo['CODE']; ?>)</span>
-                                <span class="discount-amount">-RM <?php echo number_format($applied_promo['DISCOUNT_AMOUNT'], 2); ?></span>
-                            </div>
-                            <?php endif; ?>
-                            <div class="summary-divider"></div>
-                            <div class="summary-row total">
-                                <span>Total</span>
-                                <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
-                            </div>
-                        </div>
+                                    <span>Subtotal (<?php echo $item_count; ?> items)</span>
+                                    <span class="subtotal">RM <?php echo number_format($subtotal, 2); ?></span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Delivery Fee</span>
+                                    <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
+                                </div>
+                                <div class="summary-row promo-discount" style="<?php echo !isset($_SESSION['applied_promo']) ? 'display:none;' : ''; ?>">
+                                    <span>Promo Discount</span>
+                                    <span class="discount-amount">-RM <?php echo isset($_SESSION['applied_promo']) ? number_format($_SESSION['applied_promo']['amount'], 2) : '0.00'; ?></span>
+                                </div>
+                                <div class="summary-divider"></div>
+    <div class="summary-row total">
+        <span>Total</span>
+        <span class="total-amount">RM <?php echo number_format($total, 2); ?></span>
+    </div>
+</div>
                     </section>
                     
                     <!-- Delivery Information -->
@@ -565,22 +555,26 @@ $conn->close();
     
     // Function to update order total
     function updateOrderTotal() {
-        const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
-        const deliveryFee = parseFloat(document.querySelector('.delivery-fee').textContent.replace('RM ', ''));
-        const total = (subtotal - discount) + deliveryFee;
-        
-        document.querySelector('.total-amount').textContent = 'RM ' + total.toFixed(2);
-        
-        // Update discount display if exists
-        const discountRow = document.querySelector('.summary-row.promo-discount');
-        if (discountRow) {
-            if (discount > 0) {
-                discountRow.style.display = 'flex';
-                discountRow.querySelector('.discount-amount').textContent = `-RM ${discount.toFixed(2)}`;
-            } else {
-                discountRow.style.display = 'none';
-            }
-        }
+    const subtotal = parseFloat(document.querySelector('.subtotal').textContent.replace('RM ', ''));
+    const deliveryFee = parseFloat(document.querySelector('.delivery-fee').textContent.replace('RM ', ''));
+    const total = (subtotal - discount) + deliveryFee;
+    
+    // Update discount row
+    const discountRow = document.querySelector('.summary-row.promo-discount');
+    const discountAmount = document.querySelector('.discount-amount');
+    
+    if (discount > 0) {
+        discountRow.style.display = 'flex';
+        discountAmount.textContent = `-RM ${discount.toFixed(2)}`;
+    } else {
+        discountRow.style.display = 'none';
+    }
+    
+    // Update total
+    document.querySelector('.total-amount').textContent = 'RM ' + total.toFixed(2);
+    
+    // Update hidden form values if needed
+    document.getElementById('delivery_fee').value = deliveryFee;
     }
     
     // Form validation before submission
