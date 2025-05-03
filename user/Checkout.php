@@ -66,49 +66,12 @@ if (empty($cart_items)) {
     exit();
 }
 
-// Initialize variables
-$promo_error = '';
-$promo_success = '';
-$applied_promo = $_SESSION['applied_promo'] ?? null;
-
-// Handle promo code application
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_promo'])) {
-    $promo_code = trim($_POST['promo_code']);
-    
-    if (!empty($promo_code)) {
-        // Improved promo code validation
-        $promo_sql = "SELECT * FROM promo_code 
-                      WHERE CODE = ?
-                      AND (VALID_FROM <= CURDATE() OR VALID_FROM = '0000-00-00')
-                      AND (VALID_TO >= CURDATE() OR VALID_TO = '0000-00-00')
-                      AND (MAX_USES IS NULL OR USES_COUNT < MAX_USES)
-                      AND (MIN_ORDER IS NULL OR MIN_ORDER <= ?)";
-        
-        $stmt = $conn->prepare($promo_sql);
-        $stmt->bind_param("sd", $promo_code, $subtotal);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            $applied_promo = $result->fetch_assoc();
-            $_SESSION['applied_promo'] = $applied_promo;
-            $promo_success = "Promo code applied successfully! Discount: RM" . $applied_promo['DISCOUNT_AMOUNT'];
-        } else {
-            $promo_error = "Invalid promo code or minimum order not met";
-            unset($_SESSION['applied_promo']);
-            $applied_promo = null;
-        }
-    } else {
-        $promo_error = "Please enter a promo code";
-    }
-}
-
 // In your main checkout.php file, keep this but simplify it:
-    if (isset($_GET['remove_promo'])) {
-        unset($_SESSION['applied_promo']);
-        header("Location: checkout.php");
-        exit();
-    }
+if (isset($_GET['remove_promo'])) {
+    unset($_SESSION['applied_promo']);
+    header("Location: checkout.php");
+    exit();
+}
 
 // Calculate delivery fee
 $delivery_method = isset($_POST['delivery_method']) ? $_POST['delivery_method'] : 'standard';
@@ -377,18 +340,18 @@ $conn->close();
                     <section class="checkout-section">
                         <h2><i class="fas fa-tag"></i> Promo Code</h2>
                         <div class="promo-section">
-                        <?php if (isset($_SESSION['applied_promo'])): ?>
-                        <div class="applied-promo">
-                            <span>Applied: <?php echo $_SESSION['applied_promo']['code']; ?> (-RM <?php echo number_format($_SESSION['applied_promo']['amount'], 2); ?>)</span>
-                            <a href="checkout.php?remove_promo=1" class="remove-promo">Remove</a>
-                        </div>
-                        <?php else: ?>
-                        <div class="promo-input">
-                            <input type="text" id="promoCode" name="promoCode" placeholder="Enter Promo Code">
-                            <button type="button" onclick="applyPromo()" class="btn">Apply</button>
-                        </div>
-                        <p id="discountInfo" class="promo-message"></p>
-                        <?php endif; ?>
+                            <?php if (isset($_SESSION['applied_promo'])): ?>
+                                <div class="applied-promo">
+                                    <span>Applied: <?php echo $_SESSION['applied_promo']['code']; ?> (-RM <?php echo number_format($_SESSION['applied_promo']['amount'], 2); ?>)</span>
+                                <a href="checkout.php?remove_promo=1" class="remove-promo">Remove</a>
+                                </div>
+                            <?php else: ?>
+                            <div class="promo-input">
+                                <input type="text" id="promoCode" name="promoCode" placeholder="Enter Promo Code">
+                                <button type="button" onclick="applyPromo()" class="btn">Apply</button>
+                            </div>
+                            <p id="discountInfo" class="promo-message"></p>
+                            <?php endif; ?>
                         </div>
                     </section>
                     <div class="checkout-actions">
