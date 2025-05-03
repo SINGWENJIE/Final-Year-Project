@@ -66,17 +66,12 @@ if (empty($cart_items)) {
     exit();
 }
 
-// In your main checkout.php file, keep this but simplify it:
-if (isset($_GET['remove_promo'])) {
-    unset($_SESSION['applied_promo']);
-    header("Location: checkout.php");
-    exit();
-}
 
 // Calculate delivery fee
 $delivery_method = isset($_POST['delivery_method']) ? $_POST['delivery_method'] : 'standard';
 $delivery_fee = ($delivery_method == 'express') ? 10.00 : 5.00;
 
+$total = $subtotal + $delivery_fee - (isset($_POST['discount_amount']) ? (float)$_POST['discount_amount'] : 0);
 
 $conn->close();
 ?>
@@ -122,6 +117,8 @@ $conn->close();
                 <form id="checkoutForm" action="process_order.php" method="POST">
                     <!-- Hidden field for delivery fee -->
                     <input type="hidden" name="delivery_fee" id="delivery_fee" value="<?php echo $delivery_fee; ?>">
+                    <input type="hidden" name="discount_amount" id="discount_amount" value="0">
+                    <input type="hidden" name="promo_code" id="promo_code_field" value="">
                     
                     <!-- Order Summary -->
                     <section class="checkout-section">
@@ -154,9 +151,9 @@ $conn->close();
                                     <span>Delivery Fee</span>
                                     <span class="delivery-fee">RM <?php echo number_format($delivery_fee, 2); ?></span>
                                 </div>
-                                <div class="summary-row promo-discount" style="<?php echo !isset($_SESSION['applied_promo']) ? 'display:none;' : ''; ?>">
+                                <div class="summary-row promo-discount" style="display: none;">
                                     <span>Promo Discount</span>
-                                    <span class="discount-amount">-RM <?php echo isset($_SESSION['applied_promo']) ? number_format($_SESSION['applied_promo']['amount'], 2) : '0.00'; ?></span>
+                                    <span class="discount-amount">-RM 0.00</span>
                                 </div>
                                 <div class="summary-divider"></div>
                                 <div class="summary-row total">
@@ -333,25 +330,18 @@ $conn->close();
                                 <input type="checkbox" id="save_card" name="save_card">
                                 <label for="save_card">Save this card for future purchases</label>
                             </div>
-                       </div>
+                        </div>
                     </section>
                     
                     <!-- Promo Code Section -->
                     <section class="checkout-section">
                         <h2><i class="fas fa-tag"></i> Promo Code</h2>
                         <div class="promo-section">
-                            <?php if (isset($_SESSION['applied_promo'])): ?>
-                                <div class="applied-promo">
-                                    <span>Applied: <?php echo $_SESSION['applied_promo']['code']; ?> (-RM <?php echo number_format($_SESSION['applied_promo']['amount'], 2); ?>)</span>
-                                <a href="checkout.php?remove_promo=1" class="remove-promo">Remove</a>
-                                </div>
-                            <?php else: ?>
                             <div class="promo-input">
-                                <input type="text" id="promoCode" name="promoCode" placeholder="Enter Promo Code">
+                                <input type="text" id="promoCode" placeholder="Enter Promo Code">
                                 <button type="button" onclick="applyPromo()" class="btn">Apply</button>
                             </div>
                             <p id="discountInfo" class="promo-message"></p>
-                            <?php endif; ?>
                         </div>
                     </section>
                     <div class="checkout-actions">
@@ -397,7 +387,7 @@ $conn->close();
         "SAVE5": 5.00
     };
 
-    let discount = <?php echo isset($_SESSION['applied_promo']) ? $_SESSION['applied_promo']['amount'] : 0; ?>;
+    let discount = 0;
     
     // Show/hide new address form
     const newAddressRadio = document.getElementById('new_address');
@@ -467,24 +457,18 @@ $conn->close();
     window.applyPromo = function() {
         const promoCode = document.getElementById("promoCode").value.trim().toUpperCase();
         const discountInfo = document.getElementById("discountInfo");
-        
+    
         if (validPromoCodes.hasOwnProperty(promoCode)) {
             // Valid promo code
             discount = validPromoCodes[promoCode];
             discountInfo.innerText = `Promo Applied: ${promoCode} (-RM ${discount.toFixed(2)})`;
             discountInfo.style.color = "green";
             discountInfo.className = "promo-message success";
-            
-            // Save to session via AJAX
-            fetch('save_promo.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `code=${promoCode}&amount=${discount}`
-            });
-            
-            // Update order total
+        
+            // Update hidden fields
+            document.getElementById('promo_code_field').value = promoCode;
+            document.getElementById('discount_amount').value = discount;
+        
             updateOrderTotal();
         } else {
             // Invalid promo code
@@ -492,6 +476,8 @@ $conn->close();
             discountInfo.innerText = "❌ Invalid or expired promo code!";
             discountInfo.style.color = "red";
             discountInfo.className = "promo-message error";
+            document.getElementById('promo_code_field').value = "";
+            document.getElementById('discount_amount').value = 0;
             updateOrderTotal();
         }
     };
@@ -518,6 +504,8 @@ $conn->close();
     
     // Update hidden form values if needed
     document.getElementById('delivery_fee').value = deliveryFee;
+
+    document.getElementById('discount_amount').value = discount;
     }
     
     // Form validation before submission
