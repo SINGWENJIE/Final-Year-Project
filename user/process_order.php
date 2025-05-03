@@ -21,6 +21,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $user_id = $_SESSION['user_id'];
 
 // Process the order
@@ -109,31 +113,51 @@ try {
             throw new Exception("Failed to add order items: " . $conn->error);
         }
         
-        // Update product stock (optional)
+        // Update product stock
         $update_stock_sql = "UPDATE product SET stock = stock - $quantity WHERE prod_id = $prod_id";
         $conn->query($update_stock_sql);
     }
     
-    // 5. Create payment record
-    $payment_sql = "INSERT INTO payment (order_id, amount, payment_method, payment_status)
-                    VALUES ($order_id, $total_amount, '$payment_method', 'completed')";
+    // 5. Generate transaction ID (format: TRANS-YYYYMMDD-ORDERID-RANDOM4DIGITS)
+    $transaction_id = 'TRANS-' . date('Ymd') . '-' . $order_id . '-' . sprintf('%04d', rand(0, 9999));
+    
+    // 6. Calculate estimated delivery date
+    $delivery_method = ($delivery_fee == 10.00) ? 'EXPRESS DELIVERY' : 'STANDARD DELIVERY';
+    
+    // Get current date and time in Malaysia timezone
+    date_default_timezone_set('Asia/Kuala_Lumpur');
+    $current_date = new DateTime();
+    
+    // Calculate estimated delivery date
+    if ($delivery_method == 'EXPRESS DELIVERY') {
+        // Next business day (skip weekends)
+        $estimated_date = clone $current_date;
+        $estimated_date->modify('+1 weekday');
+    } else {
+        // Standard delivery (2-3 business days)
+        $estimated_date = clone $current_date;
+        $estimated_date->modify('+3 weekdays');
+    }
+    
+    $estimated_delivery_date = $estimated_date->format('Y-m-d');
+    
+    // 7. Create payment record
+    $payment_sql = "INSERT INTO payment (order_id, amount, payment_method, transaction_id, payment_status, payment_date)
+                    VALUES ($order_id, $total_amount, '$payment_method', '$transaction_id', 'completed', NOW())";
     
     if (!$conn->query($payment_sql)) {
         throw new Exception("Failed to record payment: " . $conn->error);
     }
     
-    // 6. Create delivery record
-    $delivery_method = ($delivery_fee == 10.00) ? 'EXPRESS DELIVERY' : 'STANDARD DELIVERY';
-    $delivery_date = date('Y-m-d', strtotime('+3 days')); // Default estimate
-    
+    // 8. Create delivery record
     $delivery_sql = "INSERT INTO delivery (order_id, delivery_status, carrier, estimated_delivery_date)
-                      VALUES ($order_id, 'processing', '$delivery_method', '$delivery_date')";
+                      VALUES ($order_id, 'processing', '$delivery_method', '$estimated_delivery_date')";
     
     if (!$conn->query($delivery_sql)) {
         throw new Exception("Failed to create delivery record: " . $conn->error);
     }
     
-    // 7. Clear the cart
+    // 9. Clear the cart
     $cart_id_sql = "SELECT CART_ID FROM cart WHERE user_id = $user_id";
     $cart_id_result = $conn->query($cart_id_sql);
     $cart_id = $cart_id_result->fetch_assoc()['CART_ID'];
