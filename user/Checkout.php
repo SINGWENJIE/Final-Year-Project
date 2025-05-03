@@ -201,30 +201,30 @@ $conn->close();
                         <div class="new-address-form" id="newAddressForm" style="display: none;">
                             <div class="form-group">
                                 <label for="recipient_name">Recipient Name</label>
-                                <input type="text" id="recipient_name" name="recipient_name" required>
+                                <input type="text" id="recipient_name" name="recipient_name">
                             </div>
                             <div class="form-group">
                                 <label for="street_address">Street Address</label>
-                                <input type="text" id="street_address" name="street_address" required>
+                                <input type="text" id="street_address" name="street_address">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="city">City</label>
-                                    <input type="text" id="city" name="city" required>
+                                    <input type="text" id="city" name="city">
                                 </div>
                                 <div class="form-group">
                                     <label for="state">State</label>
-                                    <input type="text" id="state" name="state" required>
+                                    <input type="text" id="state" name="state">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="postal_code">Postal Code</label>
-                                    <input type="text" id="postal_code" name="postal_code" required>
+                                    <input type="text" id="postal_code" name="postal_code">
                                 </div>
                                 <div class="form-group">
                                     <label for="phone_number">Phone Number</label>
-                                    <input type="tel" id="phone_number" name="phone_number" required>
+                                    <input type="tel" id="phone_number" name="phone_number">
                                 </div>
                             </div>
                             <div class="form-group">

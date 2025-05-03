@@ -1,11 +1,19 @@
 <?php
 session_start();
 
-// Redirect to login if not authenticated
+// Redirect if not authenticated
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+
+if (!isset($_GET['order_id'])) {
+    header("Location: product_list.php");
+    exit();
+}
+
+$order_id = (int)$_GET['order_id'];
+$user_id = $_SESSION['user_id'];
 
 // Database connection
 $servername = "localhost";
@@ -13,26 +21,21 @@ $username = "root";
 $password = "";
 $dbname = "gogo_supermarket";
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$user_id = $_SESSION['user_id'];
-
-// Get the latest order for this user
-$order_sql = "SELECT o.*, a.*, p.payment_method 
+// Get order details
+$order_sql = "SELECT o.*, a.* 
               FROM orders o
               JOIN address a ON o.shipping_address_id = a.address_id
-              JOIN payment p ON o.order_id = p.order_id
-              WHERE o.user_id = $user_id
-              ORDER BY o.order_date DESC LIMIT 1";
+              WHERE o.order_id = $order_id AND o.user_id = $user_id";
 $order_result = $conn->query($order_sql);
 
-if ($order_result->num_rows === 0) {
+if ($order_result->num_rows == 0) {
+    $conn->close();
     header("Location: product_list.php");
     exit();
 }
@@ -43,18 +46,20 @@ $order = $order_result->fetch_assoc();
 $items_sql = "SELECT oi.*, p.prod_name, p.prod_image 
               FROM order_item oi
               JOIN product p ON oi.prod_id = p.prod_id
-              WHERE oi.order_id = " . $order['order_id'];
+              WHERE oi.order_id = $order_id";
 $items_result = $conn->query($items_sql);
 $order_items = [];
-
-if ($items_result->num_rows > 0) {
-    while($row = $items_result->fetch_assoc()) {
-        $order_items[] = $row;
-    }
+while($row = $items_result->fetch_assoc()) {
+    $order_items[] = $row;
 }
 
-// Get delivery info
-$delivery_sql = "SELECT * FROM delivery WHERE order_id = " . $order['order_id'];
+// Get payment details
+$payment_sql = "SELECT * FROM payment WHERE order_id = $order_id";
+$payment_result = $conn->query($payment_sql);
+$payment = $payment_result->fetch_assoc();
+
+// Get delivery details
+$delivery_sql = "SELECT * FROM delivery WHERE order_id = $order_id";
 $delivery_result = $conn->query($delivery_sql);
 $delivery = $delivery_result->fetch_assoc();
 
@@ -77,7 +82,7 @@ $conn->close();
             <nav>
                 <a href="product_list.php"><i class="fas fa-store"></i> Products</a>
                 <a href="#"><i class="fas fa-heart"></i> Wishlist</a>
-                <a href="cart.php"><i class="fas fa-shopping-cart"></i> Cart</a>
+                <a href="cart.php"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a>
                 <span class="user-info">
                     <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                     <a href="logout.php" class="logout-btn">Logout</a>
@@ -96,38 +101,119 @@ $conn->close();
 
         <div class="confirmation-container">
             <div class="confirmation-header">
-                <div class="confirmation-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
+                <i class="fas fa-check-circle"></i>
                 <h1>Thank You for Your Order!</h1>
-                <p class="order-number">Order #<?php echo $order['order_id']; ?></p>
-                <p class="confirmation-message">We've received your order and will process it shortly.</p>
+                <p>Your order has been placed successfully. Here are your order details:</p>
+                <div class="order-summary-box">
+                    <div class="summary-item">
+                        <span>Order Number:</span>
+                        <strong>#<?php echo $order_id; ?></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Order Date:</span>
+                        <strong><?php echo date('F j, Y', strtotime($order['order_date'])); ?></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Amount:</span>
+                        <strong>RM <?php echo number_format($order['total_amount'], 2); ?></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Payment Method:</span>
+                        <strong>
+                            <?php 
+                            switch($payment['payment_method']) {
+                                case 'credit_card': echo 'Credit Card'; break;
+                                case 'debit_card': echo 'Debit Card'; break;
+                                case 'tng_ewallet': echo 'Touch \'n Go eWallet'; break;
+                                case 'cash_on_delivery': echo 'Cash on Delivery'; break;
+                                default: echo $payment['payment_method'];
+                            }
+                            ?>
+                        </strong>
+                    </div>
+                </div>
             </div>
 
             <div class="confirmation-details">
-                <div class="order-summary">
-                    <h2><i class="fas fa-receipt"></i> Order Summary</h2>
-                    <div class="summary-items">
+                <div class="detail-section">
+                    <h2><i class="fas fa-box-open"></i> Order Items</h2>
+                    <div class="order-items">
                         <?php foreach ($order_items as $item): ?>
-                        <div class="summary-item">
+                        <div class="order-item">
                             <div class="item-image">
                                 <img src="../assets/uploads/<?php echo htmlspecialchars($item['prod_image']); ?>" 
                                      alt="<?php echo htmlspecialchars($item['prod_name']); ?>">
                             </div>
                             <div class="item-details">
                                 <h4><?php echo htmlspecialchars($item['prod_name']); ?></h4>
-                                <p>Qty: <?php echo $item['quantity']; ?></p>
+                                <p>Quantity: <?php echo $item['quantity']; ?></p>
+                                <p>Price: RM <?php echo number_format($item['order_item_price'], 2); ?></p>
                             </div>
-                            <div class="item-price">
-                                RM <?php echo number_format($item['order_item_price'], 2); ?>
+                            <div class="item-total">
+                                RM <?php echo number_format($item['order_item_price'] * $item['quantity'], 2); ?>
                             </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
-                    
-                    <div class="summary-totals">
+                </div>
+
+                <div class="detail-section">
+                    <h2><i class="fas fa-truck"></i> Delivery Information</h2>
+                    <div class="delivery-info">
+                        <div class="address-card">
+                            <h3>Shipping Address</h3>
+                            <p><strong><?php echo htmlspecialchars($order['recipient_name']); ?></strong></p>
+                            <p><?php echo htmlspecialchars($order['street_address']); ?></p>
+                            <p><?php echo htmlspecialchars($order['city'] . ', ' . $order['state'] . ' ' . $order['postal_code']); ?></p>
+                            <p>Phone: <?php echo htmlspecialchars($order['phone_number']); ?></p>
+                            <?php if (!empty($order['note'])): ?>
+                            <p class="delivery-note">Note: <?php echo htmlspecialchars($order['note']); ?></p>
+                            <?php endif; ?>
+                        </div>
+                        <div class="delivery-status">
+                            <h3>Delivery Status</h3>
+                            <div class="status-timeline">
+                                <div class="status-step <?php echo $delivery['delivery_status'] == 'processing' ? 'active' : ''; ?>">
+                                    <div class="step-icon">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div class="step-details">
+                                        <h4>Processing</h4>
+                                        <p>Your order is being prepared</p>
+                                    </div>
+                                </div>
+                                <div class="status-step <?php echo $delivery['delivery_status'] == 'out_for_delivery' ? 'active' : ''; ?>">
+                                    <div class="step-icon">
+                                        <i class="fas fa-shipping-fast"></i>
+                                    </div>
+                                    <div class="step-details">
+                                        <h4>Out for Delivery</h4>
+                                        <p>Your order is on its way</p>
+                                    </div>
+                                </div>
+                                <div class="status-step <?php echo $delivery['delivery_status'] == 'delivered' ? 'active' : ''; ?>">
+                                    <div class="step-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="step-details">
+                                        <h4>Delivered</h4>
+                                        <p>Your order has arrived</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="delivery-method">
+                                <p><strong>Delivery Method:</strong> <?php echo $delivery['carrier']; ?></p>
+                                <p><strong>Estimated Delivery:</strong> <?php echo date('F j, Y', strtotime($delivery['estimated_delivery_date'])); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+                    <div class="order-summary">
                         <div class="summary-row">
-                            <span>Subtotal</span>
+                            <span>Subtotal (<?php echo count($order_items); ?> items)</span>
                             <span>RM <?php echo number_format($order['subtotal'], 2); ?></span>
                         </div>
                         <div class="summary-row">
@@ -147,94 +233,13 @@ $conn->close();
                         </div>
                     </div>
                 </div>
-
-                <div class="delivery-info">
-                    <h2><i class="fas fa-truck"></i> Delivery Information</h2>
-                    <div class="info-card">
-                        <div class="info-row">
-                            <span class="info-label">Delivery Method:</span>
-                            <span class="info-value"><?php echo $delivery['carrier']; ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Estimated Delivery:</span>
-                            <span class="info-value">
-                                <?php 
-                                if ($delivery['estimated_delivery_date']) {
-                                    echo date('j M Y', strtotime($delivery['estimated_delivery_date']));
-                                } else {
-                                    echo $delivery['carrier'] == 'STANDARD DELIVERY' ? '2-3 business days' : 'Next business day';
-                                }
-                                ?>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Tracking Number:</span>
-                            <span class="info-value">
-                                <?php echo $delivery['tracking_number'] ? $delivery['tracking_number'] : 'Not available yet'; ?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="shipping-info">
-                    <h2><i class="fas fa-map-marker-alt"></i> Shipping Address</h2>
-                    <div class="info-card">
-                        <div class="info-row">
-                            <span class="info-label">Recipient:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($order['recipient_name']); ?></span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Address:</span>
-                            <span class="info-value">
-                                <?php 
-                                echo htmlspecialchars($order['street_address']) . ',<br>';
-                                echo htmlspecialchars($order['city']) . ', ';
-                                echo htmlspecialchars($order['state']) . ' ';
-                                echo htmlspecialchars($order['postal_code']);
-                                ?>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Phone:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($order['phone_number']); ?></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="payment-info">
-                    <h2><i class="fas fa-credit-card"></i> Payment Information</h2>
-                    <div class="info-card">
-                        <div class="info-row">
-                            <span class="info-label">Payment Method:</span>
-                            <span class="info-value">
-                                <?php 
-                                switch($order['payment_method']) {
-                                    case 'credit_card': echo 'Credit Card'; break;
-                                    case 'debit_card': echo 'Debit Card'; break;
-                                    case 'tng_ewallet': echo 'Touch \'n Go eWallet'; break;
-                                    case 'cash_on_delivery': echo 'Cash on Delivery'; break;
-                                    default: echo $order['payment_method'];
-                                }
-                                ?>
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Payment Status:</span>
-                            <span class="info-value">Completed</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Payment Date:</span>
-                            <span class="info-value"><?php echo date('j M Y, g:i a', strtotime($order['order_date'])); ?></span>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="confirmation-actions">
-                <a href="product_list.php" class="btn btn-primary">
+                <a href="product_list.php" class="btn btn-continue">
                     <i class="fas fa-shopping-bag"></i> Continue Shopping
                 </a>
-                <a href="order_history.php" class="btn btn-secondary">
+                <a href="order_history.php" class="btn btn-orders">
                     <i class="fas fa-history"></i> View Order History
                 </a>
             </div>
@@ -261,6 +266,12 @@ $conn->close();
         </div>
     </footer>
 
-    <script src="../user_assets/js/order_confirmation.js"></script>
+    <script>
+        // Update cart count
+        document.addEventListener('DOMContentLoaded', function() {
+            // In a real app, you might fetch this from the server
+            document.querySelector('.cart-count').textContent = '0';
+        });
+    </script>
 </body>
 </html>
