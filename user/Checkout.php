@@ -101,49 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_promo'])) {
     } else {
         $promo_error = "Please enter a promo code";
     }
-} else {
-    // Debugging - check why the code didn't work
-    $debug_sql = "SELECT * FROM promo_code WHERE CODE = ?";
-    $debug_stmt = $conn->prepare($debug_sql);
-    $debug_stmt->bind_param("s", $promo_code);
-    $debug_stmt->execute();
-    $debug_result = $debug_stmt->get_result();
-    
-    if ($debug_result->num_rows > 0) {
-        $debug_row = $debug_result->fetch_assoc();
-        $reasons = [];
-        
-        // Check validity dates
-        if ($debug_row['VALID_FROM'] != '0000-00-00' && strtotime($debug_row['VALID_FROM']) > time()) {
-            $reasons[] = "code not valid yet (starts " . $debug_row['VALID_FROM'];
-        }
-        if ($debug_row['VALID_TO'] != '0000-00-00' && strtotime($debug_row['VALID_TO']) < time()) {
-            $reasons[] = "code expired (ended " . $debug_row['VALID_TO'];
-        }
-        
-        // Check minimum order
-        if ($debug_row['MIN_ORDER'] > 0 && $subtotal < $debug_row['MIN_ORDER']) {
-            $reasons[] = "minimum order not met (need RM" . $debug_row['MIN_ORDER'] . ")";
-        }
-        
-        // Check usage limits
-        if ($debug_row['MAX_USES'] > 0 && $debug_row['USES_COUNT'] >= $debug_row['MAX_USES']) {
-            $reasons[] = "usage limit reached";
-        }
-        
-        if (!empty($reasons)) {
-            $promo_error .= " - " . implode(", ", $reasons);
-        }
-    }
 }
 
-// Handle promo code removal
-if (isset($_GET['remove_promo'])) {
-    unset($_SESSION['applied_promo']);
-    $applied_promo = null;
-    header("Location: checkout.php");
-    exit();
-}
+// In your main checkout.php file, keep this but simplify it:
+    if (isset($_GET['remove_promo'])) {
+        unset($_SESSION['applied_promo']);
+        header("Location: checkout.php");
+        exit();
+    }
 
 // Calculate delivery fee
 $delivery_method = isset($_POST['delivery_method']) ? $_POST['delivery_method'] : 'standard';
