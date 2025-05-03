@@ -347,7 +347,7 @@ $conn->close();
                             <div class="payment-option">
                                 <input type="radio" name="payment_method" id="credit_card" value="credit_card" checked required>
                                 <label for="credit_card">
-                                    <i class="fab fa-cc-visa"></i> Credit Card
+                                    <i class="fab fa-cc-visa"></i> <i class="fab fa-cc-mastercard"></i> Credit Card
                                 </label>
                             </div>
                             <div class="payment-option">
@@ -374,23 +374,38 @@ $conn->close();
                         <div class="credit-card-form" id="creditCardForm">
                             <div class="form-group">
                                 <label for="card_number">Card Number</label>
-                                <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456">
+                                <input type="text" id="card_number" name="card_number" 
+                                    placeholder="4242 4242 4242 4242" 
+                                    maxlength="19"
+                                    pattern="[0-9\s]{16,19}">
+                                <small class="card-hint">Visa (starts with 4) or Mastercard (starts with 5)</small>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="expiry_date">Expiry Date</label>
-                                    <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/YY">
+                                    <input type="text" id="expiry_date" name="expiry_date" 
+                                        placeholder="MM/YY" maxlength="5"
+                                        pattern="(0[1-9]|1[0-2])\/[0-9]{2}">
                                 </div>
                                 <div class="form-group">
                                     <label for="cvv">CVV</label>
-                                    <input type="text" id="cvv" name="cvv" placeholder="123">
+                                    <input type="text" id="cvv" name="cvv" 
+                                        placeholder="123" maxlength="3"
+                                        pattern="[0-9]{3}">
+                                    <small class="cvv-hint">3 digits on back of card</small>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="card_name">Name on Card</label>
-                                <input type="text" id="card_name" name="card_name" placeholder="John Doe">
+                                <input type="text" id="card_name" name="card_name" 
+                                    placeholder="e.g. AHMAD BIN ABDULLAH"
+                                    pattern="[a-zA-Z\s\.\']+">
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <input type="checkbox" id="save_card" name="save_card">
+                                <label for="save_card">Save this card for future purchases</label>
+                            </div>
+                       </div>
                     </section>
                     
                     <!-- Promo Code Section -->
@@ -619,36 +634,73 @@ $conn->close();
         });
     }
     
-    // Credit card validation
+    // Enhanced Malaysian credit card validation
     function validateCreditCard() {
-        const cardNumber = document.getElementById('card_number').value.trim();
+        const cardNumber = document.getElementById('card_number').value.trim().replace(/\s/g, '');
         const expiryDate = document.getElementById('expiry_date').value.trim();
         const cvv = document.getElementById('cvv').value.trim();
         const cardName = document.getElementById('card_name').value.trim();
-        
-        if (!cardNumber || !expiryDate || !cvv || !cardName) {
-            showToast('Please fill in all credit card details', 'error');
+    
+        // Validate card number (Malaysian cards typically start with 4 or 5)
+        if (!/^[45]\d{15}$/.test(cardNumber)) {
+            showToast('Please enter a valid 16-digit Visa (starts with 4) or Mastercard (starts with 5)', 'error');
             return false;
         }
-        
-        // Simple validation for demo purposes
-        if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
-            showToast('Please enter a valid 16-digit card number', 'error');
+    
+        // Validate expiry date
+        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
+            showToast('Please enter expiry date in MM/YY format (e.g. 12/25)', 'error');
             return false;
         }
-        
-        if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-            showToast('Please enter expiry date in MM/YY format', 'error');
+    
+        // Check if card is expired
+        const [month, year] = expiryDate.split('/');
+        const currentYear = new Date().getFullYear() % 100;
+        const currentMonth = new Date().getMonth() + 1;
+    
+        if (parseInt(year) < currentYear || 
+            (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+            showToast('This card has expired. Please use a valid card.', 'error');
             return false;
         }
-        
-        if (!/^\d{3,4}$/.test(cvv)) {
-            showToast('Please enter a valid CVV (3 or 4 digits)', 'error');
+    
+        // Validate CVV
+        if (!/^\d{3}$/.test(cvv)) {
+            showToast('Please enter a valid 3-digit CVV', 'error');
             return false;
         }
-        
+    
+        // Validate card name (allowing for Malaysian names with bin/binti)
+        if (!/^[a-zA-Z\s\.\'\-]+$/.test(cardName) || cardName.length < 3) {
+            showToast('Please enter the name as it appears on your card', 'error');
+            return false;
+        }
+    
         return true;
     }
+
+    // Add input formatting for card number
+    document.getElementById('card_number').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\s/g, '');
+        if (value.length > 0) {
+            value = value.match(new RegExp('.{1,4}', 'g')).join(' ');
+        }
+        e.target.value = value;
+    });
+
+    // Add input formatting for expiry date
+    document.getElementById('expiry_date').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        e.target.value = value;
+    });
+
+    // Restrict CVV input to numbers only
+    document.getElementById('cvv').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+    });
     
     // Toast notification function
     function showToast(message, type) {

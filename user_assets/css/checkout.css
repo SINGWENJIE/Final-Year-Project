@@ -389,11 +389,29 @@ header nav a.active {
 
 /* Credit Card Form */
 .credit-card-form {
-    background-color: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 6px;
-    margin-top: 1rem;
+    margin-top: 15px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
+
+.card-hint, .cvv-hint {
+    display: block;
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Payment Icons */
+.payment-options .payment-option i {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.fa-cc-visa { color: #1a1f71; }
+.fa-cc-mastercard { color: #eb001b; }
+.fa-wallet { color: #ff6b00; }
 
 /* Promo Code Styles */
 .promo-section {
