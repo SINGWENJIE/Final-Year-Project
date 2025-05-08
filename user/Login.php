@@ -53,7 +53,7 @@ $registration_success = isset($_GET['registration']) && $_GET['registration'] ==
 </head>
 <body>
     <div class="login-container">
-        <h1>Welcome Back</h1>
+        <h1>WELCOME TO GOGO SUPERMARKET</h1>
         
         <?php if ($registration_success): ?>
             <div class="success-message">Registration successful! Please login.</div>
