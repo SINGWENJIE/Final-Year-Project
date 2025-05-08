@@ -39,17 +39,45 @@ $products_result = $conn->query($sql);
     <link rel="stylesheet" href="../user_assets/css/product_list.css">
 </head>
 <body>
-    <header>
-        <div class="user-info">
-            Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-            <a href="logout.php" class="logout-btn">Logout</a>
+
+<header>
+    <div class="auth-section">
+        <ul class="auth-links">
+            <li><a href="../Profile/Profile.php">My Account</a></li>
+            <li><a href="../order_history.php">All Orders</a></li>
+            <li><a href="#">Member</a></li>
+            <li><a href="../logout.php">Logout</a></li>
+        </ul>
+        <a href="../Cart.php" class="shopping-cart-link">
+            <img src="../image/cart.png" alt="Cart" class="shopping-cart">
+        </a>
+    </div>
+
+    <!-- 左边 Logo -->
+    <div class="header-main">
+            <a href="../MainPage/MainPage.php">
+                <img src="../image/gogoname.png" alt="GOGO Logo">
+            </a>
         </div>
-        <h1>Our Products</h1>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search products...">
-            <button id="searchBtn">Search</button>
-        </div>
-    </header>
+
+    <!-- 中间 Search -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search products...">
+        <button id="searchBtn">Search</button>
+    </div>
+
+    <!-- 左边导航 -->
+    <nav>
+        <ul class="nav-links">
+            <li><a href="MainPage.html">Menu</a></li>
+            <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
+            <li><a href="CustomerService.html">Customer Service</a></li>
+        </ul>
+    </nav>
+</header>
+
+
+
 
     <main>
         <div class="filter-section">

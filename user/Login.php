@@ -56,7 +56,6 @@ $registration_success = isset($_GET['registration']) && $_GET['registration'] ==
             <ul class="nav-links">
                 <li><a href="MainPage/MainPage.php">Menu</a></li>
                 <li><a href="AboutUs/AboutUs.html">About GOGO</a></li>
-                <li><a href="CustomerService.html">Customer Service</a></li>
             </ul>
         </nav>
     </header>

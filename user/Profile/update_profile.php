@@ -10,7 +10,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $phone = preg_replace('/[^0-9]/', '', $_POST['phone']);
     $birth_date = $_POST['birth_date'];
-    $address = filter_input(INPUT_POST, 'address', FILTER_SANITIZE_STRING);
 
     // 数据验证
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -27,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
     email = ?, 
     user_phone_num = ?, 
     birth_date = ?, 
-    address = ?
     WHERE user_id = ?");
 
     $stmt->bind_param("sssssi", 
@@ -35,7 +33,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $email, 
         $phone, 
         $birth_date, 
-        $address, 
         $user_id
     );
 

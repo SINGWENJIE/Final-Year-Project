@@ -28,7 +28,7 @@ if ($conn->connect_error) {
         <div class="auth-section">
             <ul class="auth-links">
                 <li><a href="../Profile/Profile.php">My Account</a></li>
-                <li><a href="#">All Orders</a></li>
+                <li><a href="../order_history.php">All Orders</a></li>
                 <li><a href="#">Member</a></li>
                 <li><a href="../logout.php">Logout</a></li>
             </ul>

@@ -104,11 +104,6 @@ $user = $result->fetch_assoc();
                     placeholder="Select Date" required>
             </div>
 
-            <div class="form-group">
-                <label><i class='bx bx-home'></i> Address</label>
-                <textarea name="address"><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
-            </div>
-
             <div class="action-buttons">
                 <button type="submit" class="save-btn">
                     <i class='bx bx-save'></i> Save Changes
