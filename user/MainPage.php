@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 
 <head>
     <title>GOGO | Shop Conveniently</title>
-    <link rel="icon" type="image" href="../../image/GOGO.png">
+    <link rel="icon" type="image" href="../image/GOGO.png">
     <link rel="stylesheet" href="../user_assets/css/MainPage.css">
     <link rel="stylesheet" href="../user_assets/js/MainPage.js">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -72,7 +72,7 @@ if ($conn->connect_error) {
     <section class="container">
         <div class="slider-wrapper">
             <div class="slider">
-                <img src="../../image/Slide-1.png" alt="广告1">
+                <img src="../image/Slide-1.png" alt="广告1">
                 <img src="../../image/Slide-2.jpg" alt="广告2">
                 <img src="../../image/Slide-3.jpg" alt="广告3">
             </div>
@@ -109,7 +109,7 @@ if ($conn->connect_error) {
                 // 分类标题 + More 按钮
                 echo "<div class='section-header'>";
                 echo "<div class='section-title'>" . htmlspecialchars($categoryName) . "</div>";
-                echo "<a href='../Product_List.php' class='more-btn'>More</a>";  // ✅ 固定跳转
+                echo "<a href='Product_List.php' class='more-btn'>More</a>";  // ✅ 固定跳转
                 echo "</div>";                
 
                 echo "<div class='product-row'>";
