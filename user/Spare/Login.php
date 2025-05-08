@@ -28,6 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_name'] = $user['user_name'];
             $_SESSION['email'] = $user['email'];
             
+            // Remember me functionality
+            if (isset($_POST['remember'])) {
+                setcookie('remember_token', bin2hex(random_bytes(32)), time() + 86400 * 30, '/');
+            }
+            
             // Redirect to dashboard or home page
             header("Location: product_list.php");
             exit();
@@ -41,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Check if user is coming from registration
 $registration_success = isset($_GET['registration']) && $_GET['registration'] === 'success';
+$password_reset_success = isset($_GET['reset']) && $_GET['reset'] === 'success';
 ?>
 
 <!DOCTYPE html>
@@ -48,45 +54,58 @@ $registration_success = isset($_GET['registration']) && $_GET['registration'] ==
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supermarket - User Login</title>
+    <title>GoGo Supermarket - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../user_assets/css/login.css">
 </head>
 <body>
     <div class="login-container">
-        <h1>Welcome Back</h1>
+        <div class="login-header">
+            <h1>Welcome to GoGo Supermarket</h1>
+            <p>Please login to your account</p>
+        </div>
         
         <?php if ($registration_success): ?>
             <div class="success-message">Registration successful! Please login.</div>
+        <?php endif; ?>
+        
+        <?php if ($password_reset_success): ?>
+            <div class="success-message">Password reset successful! Please login with your new password.</div>
         <?php endif; ?>
         
         <?php if (isset($error)): ?>
             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
         
-        <form id="loginForm" action="login.php" method="post">
+        <form id="loginForm" method="post">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" class="form-control" required>
             </div>
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-control" required>
+                    <span class="input-group-append toggle-password">
+                        <i class="eye-icon">👁️</i>
+                    </span>
+                </div>
             </div>
             
             <div class="form-options">
                 <label class="remember-me">
                     <input type="checkbox" name="remember"> Remember me
                 </label>
-                <a href="Forgot_password.php" class="forgot-password">Forgot password?</a>
+                <a href="forgot_password.php" class="forgot-password">Forgot password?</a>
             </div>
             
-            <button type="submit" class="login-btn">Login</button>
+            <button type="submit" class="btn">Login</button>
+            
+            <div class="register-link">
+                Don't have an account? <a href="register.php">Register here</a>
+            </div>
         </form>
-        
-        <div class="register-link">
-            Don't have an account? <a href="register.php">Register here</a>
-        </div>
     </div>
 
     <script src="../user_assets/js/login.js"></script>
