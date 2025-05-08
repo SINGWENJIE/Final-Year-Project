@@ -86,6 +86,7 @@ if (isset($_POST['update_product'])) {
     $category_id = $_POST['edit_category_id'];
     $description = mysqli_real_escape_string($conn, $_POST['edit_description']);
     $price = floatval($_POST['edit_prod_price']);
+    $prod_name = mysqli_real_escape_string($conn, $_POST['edit_prod_name']); 
 
     $check_order_sql = "SELECT COUNT(*) AS order_count FROM order_item WHERE prod_id = '$id'";
     $check_order_result = $conn->query($check_order_sql);
@@ -93,11 +94,11 @@ if (isset($_POST['update_product'])) {
 
     if ($order_count > 0) {
         $update_sql = "UPDATE product 
-                       SET prod_price='$price', stock='$stock', category_id='$category_id', prod_description='$description'
+                       SET prod_name='$prod_name',prod_price='$price', stock='$stock', category_id='$category_id', prod_description='$description'
                        WHERE prod_id='$id'";
     } else {
         $update_sql = "UPDATE product 
-                       SET prod_price='$price', stock='$stock', category_id='$category_id', prod_description='$description'
+                       SET prod_name='$prod_name',prod_price='$price', stock='$stock', category_id='$category_id', prod_description='$description'
                        WHERE prod_id='$id'";
     }
 

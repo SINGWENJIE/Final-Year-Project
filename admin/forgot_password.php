@@ -16,7 +16,7 @@ if (isset($_POST['send_otp'])) {
     $result = $conn->query($check_email_query);
 
     if ($result->num_rows == 0) {
-        $error = "Email not found in admin records.";
+        $error = "This email is not registered in our admin system.";
 
     } else {
         $_SESSION['admin_email'] = $email;
@@ -51,7 +51,7 @@ GoGo Supermarket Team";
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
-            $mail->setFrom('qiaoxuanp@gmail.com', 'qiaoxuan');
+            $mail->setFrom('qiaoxuanp@gmail.com', 'GoGo Supermarket');
             $mail->addAddress($email);
             $mail->addReplyTo('qiaoxuanp@gmail.com', 'qiaoxuan');
 
