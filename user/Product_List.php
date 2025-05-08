@@ -107,9 +107,54 @@ $products_result = $conn->query($sql);
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2023 Supermarket. All rights reserved.</p>
-    </footer>
+    <div class="footer-nav">
+        <div class="footer-column">
+            <h4>Our Helpline</h4>
+            <ul>
+                <li><a href="">MR.SING</a></li>
+                <li><a href="">MR.PIOW</a></li>
+                <li><a href="">MR.CHEW</a></li>
+            </ul>
+        </div>
+    
+        <div class="footer-column">
+            <h4>News & Media</h4>
+            <ul>
+                <li><a href="#">Press Release</a></li>
+                <li><a href="#">News Article</a></li>
+            </ul>
+        </div>
+    
+        <div class="footer-column">
+            <h4>Policies</h4>
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="../TermsConditions/TermsConditions.html">Terms & Conditions</a></li>
+                <li><a href="#">Anti Bribery Policies</a></li>
+                <li><a href="#">Electrical Policy</a></li>
+            </ul>
+        </div>
+    
+        <div class="footer-column">
+            <h4>&nbsp;</h4>
+            <ul>
+                <li><a href="#">Return Policy</a></li>
+                <li><a href="#">Product Policy</a></li>
+                <li><a href="#">Halal Statement</a></li>
+            </ul>
+        </div>
+    
+        <div class="footer-column">
+            <ul>
+                <li>
+                    <a href="https://www.instagram.com/cheeew.05?igsh=MTBvcTQ5MXR0emNidQ%3D%3D&utm_source=qr">
+                        <i class="fab fa-instagram" style="font-size: 30px; margin-top: 75px;"></i>
+                      </a>                      
+                </li>
+                <li>&copy; GOGO_SUPERMARKET</li>
+            </ul>
+        </div>
+    </div>
 
     <script src="../user_assets/js/product_list.js"></script>
 </body>

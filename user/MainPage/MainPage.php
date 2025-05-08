@@ -1,10 +1,24 @@
+<?php
+// db_connection.php
+$servername = "localhost";
+$username   = "root";
+$password   = "";
+$dbname     = "gogo_supermarket";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <title>GOGO | Shop Conveniently</title>
     <link rel="icon" type="image" href="../../image/GOGO.png">
-    <link rel="stylesheet" href="HomePage.css">
+    <link rel="stylesheet" href="MainPage.css">
+    <link rel="stylesheet" href="MainPage.js">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
 </head>
@@ -13,24 +27,48 @@
     <header>
         <div class="auth-section">
             <ul class="auth-links">
-                <li><a href="../Login.php">Login</a></li>
-                <li><a href="../Register.php">Register</a></li>
+                <li><a href="../Profile/Profile.php">My Account</a></li>
+                <li><a href="#">All Orders</a></li>
+                <li><a href="#">Member</a></li>
+                <li><a href="../logout.php">Logout</a></li>
             </ul>
+            <a href="../Cart.php" class="shopping-cart-link">
+                <img src="../../image/cart.png" alt="Cart" class="shopping-cart">
+            </a>
         </div>
 
         <div class="header-main">
-            <a href="../MainPage/MainPage.html">
+            <a href="MainPage.html">
                 <img src="../../image/gogoname.png" alt="GOGO Logo">
             </a>
         </div>
 
         <nav>
             <ul class="nav-links">
+                <li><a href="MainPage.html">Menu</a></li>
                 <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
                 <li><a href="CustomerService.html">Customer Service</a></li>
             </ul>
         </nav>
     </header>
+
+    <nav class="category-nav">
+        <div class="dropdown">
+            <button>Category</button>
+            <div class="content">
+                <a href="../Product_List.php">Bakery & Breakfast</a>
+                <a href="../Product_List.php">Beauty & Personal Care</a>
+                <a href="../Product_List.php">Cleaning & Laundry</a>
+                <a href="../Product_List.php">Drinks</a>
+                <a href="../Product_List.php">Food</a>
+                <a href="../Product_List.php">Fruit</a>
+                <a href="../Product_List.php">Health & Wellness</a>
+                <a href="../Product_List.php">Ice Cream</a>
+                <a href="../Product_List.php">Snacks</a>
+                <a href="../Product_List.php">Vegetables</a>
+            </div>
+        </div>
+    </nav>
 
     <section class="container">
         <div class="slider-wrapper">
@@ -48,48 +86,58 @@
         </div>
     </section>
 
-    <!-- Promotion Boxes Section -->
-    <div class="promo-section">
-        <div class="promo-grid">
-          <div class="promo-box">
-            <img src="../../image/promo1.png" alt="" />
-            <h3>This Weeks Offer</h3>
-            <p>View our latest promotion.</p>
-            <a href="catalogue.html">
-                <button>View catalogue</button>
-            </a>
-          </div>
+    <div class="products-container">
+        <?php
+        $categories = ['Bakery&Breakfast', 'Drinks', 'Snacks'];
 
-          <div class="promo-box">
-            <img src="../../image/promo2.png" alt="" />
-            <h3>Promotions</h3>
-            <p>Check out our latest promotions here.</p>
-            <a href="catalogue.html">
-                <button>View Now</button>
-            </a>
-          </div>
+        foreach ($categories as $categoryName) {
+            $stmt = $conn->prepare("SELECT category_id FROM category WHERE category_name = ?");
+            $stmt->bind_param("s", $categoryName);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $category = $result->fetch_assoc();
 
-          <div class="promo-box">
-            <img src="../../image/p9.jpg" alt="" />
-            <h3>Our Products</h3>
-            <p>Check out our product range.</p>
-            <a href="../Product_List.php">
-                <button>Shop Now</button>
-            </a>
-          </div>
+            if ($category) {
+                $category_id = $category['category_id'];
 
-          <div class="promo-box">
-            <img src="../../image/promo4.png" alt="" />
-            <h3>Gifting</h3>
-            <p>Discover gifting options and ideas.</p>
-            <a href="catalogue.html">
-                <button>Learn More</button>
-            </a>
-          </div> 
-        </div>
-      </div>
+                $stmt2 = $conn->prepare("SELECT * FROM product WHERE category_id = ? LIMIT 4");
+                $stmt2->bind_param("i", $category_id);
+                $stmt2->execute();
+                $products = $stmt2->get_result();
 
-      <div class="footer-nav">
+                echo "<div>";
+
+                // 分类标题 + More 按钮
+                echo "<div class='section-header'>";
+                echo "<div class='section-title'>" . htmlspecialchars($categoryName) . "</div>";
+                echo "<a href='../Product_List.php' class='more-btn'>More</a>";  // ✅ 固定跳转
+                echo "</div>";                
+
+                echo "<div class='product-row'>";
+                while ($row = $products->fetch_assoc()) {
+                    echo '<div class="product-card">';
+                    echo '<a href="../product_details.php?id=' . $row['prod_id'] . '">';
+                    echo '<div class="product-image">';
+                    echo '<img src="/Final-Year-Project/assets/uploads/' . htmlspecialchars($row['prod_image']) . '" alt="' . htmlspecialchars($row['prod_name']) . '">';
+                    echo '</div>';
+                    echo '<div class="product-info">';
+                    echo '<h3>' . htmlspecialchars($row['prod_name']) . '</h3>';
+                    echo '<p class="price">RM' . number_format($row['prod_price'], 2) . '</p>';
+                    echo '</div>';
+                    echo '</a>';
+                    echo '</div>';
+                }
+                echo "</div></div>";
+                
+            }
+        }
+        ?>
+    </div>
+
+
+    
+
+    <div class="footer-nav">
         <div class="footer-column">
             <h4>Our Helpline</h4>
             <ul>
@@ -137,8 +185,6 @@
             </ul>
         </div>
     </div>
-    
-
 </body>
 
 <script>

@@ -62,23 +62,32 @@ $is_cart_empty = empty($cart_items);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1><a href="product_list.php">Supermarket</a></h1>
-            <nav>
-                <a href="product_list.php"><i class="fas fa-store"></i> Products</a>
-                <a href="#"><i class="fas fa-heart"></i> Wishlist</a>
-                <a href="cart.php" class="active"><i class="fas fa-shopping-cart"></i> Cart 
-                    <?php if (!$is_cart_empty): ?>
-                        <span class="cart-count"><?php echo $item_count; ?></span>
-                    <?php endif; ?>
-                </a>
-                <span class="user-info">
-                    <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-                    <a href="logout.php" class="logout-btn">Logout</a>
-                </span>
-            </nav>
+<header>
+        <div class="auth-section">
+            <ul class="auth-links">
+                <li><a href="../Profile/Profile.php">My Account</a></li>
+                <li><a href="#">All Orders</a></li>
+                <li><a href="#">Member</a></li>
+                <li><a href="../logout.php">Logout</a></li>
+            </ul>
+            <a href="Cart.php" class="shopping-cart-link">
+                <img src="../image/cart.png" alt="Cart" class="shopping-cart">
+            </a>
         </div>
+
+        <div class="header-main">
+            <a href="MainPage/MainPage.php">
+                <img src="../image/gogoname.png" alt="GOGO Logo">
+            </a>
+        </div>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="MainPage/MainPage.php">Menu</a></li>
+                <li><a href="AboutUs/AboutUs.html">About GOGO</a></li>
+                <li><a href="CustomerService.html">Customer Service</a></li>
+            </ul>
+        </nav>
     </header>
 
     <main class="container">
@@ -179,26 +188,55 @@ $is_cart_empty = empty($cart_items);
         <?php endif; ?>
     </main>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About Us</h3>
-                <p>Your one-stop supermarket for all daily needs.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="product_list.php">Products</a></li>
-                    <li><a href="#">Special Offers</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                </ul>
-            </div>
+    <div class="footer-nav">
+        <div class="footer-column">
+            <h4>Our Helpline</h4>
+            <ul>
+                <li><a href="">MR.SING</a></li>
+                <li><a href="">MR.PIOW</a></li>
+                <li><a href="">MR.CHEW</a></li>
+            </ul>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2023 Supermarket. All rights reserved.</p>
+    
+        <div class="footer-column">
+            <h4>News & Media</h4>
+            <ul>
+                <li><a href="#">Press Release</a></li>
+                <li><a href="#">News Article</a></li>
+            </ul>
         </div>
-    </footer>
-
+    
+        <div class="footer-column">
+            <h4>Policies</h4>
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="../TermsConditions/TermsConditions.html">Terms & Conditions</a></li>
+                <li><a href="#">Anti Bribery Policies</a></li>
+                <li><a href="#">Electrical Policy</a></li>
+            </ul>
+        </div>
+    
+        <div class="footer-column">
+            <h4>&nbsp;</h4>
+            <ul>
+                <li><a href="#">Return Policy</a></li>
+                <li><a href="#">Product Policy</a></li>
+                <li><a href="#">Halal Statement</a></li>
+            </ul>
+        </div>
+    
+        <div class="footer-column">
+            <ul>
+                <li>
+                    <a href="https://www.instagram.com/cheeew.05?igsh=MTBvcTQ5MXR0emNidQ%3D%3D&utm_source=qr">
+                        <i class="fab fa-instagram" style="font-size: 30px; margin-top: 75px;"></i>
+                      </a>                      
+                </li>
+                <li>&copy; GOGO_SUPERMARKET</li>
+            </ul>
+        </div>
+    </div>
+    
     <script src="../user_assets/js/cart.js"></script>
 </body>
 </html>
