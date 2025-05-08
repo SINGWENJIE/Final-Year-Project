@@ -364,8 +364,8 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
         }
         
         .btn-outline:hover {
-            background-color: var(--primary-color);
-            color: white;
+            background-color:rgb(207, 242, 186);
+            color: rgb(35, 43, 29);
         }
         
         .text-center {
@@ -650,7 +650,7 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
             </div>
             
             <div class="form-group">
-                <label for="street_address">Shipping Address</label>
+                <label for="street_address">Delivery Address</label>
                 <input type="text" id="street_address" name="street_address" class="form-control" required>
             </div>
             
