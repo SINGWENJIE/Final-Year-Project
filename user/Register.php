@@ -249,14 +249,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="email" id="email" name="email" required>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="position: relative;">
             <label for="user_password">Password</label>
             <input type="password" id="user_password" name="user_password" required>
+            <button type="button" class="toggle-password" data-target="user_password" style="position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer;">👁️</button>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="position: relative;">
             <label for="confirm_password">Confirm Password</label>
             <input type="password" id="confirm_password" required>
+            <button type="button" class="toggle-password" data-target="confirm_password" style="position: absolute; right: 10px; top: 32px; background: none; border: none; cursor: pointer;">👁️</button>
+        </div>
+
+
+        <div class="password-rules" style="margin:15px 0; color:#666; font-size:12px; text-align:left;">
+            <p>Password Requirements:</p>
+            <ul style="list-style:none; padding-left:20px;">
+                <li>At least 8 characters</li>
+                <li>At least 1 special character (e.g., !@#$%^&*)</li>
+                <li>At least 1 number</li>
+                <li>At least 1 uppercase letter</li>
+            </ul>
         </div>
 
         <div class="form-group">
@@ -299,6 +312,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <button type="button" id="saveAddressBtn" class="save-address-btn">Save Address</button>
             </div>
+            
         </div>
 
         <button type="submit" class="register-btn">Register</button>
@@ -310,6 +324,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </div>
 
 <script>
+    document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const targetInput = document.getElementById(targetId);
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    this.textContent = '🙈';
+                } else {
+                    targetInput.type = 'password';
+                    this.textContent = '👁️';
+                }
+            });
+        }); 
+
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('registrationForm');
         const passwordInput = document.getElementById('user_password');
@@ -329,14 +357,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
 
         form.addEventListener('submit', function (e) {
-            if (passwordInput.value !== confirmPasswordInput.value) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (password !== confirmPassword) {
                 alert('Passwords do not match!');
                 e.preventDefault();
                 return;
             }
 
-            if (passwordInput.value.length < 8) {
+            if (password.length < 8) {
                 alert('Password must be at least 8 characters long!');
+                e.preventDefault();
+                return;
+            }
+
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/;
+            if (!passwordRegex.test(password)) {
+                alert('Password must contain at least one lowercase letter, one uppercase letter, one number, and one symbol.');
                 e.preventDefault();
                 return;
             }
@@ -363,6 +401,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
     });
 </script>
+
 
 </body>
 </html>
