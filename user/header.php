@@ -53,7 +53,5 @@ if ($conn->connect_error) {
         </nav>
     </div>
 </header>
-
-
 </body>
 </html>
