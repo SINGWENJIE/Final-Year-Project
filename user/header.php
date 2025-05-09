@@ -32,13 +32,13 @@ if ($conn->connect_error) {
     <div class="container column-layout">
         <div class="left-section">
             <h1>            
-                <a href="MainPage.php"><img src="../image/gogoname.png" alt="GOGO Logo"></a>
+                <a href="MainPage.html"><img src="../image/gogoname.png" alt="GOGO Logo"></a>
             </h1>
 
             <nav class="sub-nav">
                 <ul class="nav-links">
-                    <li><a href="MainPage.html">Menu</a></li>
-                    <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
+                    <li><a href="Product_List.php">Menu</a></li>
+                    <li><a href="AboutUs/AboutUs.html">About GOGO</a></li>
                 </ul>
             </nav>
         </div>

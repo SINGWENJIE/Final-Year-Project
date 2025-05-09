@@ -14,9 +14,9 @@
     <div class="footer-column">
         <h4>Our Helpline</h4>
         <ul>
-            <li><a href="">MR.SING</a></li>
-            <li><a href="">MR.PIOW</a></li>
-            <li><a href="">MR.CHEW</a></li>
+            <li><a href="AboutUs/Boss_SING.html">MR.SING</a></li>
+            <li><a href="AboutUs/Boss_PIOW.html">MR.PIOW</a></li>
+            <li><a href="AboutUs/Boss_CHEW.html">MR.CHEW</a></li>
         </ul>
     </div>
 

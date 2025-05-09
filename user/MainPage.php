@@ -28,24 +28,24 @@ if ($conn->connect_error) {
         <div class="auth-section">
             <ul class="auth-links">
                 <li><a href="../Profile/Profile.php">My Account</a></li>
-                <li><a href="../order_history.php">All Orders</a></li>
+                <li><a href="order_history.php">All Orders</a></li>
                 <li><a href="#">Member</a></li>
-                <li><a href="../logout.php">Logout</a></li>
+                <li><a href="logout.php">Logout</a></li>
             </ul>
             <a href="../Cart.php" class="shopping-cart-link">
-                <img src="../../image/cart.png" alt="Cart" class="shopping-cart">
+                <img src="../image/cart.png" alt="Cart" class="shopping-cart">
             </a>
         </div>
 
         <div class="header-main">
-            <a href="MainPage.html">
-                <img src="../../image/gogoname.png" alt="GOGO Logo">
+            <a href="MainPage.php">
+                <img src="../image/gogoname.png" alt="GOGO Logo">
             </a>
         </div>
 
         <nav>
             <ul class="nav-links">
-                <li><a href="MainPage.html">Menu</a></li>
+                <li><a href="MainPage.php   ">Menu</a></li>
                 <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
             </ul>
         </nav>
@@ -55,16 +55,16 @@ if ($conn->connect_error) {
         <div class="dropdown">
             <button>Category</button>
             <div class="content">
-                <a href="../Product_List.php">Bakery & Breakfast</a>
-                <a href="../Product_List.php">Beauty & Personal Care</a>
-                <a href="../Product_List.php">Cleaning & Laundry</a>
-                <a href="../Product_List.php">Drinks</a>
-                <a href="../Product_List.php">Food</a>
-                <a href="../Product_List.php">Fruit</a>
-                <a href="../Product_List.php">Health & Wellness</a>
-                <a href="../Product_List.php">Ice Cream</a>
-                <a href="../Product_List.php">Snacks</a>
-                <a href="../Product_List.php">Vegetables</a>
+                <a href="Product_List.php">Bakery & Breakfast</a>
+                <a href="Product_List.php">Beauty & Personal Care</a>
+                <a href="Product_List.php">Cleaning & Laundry</a>
+                <a href="Product_List.php">Drinks</a>
+                <a href="Product_List.php">Food</a>
+                <a href="Product_List.php">Fruit</a>
+                <a href="Product_List.php">Health & Wellness</a>
+                <a href="Product_List.php">Ice Cream</a>
+                <a href="Product_List.php">Snacks</a>
+                <a href="Product_List.php">Vegetables</a>
             </div>
         </div>
     </nav>
@@ -73,8 +73,8 @@ if ($conn->connect_error) {
         <div class="slider-wrapper">
             <div class="slider">
                 <img src="../image/Slide-1.png" alt="广告1">
-                <img src="../../image/Slide-2.jpg" alt="广告2">
-                <img src="../../image/Slide-3.jpg" alt="广告3">
+                <img src="../image/Slide-2.jpg" alt="广告2">
+                <img src="../image/Slide-3.jpg" alt="广告3">
             </div>
     
             <div class="slider-nav">
@@ -115,7 +115,7 @@ if ($conn->connect_error) {
                 echo "<div class='product-row'>";
                 while ($row = $products->fetch_assoc()) {
                     echo '<div class="product-card">';
-                    echo '<a href="../product_details.php?id=' . $row['prod_id'] . '">';
+                    echo '<a href="product_details.php?id=' . $row['prod_id'] . '">';
                     echo '<div class="product-image">';
                     echo '<img src="/Final-Year-Project/assets/uploads/' . htmlspecialchars($row['prod_image']) . '" alt="' . htmlspecialchars($row['prod_name']) . '">';
                     echo '</div>';
