@@ -41,11 +41,7 @@ if ($conn->connect_error) {
         <nav class="main-nav">
             <a href="product_list.php"><i class="fas fa-store"></i> Products</a>
             <a href="#"><i class="fas fa-heart"></i> Wishlist</a>
-            <a href="cart.php" class="active"><i class="fas fa-shopping-cart"></i> Cart 
-                    <?php if (!$is_cart_empty): ?>
-                        <span class="cart-count"><?php echo $item_count; ?></span>
-                    <?php endif; ?>
-            </a>
+            <a href="Cart.php"><i class="fas fa-shopping-cart"></i> Cart</a>
             <span class="user-info">
                 <a href="Profile/Profile.php"><i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?></a>
                 <a href="logout.php" class="logout-btn">Logout</a>
