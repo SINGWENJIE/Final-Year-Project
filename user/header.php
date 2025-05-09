@@ -136,7 +136,7 @@ if ($conn->connect_error) {
         }
         
         /* Underline effect for sub-nav only */
-        .sub-nav .nav-links li a::after {
+        .left-section .sub-nav .nav-links li a::after {
             content: '';
             position: absolute;
             bottom: 0;
@@ -147,10 +147,22 @@ if ($conn->connect_error) {
             transition: width 0.3s ease;
         }
         
-        .sub-nav .nav-links li a:hover::after {
+        .left-section .sub-nav .nav-links li a:hover::after {
             width: 100%;
         }
-        
+
+        /* Explicitly remove underline from logout button */
+        .user-info a.logout-btn::after,
+        .user-info a.logout-btn:hover::after {
+            display: none;
+            content: none;
+        }
+
+        /* Also ensure no text-decoration on hover */
+        .user-info a.logout-btn:hover {
+            text-decoration: none;
+        }
+
         /* User Info Styles */
         .user-info {
             display: flex;
@@ -175,12 +187,14 @@ if ($conn->connect_error) {
             font-weight: 500;
             transition: all 0.3s ease;
             cursor: pointer;
+            text-decoration: none !important;
         }
         
         .logout-btn:hover {
             background-color: var(--white);
-            color: var(--white);
+            color: var(--hover-color);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-decoration: none !important;
         }
         
         /* Responsive Styles */
@@ -269,7 +283,7 @@ if ($conn->connect_error) {
             <?php if(isset($_SESSION['user_name'])): ?>
                 <span class="user-info">
                     <a href="Profile/Profile.php"><i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?></a>
-                    <a href="logout.php" class="logout-btn">Logout</a>
+                    <button onclick="window.location.href='logout.php'" class="logout-btn">Logout</button>
                 </span>
             <?php else: ?>
                 <span class="user-info">
