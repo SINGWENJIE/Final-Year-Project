@@ -224,14 +224,6 @@
     background-color: #2ecc71;
 }
 
-footer {
-    text-align: center;
-    padding: 1.5rem;
-    margin-top: 2rem;
-    background-color: #2c3e50;
-    color: white;
-}
-
 /* Responsive styles */
 @media (max-width: 1200px) {
     .product-card {

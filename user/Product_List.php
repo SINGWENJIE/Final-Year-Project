@@ -113,7 +113,9 @@ $products_result = $conn->query($sql);
         </div>
     </main>
 
-    <?php include 'footer.php'; ?>
+    <footer>
+        <?php include 'footer.php'; ?>
+    </footer>
 
     <script src="../user_assets/js/product_list.js"></script>
 </body>
