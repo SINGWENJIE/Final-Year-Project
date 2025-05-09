@@ -24,7 +24,7 @@ if ($conn->connect_error) {
     <style>
         :root {
             --primary-color: #45ad9c;
-            --primary-dark: #45ad9c;
+            --primary-dark: #45a049;
             --primary-light: #d4edda;
             --secondary-color: #f8f9fa;
             --text-color: #333;
@@ -33,7 +33,7 @@ if ($conn->connect_error) {
             --error-color: #d9534f;
             --success-color: #5cb85c;
             --white: #ffffff;
-            --hover-color: #3d8b40;
+            --hover-color: #f39c12; /* Orange color for hover */
         }
         
         * {
@@ -120,17 +120,35 @@ if ($conn->connect_error) {
             position: relative;
         }
         
+        /* Orange hover effect for all nav items */
         header nav a:hover {
-            color: var(--primary-light);
+            color: var(--hover-color) !important;
         }
         
         header nav a:hover i {
+            color: var(--hover-color) !important;
             transform: translateY(-2px);
         }
         
         header nav a i {
             font-size: 18px;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+        }
+        
+        /* Underline effect for sub-nav only */
+        .sub-nav .nav-links li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--hover-color);
+            transition: width 0.3s ease;
+        }
+        
+        .sub-nav .nav-links li a:hover::after {
+            width: 100%;
         }
         
         /* User Info Styles */
@@ -161,31 +179,8 @@ if ($conn->connect_error) {
         
         .logout-btn:hover {
             background-color: var(--white);
-            color: var(--primary-color);
+            color: var(--white);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        /* Sub Navigation Links */
-        .sub-nav .nav-links li a {
-            font-size: 18px;
-            font-weight: 250;
-            letter-spacing: 0.5px;
-            position: relative;
-        }
-        
-        .sub-nav .nav-links li a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--primary-light);
-            transition: width 0.3s ease;
-        }
-        
-        .sub-nav .nav-links li a:hover::after {
-            width: 100%;
         }
         
         /* Responsive Styles */
