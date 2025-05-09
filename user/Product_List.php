@@ -35,7 +35,6 @@ $products_result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supermarket - Product List</title>
-    <link rel="stylesheet" href="../user_assets/css/header.css">
     <link rel="stylesheet" href="../user_assets/css/product_list.css">
     <link rel="stylesheet" href="../user_assets/css/footer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
