@@ -29,36 +29,36 @@ $categories_result = $conn->query($categories_sql);
 $sql = "SELECT * FROM product";
 $products_result = $conn->query($sql);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supermarket - Product List</title>
+    <link rel="stylesheet" href="../user_assets/css/header.css">
     <link rel="stylesheet" href="../user_assets/css/product_list.css">
+    <link rel="stylesheet" href="../user_assets/css/footer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="user-info">
-            Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-            <a href="logout.php" class="logout-btn">Logout</a>
-        </div>
-        <h1>Our Products</h1>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search products...">
-            <button id="searchBtn">Search</button>
-        </div>
-    </header>
+    <?php include 'header.php'; ?>
 
     <main>
+        <div class="page-header">
+            <h1>Our Products</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search products..." aria-label="Search products">
+                <button id="searchBtn">Search</button>
+            </div>
+        </div>
+
         <div class="filter-section">
-            <select id="categoryFilter">
+            <select id="categoryFilter" aria-label="Filter by category">
                 <option value="">All Categories</option>
                 <?php
                 if ($categories_result->num_rows > 0) {
                     while($category = $categories_result->fetch_assoc()) {
-                        echo '<option value="'.$category['category_id'].'">'.$category['category_name'].'</option>';
+                        echo '<option value="'.$category['category_id'].'">'.htmlspecialchars($category['category_name']).'</option>';
                     }
                 }
                 ?>
@@ -72,44 +72,48 @@ $products_result = $conn->query($sql);
                 echo "<div class='product-row'>";
                 $count = 0;
                 while($row = $products_result->fetch_assoc()) {
-                    if ($count > 0 && $count % 5 == 0){
-                        echo "</div><div class='product-row'>"; // Start new row every 5 products
+                    if ($count > 0 && $count % 5 == 0) {
+                        echo "</div><div class='product-row'>";
                     }
                     ?>
-                    <div class="product-card" data-category="<?php echo $row['category_id']; ?>">
-                        <a href="product_details.php?id=<?php echo $row['prod_id']; ?>" class="product-link">
+                    <div class="product-card" data-category="<?php echo htmlspecialchars($row['category_id']); ?>">
+                        <a href="product_details.php?id=<?php echo htmlspecialchars($row['prod_id']); ?>" class="product-link">
                             <div class="product-image">
-                                <img src="../assets/uploads/<?php echo $row['prod_image']; ?>" alt="<?php echo $row['prod_name']; ?>">
+                                <img src="../assets/uploads/<?php echo htmlspecialchars($row['prod_image']); ?>" 
+                                     alt="<?php echo htmlspecialchars($row['prod_name']); ?>"
+                                     loading="lazy">
                             </div>
                         </a>
                         <div class="product-info">
-                            <h3><?php echo $row['prod_name']; ?></h3>
+                            <h3><?php echo htmlspecialchars($row['prod_name']); ?></h3>
                             <p class="price">RM <?php echo number_format($row['prod_price'], 2); ?></p>
-                            <p class="description"><?php echo substr($row['prod_description'], 0, 50) . '...'; ?></p>
+                            <p class="description"><?php echo htmlspecialchars(substr($row['prod_description'], 0, 50) . '...'); ?></p>
                             <div class="product-actions">
                                 <div class="quantity-controls">
                                     <button class="quantity-minus" type="button" aria-label="Decrease quantity">-</button>
-                                    <input type="text" class="quantity" value="1" readonly data-max="<?php echo $row['stock']; ?>">
+                                    <input type="text" class="quantity" value="1" readonly 
+                                           data-max="<?php echo htmlspecialchars($row['stock']); ?>"
+                                           aria-label="Quantity">
                                     <button class="quantity-plus" type="button" aria-label="Increase quantity">+</button>
                                 </div>
-                                <button class="add-to-cart" data-id="<?php echo $row['prod_id']; ?>">Add to Cart</button>
+                                <button class="add-to-cart" data-id="<?php echo htmlspecialchars($row['prod_id']); ?>">
+                                    Add to Cart
+                                </button>
                             </div>
                         </div>
                     </div>
                     <?php
                     $count++;
                 }
-                echo "</div>"; // Close last row
+                echo "</div>";
             } else {
-                echo "<p>No products found.</p>";
+                echo '<p class="no-products">No products found.</p>';
             }
             ?>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2023 Supermarket. All rights reserved.</p>
-    </footer>
+    <?php include 'footer.php'; ?>
 
     <script src="../user_assets/js/product_list.js"></script>
 </body>

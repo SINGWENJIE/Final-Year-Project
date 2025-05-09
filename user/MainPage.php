@@ -45,7 +45,7 @@ if ($conn->connect_error) {
 
         <nav>
             <ul class="nav-links">
-                <li><a href="MainPage.php   ">Menu</a></li>
+                <li><a href="Product_List.php">Menu</a></li>
                 <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
             </ul>
         </nav>
