@@ -20,15 +20,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         die("Phone number must be 10-11 digits");
     }
 
-    // 更新数据库
+    // Prepare statement with corrected SQL
     $stmt = $conn->prepare("UPDATE users SET 
-    user_name = ?, 
-    email = ?, 
-    user_phone_num = ?, 
-    birth_date = ?, 
-    WHERE user_id = ?");
+        user_name = ?, 
+        email = ?, 
+        user_phone_num = ?, 
+        birth_date = ?
+        WHERE user_id = ?");
 
-    $stmt->bind_param("sssssi", 
+    $stmt->bind_param("ssssi", 
         $username, 
         $email, 
         $phone, 
@@ -36,13 +36,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['user_id'])) {
         $user_id
     );
 
+
     if ($stmt->execute()) {
         $_SESSION['success'] = "Profile updated successfully!";
-        header("Location: profile.php");
+        header("Location: ../profile.php");
         exit();
     } else {
         $_SESSION['error'] = "Error updating profile: " . $conn->error;
-        header("Location: profile.php");
+        header("Location: ../profile.php");
         exit();
     }
     

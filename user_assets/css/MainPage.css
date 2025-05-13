@@ -12,109 +12,6 @@ body {
     min-height: 100vh;
 }
 
-header {
-    background-color: #45ad9c;
-    padding: 10px 20px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 10; /* 加入这一行确保在前层 */
-}
-
-
-/* 右上角的 Login、Register 和 Shopping Cart */
-.auth-section {
-    position: absolute;
-    top: 15px;  /* 微调垂直位置 */
-    right: 40px;  /* 从右边往左移 */
-    display: flex;
-    align-items: center;  /* 保持元素垂直居中 */
-    gap: 30px;  /* 控制文字链接和购物车的间距 */
-}
-
-.auth-links {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 25px;  /* 控制文字链接之间的间距 */
-}
-
-.auth-links a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    font-family: Arial, sans-serif;  /* 根据截图添加字体 */
-}
-
-.shopping-cart {
-    width: 40px;  /* 根据截图缩小图标 */
-    height: auto;
-    margin-top: -3px;  /* 微调图标垂直对齐 */
-}
-
-/* Logo 和搜索栏 */
-.header-main {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.header-main img {
-    width: 180px;
-    height: 70px;
-}
-
-.search-form {
-    flex-grow: 1;
-    margin-left: 20px;
-}
-
-.search {
-    width: 100%;
-    max-width: 400px;
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: 28px;
-    background-color: #f6f6f6;
-}
-
-.search-input {
-    font-size: 16px;
-    font-family: 'Lexend', sans-serif;
-    color: #333333;
-    margin-left: 10px;
-    outline: none;
-    border: none;
-    background: transparent;
-    flex-grow: 1;
-}
-
-.search-input::placeholder,
-.search-icon {
-    color: rgba(0, 0, 0, 0.25);
-}
-
-/* 导航链接 */
-.nav-links {
-    display: flex;
-    list-style: none;
-    margin-top: 10px;
-}
-
-.nav-links li {
-    margin-left: 20px;
-}
-
-.nav-links li a {
-    font-size: 20px;
-    font-family: 'Impact', sans-serif;
-    text-decoration: none;
-    color: white;
-}
-
 /* 分类和订单列表 */
 .category-nav {
     display: flex;
@@ -170,9 +67,6 @@ header {
     background-color: #367F7A;
     color: white;
 }
-
-
-
 
 .container {
     max-width: 100%;
@@ -260,52 +154,6 @@ header {
     background: #f0fff4;
 }
 
-  
-
-
-
-.footer-nav {
-    background-color: #45ad9c;
-    padding: 40px 20px;
-    display: flex;
-    justify-content: space-around;
-    margin-top: auto; /* 确保固定在底部 */
-}
-
-.footer-column {
-    flex: 1;
-    max-width: 250px;
-    padding: 0 20px;
-}
-
-.footer-column h4 {
-    color: white;
-    font-family: 'Impact', sans-serif;
-    font-size: 18px;
-    margin-bottom: 15px;
-    border-bottom: 2px solid rgba(255,255,255,0.2);
-    padding-bottom: 10px;
-}
-
-.footer-column ul {
-    list-style: none;
-}
-
-.footer-column li {
-    margin-bottom: 8px;
-}
-
-.footer-column a {
-    color: rgba(255,255,255,0.9);
-    text-decoration: none;
-    font-size: 14px;
-    transition: color 0.3s;
-}
-
-.footer-column a:hover {
-    color: white;
-    text-decoration: underline;
-}
 
 .products-container {
     width: 90%;
@@ -328,7 +176,7 @@ header {
 }
 
 .product-card {
-    width: 140px;
+    width: 180px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -376,18 +224,5 @@ header {
     justify-content: space-between;
     align-items: center;
     margin: 15px 0 10px;
-}
-
-.more-button {
-    font-size: 14px;
-    padding: 5px 10px;
-    background-color: #333;
-    color: #fff;
-    border-radius: 5px;
-    text-decoration: none;
-}
-
-.more-button:hover {
-    background-color: #555;
 }
 

@@ -18,7 +18,7 @@ $user = $result->fetch_assoc();
 <html lang="en">
 <head>
     <title>GOGO | Edit Profile</title>
-    <link rel="icon" type="image" href="../../image/GOGO.png">
+    <link rel="icon" type="image" href="../image/GOGO.png">
     <link rel="stylesheet" href="../user_assets/css/Profile.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -65,12 +65,12 @@ $user = $result->fetch_assoc();
 
             <div class="form-group">
                 <label><i class='bx bx-phone'></i> Phone</label>
-                <input type="tel" name="phone" 
-                       pattern="[0-9]{10,11}"
-                       title="Format: 0123456789 (10-11 digits)"
-                       value="<?php echo htmlspecialchars($user['user_phone_num']); ?>" 
-                       required>
-                <small>Format: 0123456789 (10-11 digits)</small>
+                <input type="tel" name="phone" id="phone"
+                    pattern="[0-9\- ]{13,14}"
+                    title="Format: 012-345 6789 或 012-345 67890"
+                    value="<?php echo htmlspecialchars($user['user_phone_num']); ?>" 
+                    required>
+                <small>Format: 012-345 6789 (10-11 digits)</small>
             </div>
 
             <div class="form-group">
@@ -107,6 +107,15 @@ $user = $result->fetch_assoc();
         animate: true,
         });
 
+        document.getElementById('phone').addEventListener('input', function (e) {
+        let input = e.target.value.replace(/\D/g, ''); // 去除非数字
+        if (input.length > 3 && input.length <= 6) {
+            input = input.slice(0, 3) + '-' + input.slice(3);
+        } else if (input.length > 6) {
+            input = input.slice(0, 3) + '-' + input.slice(3, 6) + ' ' + input.slice(6, 11);
+        }
+        e.target.value = input;
+        });
     </script>
 </body>
 </html>

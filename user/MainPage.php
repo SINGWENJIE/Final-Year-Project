@@ -75,7 +75,7 @@ if ($conn->connect_error) {
             if ($category) {
                 $category_id = $category['category_id'];
 
-                $stmt2 = $conn->prepare("SELECT * FROM product WHERE category_id = ? LIMIT 4");
+                $stmt2 = $conn->prepare("SELECT * FROM product WHERE category_id = ? LIMIT 8");
                 $stmt2->bind_param("i", $category_id);
                 $stmt2->execute();
                 $products = $stmt2->get_result();
