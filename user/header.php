@@ -64,7 +64,6 @@ if ($conn->connect_error) {
             background-color: var(--primary-color);
             color: var(--white);
             padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -100,16 +99,16 @@ if ($conn->connect_error) {
             align-items: center;
             gap: 25px;
         }
-        
+
         .sub-nav .nav-links {
             display: flex;
             list-style: none;
             gap: 25px;
         }
-        
+
         header nav a {
             color: var(--white);
-            text-decoration: none;
+            text-decoration: none !important; /* Added !important */
             display: flex;
             align-items: center;
             gap: 8px;
@@ -119,23 +118,19 @@ if ($conn->connect_error) {
             padding: 8px 0;
             position: relative;
         }
-        
-        /* Orange hover effect for all nav items */
+
+        /* Orange hover effect for all nav items - without underline */
         header nav a:hover {
             color: var(--hover-color) !important;
+            text-decoration: none !important; /* Added */
         }
-        
+
         header nav a:hover i {
             color: var(--hover-color) !important;
             transform: translateY(-2px);
         }
-        
-        header nav a i {
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-        
-        /* Underline effect for sub-nav only */
+
+        /* Keep underline effect only for sub-nav links (Menu and About GOGO) */
         .left-section .sub-nav .nav-links li a::after {
             content: '';
             position: absolute;
@@ -146,7 +141,7 @@ if ($conn->connect_error) {
             background-color: var(--hover-color);
             transition: width 0.3s ease;
         }
-        
+
         .left-section .sub-nav .nav-links li a:hover::after {
             width: 100%;
         }
