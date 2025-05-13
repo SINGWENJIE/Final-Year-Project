@@ -82,7 +82,6 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Supermarket</title>
-    <link rel="stylesheet" href="../user_assets/css/header.css">
     <link rel="stylesheet" href="../user_assets/css/checkout.css">
     <link rel="stylesheet" href="../user_assets/css/footer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

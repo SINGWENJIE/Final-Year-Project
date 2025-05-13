@@ -85,23 +85,11 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History - Supermarket</title>
     <link rel="stylesheet" href="../user_assets/css/order_history.css">
+    <link rel="stylesheet" href="../user_assets/css/footer.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1><a href="product_list.php">Supermarket</a></h1>
-            <nav>
-                <a href="product_list.php"><i class="fas fa-store"></i> Products</a>
-                <a href="#"><i class="fas fa-heart"></i> Wishlist</a>
-                <a href="cart.php"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a>
-                <span class="user-info">
-                    <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-                    <a href="logout.php" class="logout-btn">Logout</a>
-                </span>
-            </nav>
-        </div>
-    </header>
+    <?php include 'header.php'; ?>
 
     <main class="container">
         <div class="breadcrumb">
@@ -226,25 +214,7 @@ $conn->close();
         </div>
     </main>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About Us</h3>
-                <p>Your one-stop supermarket for all daily needs.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="product_list.php">Products</a></li>
-                    <li><a href="#">Special Offers</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2023 Supermarket. All rights reserved.</p>
-        </div>
-    </footer>
+    <?php include 'footer.php'; ?>
 
     <!-- Review Modal -->
     <div class="modal" id="reviewModal">
