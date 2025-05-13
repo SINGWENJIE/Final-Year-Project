@@ -279,7 +279,7 @@ if ($conn->connect_error) {
             <a href="order_history.php"><i class="fas fa-history"></i> History</a>
             <?php if(isset($_SESSION['user_name'])): ?>
                 <span class="user-info">
-                    <a href="Profile/Profile.php"><i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?></a>
+                    <a href="Profile.php"><i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?></a>
                     <button onclick="window.location.href='logout.php'" class="logout-btn">Logout</button>
                 </span>
             <?php else: ?>
