@@ -3,41 +3,21 @@
 
 <head>
     <title>GOGO | Shop Conveniently</title>
-    <link rel="icon" type="image" href="../../image/GOGO.png">
-    <link rel="stylesheet" href="HomePage.css">
+    <link rel="icon" type="image" href="../image/GOGO.png">
+    <link rel="stylesheet" href="../user_assets/css/HomePage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
 </head>
 
 <body>
-    <header>
-        <div class="auth-section">
-            <ul class="auth-links">
-                <li><a href="../Login.php">Login</a></li>
-                <li><a href="../Register.php">Register</a></li>
-            </ul>
-        </div>
-
-        <div class="header-main">
-            <a href="../MainPage/MainPage.php">
-                <img src="../../image/gogoname.png" alt="GOGO Logo">
-            </a>
-        </div>
-
-        <nav>
-            <ul class="nav-links">
-                <li><a href="../MainPage/MainPage.php">Main Page</a></li>
-                <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
-            </ul>
-        </nav>
-    </header>
+<?php include 'header.php'; ?>
 
     <section class="container">
         <div class="slider-wrapper">
             <div class="slider">
-                <img src="../../image/Slide-1.png" alt="广告1">
-                <img src="../../image/Slide-2.jpg" alt="广告2">
-                <img src="../../image/Slide-3.jpg" alt="广告3">
+                <img src="../image/Slide-1.png" alt="广告1">
+                <img src="../image/Slide-2.jpg" alt="广告2">
+                <img src="../image/Slide-3.jpg" alt="广告3">
             </div>
     
             <div class="slider-nav">
@@ -52,7 +32,7 @@
     <div class="promo-section">
         <div class="promo-grid">
           <div class="promo-box">
-            <img src="../../image/promo1.png" alt="" />
+            <img src="../image/promo1.png" alt="" />
             <h3>This Weeks Offer</h3>
             <p>View our latest promotion.</p>
             <a href="catalogue.html">
@@ -61,7 +41,7 @@
           </div>
 
           <div class="promo-box">
-            <img src="../../image/promo2.png" alt="" />
+            <img src="../image/promo2.png" alt="" />
             <h3>Promotions</h3>
             <p>Check out our latest promotions here.</p>
             <a href="catalogue.html">
@@ -70,16 +50,16 @@
           </div>
 
           <div class="promo-box">
-            <img src="../../image/p9.jpg" alt="" />
+            <img src="../image/p9.jpg" alt="" />
             <h3>Our Products</h3>
             <p>Check out our product range.</p>
-            <a href="../Product_List.php">
+            <a href="Product_List.php">
                 <button>Shop Now</button>
             </a>
           </div>
 
           <div class="promo-box">
-            <img src="../../image/promo4.png" alt="" />
+            <img src="../image/promo4.png" alt="" />
             <h3>Gifting</h3>
             <p>Discover gifting options and ideas.</p>
             <a href="catalogue.html">
@@ -88,55 +68,9 @@
           </div> 
         </div>
       </div>
-
-      <div class="footer-nav">
-        <div class="footer-column">
-            <h4>Our Helpline</h4>
-            <ul>
-                <li><a href="">MR.SING</a></li>
-                <li><a href="">MR.PIOW</a></li>
-                <li><a href="">MR.CHEW</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <h4>News & Media</h4>
-            <ul>
-                <li><a href="#">Press Release</a></li>
-                <li><a href="#">News Article</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <h4>Policies</h4>
-            <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="../TermsConditions/TermsConditions.html">Terms & Conditions</a></li>
-                <li><a href="#">Anti Bribery Policies</a></li>
-                <li><a href="#">Electrical Policy</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <h4>&nbsp;</h4>
-            <ul>
-                <li><a href="#">Return Policy</a></li>
-                <li><a href="#">Product Policy</a></li>
-                <li><a href="#">Halal Statement</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <ul>
-                <li>
-                    <a href="https://www.instagram.com/cheeew.05?igsh=MTBvcTQ5MXR0emNidQ%3D%3D&utm_source=qr">
-                        <i class="fab fa-instagram" style="font-size: 30px; margin-top: 75px;"></i>
-                      </a>                      
-                </li>
-                <li>&copy; GOGO_SUPERMARKET</li>
-            </ul>
-        </div>
     </div>
+
+    <?php include 'footer.php'; ?>
     
 
 </body>

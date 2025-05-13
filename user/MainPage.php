@@ -24,32 +24,7 @@ if ($conn->connect_error) {
 </head>
 
 <body>
-    <header>
-        <div class="auth-section">
-            <ul class="auth-links">
-                <li><a href="../Profile/Profile.php">My Account</a></li>
-                <li><a href="order_history.php">All Orders</a></li>
-                <li><a href="#">Member</a></li>
-                <li><a href="logout.php">Logout</a></li>
-            </ul>
-            <a href="../Cart.php" class="shopping-cart-link">
-                <img src="../image/cart.png" alt="Cart" class="shopping-cart">
-            </a>
-        </div>
-
-        <div class="header-main">
-            <a href="MainPage.php">
-                <img src="../image/gogoname.png" alt="GOGO Logo">
-            </a>
-        </div>
-
-        <nav>
-            <ul class="nav-links">
-                <li><a href="Product_List.php">Menu</a></li>
-                <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
-            </ul>
-        </nav>
-    </header>
+<?php include 'header.php'; ?>
 
     <nav class="category-nav">
         <div class="dropdown">
@@ -133,57 +108,7 @@ if ($conn->connect_error) {
         ?>
     </div>
 
-
-    
-
-    <div class="footer-nav">
-        <div class="footer-column">
-            <h4>Our Helpline</h4>
-            <ul>
-                <li><a href="">MR.SING</a></li>
-                <li><a href="">MR.PIOW</a></li>
-                <li><a href="">MR.CHEW</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <h4>News & Media</h4>
-            <ul>
-                <li><a href="#">Press Release</a></li>
-                <li><a href="#">News Article</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <h4>Policies</h4>
-            <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="../TermsConditions/TermsConditions.html">Terms & Conditions</a></li>
-                <li><a href="#">Anti Bribery Policies</a></li>
-                <li><a href="#">Electrical Policy</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <h4>&nbsp;</h4>
-            <ul>
-                <li><a href="#">Return Policy</a></li>
-                <li><a href="#">Product Policy</a></li>
-                <li><a href="#">Halal Statement</a></li>
-            </ul>
-        </div>
-    
-        <div class="footer-column">
-            <ul>
-                <li>
-                    <a href="https://www.instagram.com/cheeew.05?igsh=MTBvcTQ5MXR0emNidQ%3D%3D&utm_source=qr">
-                        <i class="fab fa-instagram" style="font-size: 30px; margin-top: 75px;"></i>
-                      </a>                      
-                </li>
-                <li>&copy; GOGO_SUPERMARKET</li>
-            </ul>
-        </div>
-    </div>
+    <?php include 'footer.php'; ?>
 </body>
 
 <script>
