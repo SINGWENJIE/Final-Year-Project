@@ -44,7 +44,6 @@ $products_result = $conn->query($sql);
 
     <main>
         <div class="page-header">
-            <h1>Our Products</h1>
             <div class="search-container">
                 <input type="text" id="searchInput" placeholder="Search products..." aria-label="Search products">
                 <button id="searchBtn">Search</button>
