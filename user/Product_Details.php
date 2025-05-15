@@ -418,6 +418,7 @@ if ($result->num_rows > 0) {
                 });
         }
     });
+    
     </script>
 </body>
 </html>

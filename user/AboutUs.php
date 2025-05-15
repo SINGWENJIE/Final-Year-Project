@@ -1,33 +1,25 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <title>GOGO | Shop Conveniently</title>
     <link rel="icon" type="image" href="../../image/GOGO.png">
-    <link rel="stylesheet" href="AboutUs.css">
+    <link rel="stylesheet" href="../user_assets/css/AboutUs.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
 </head>
 
 <body>
-    <header>
-        <div class="header-main">
-            <a href="../MainPage/MainPage.html">
-                <img src="../../image/gogoname.png" alt="GOGO Logo">
-        </div>
-
-        <nav>
-            <ul class="nav-links">
-                <li><a href="../MainPage/MainPage.html">Menu</a></li>
-                <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
-            </ul>
-        </nav>
-    </header>
+    <?php include 'header.php'; ?>
 
     <section class="loyalty-program">
         <div class="program-intro">
             <div class="image-column">
                 <div class="image-placeholder">
-                    <img src="../../image/shopping-mall-outside-composition-mall-building-with-tags-headlines-shops-wall_1284-58788.avif">
+                    <img src="../image/shopping-mall-outside-composition-mall-building-with-tags-headlines-shops-wall_1284-58788.avif">
                 </div>
             </div>
             <div class="content-column">
@@ -41,13 +33,11 @@
             </div>
         </div>
     
-        <!-- 福利网格 -->
         <div class="benefits-grid">
-            <!-- 福利项 1 -->
             <div class="benefit-item">
                 <div class="benefit-image">
                     <div class="image-placeholder small">
-                        <img src="../../image/1458201.png">
+                        <img src="../image/1458201.png">
                     </div>
                 </div>
 
@@ -57,11 +47,10 @@
                 </div>
             </div>
     
-            <!-- 福利项 2 -->
             <div class="benefit-item">
                 <div class="benefit-image">
                     <div class="image-placeholder small">
-                        <img src="../../image/4279596.png">
+                        <img src="../image/4279596.png">
                     </div>
                 </div>
                 
@@ -71,11 +60,10 @@
                 </div>
             </div>
 
-             <!-- 福利项 3 -->
              <div class="benefit-item">
                 <div class="benefit-image">
                     <div class="image-placeholder small">
-                        <img src="../../image/1659070148_146129.png">
+                        <img src="../image/1659070148_146129.png">
                     </div>
                 </div>
                 
@@ -85,11 +73,10 @@
                 </div>
             </div>
 
-             <!-- 福利项 4 -->
              <div class="benefit-item">
                 <div class="benefit-image">
                     <div class="image-placeholder small">
-                        <img src="../../image/voucher-icon-for-your-website-mobile-presentation-and-logo-design-vector.jpg">
+                        <img src="../image/voucher-icon-for-your-website-mobile-presentation-and-logo-design-vector.jpg">
                     </div>
                 </div>
                 
@@ -101,33 +88,7 @@
         </div>
     </section>
 
-    <div class="footer-nav">
-        <div class="footer-column">
-            <h4>GOGO</h4>
-            <ul>
-                <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
-                <li><a href="#">Policies</a></li>
-                <li><a href="../TermsConditions/TermsConditions.html">Terms & Conditions</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-column">
-            <h4>Support</h4>
-            <ul>
-                <li><a href="#">FAQs</a></li>
-                <li><a href="#">Contact Us</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-column">
-            <h4>Legal</h4>
-            <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Anti-Bribery</a></li>
-                <li><a href="#">Loyalty Program</a></li>
-            </ul>
-        </div>
-    </div>
+    <?php include 'footer.php'; ?>
 
 </body>
 

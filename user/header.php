@@ -267,7 +267,7 @@ if ($conn->connect_error) {
             <nav class="sub-nav">
                 <ul class="nav-links">
                     <li><a href="Product_List.php">Menu</a></li>
-                    <li><a href="AboutUs/AboutUs.php">About GOGO</a></li>
+                    <li><a href="AboutUs.php">About GOGO</a></li>
                 </ul>
             </nav>
         </div>
