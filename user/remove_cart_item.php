@@ -2,6 +2,12 @@
 session_start();
 header('Content-Type: application/json');
 
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Please login to update cart']);
+    exit();
+}
+
 // Database connection
 $servername = "localhost";
 $username = "root";
@@ -11,46 +17,66 @@ $dbname = "gogo_supermarket";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Database connection failed']));
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    exit();
 }
 
-// Get input data
+// Get POST data
 $data = json_decode(file_get_contents('php://input'), true);
 $cart_item_id = isset($data['cart_item_id']) ? intval($data['cart_item_id']) : 0;
 
+if ($cart_item_id <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Invalid input']);
+    exit();
+}
+
+// Verify the cart item belongs to the user
+$verify_sql = "SELECT ci.CART_ITEM_ID 
+               FROM cart_items ci
+               JOIN cart c ON ci.CART_ID = c.CART_ID
+               WHERE ci.CART_ITEM_ID = ? AND c.user_id = ?";
+$verify_stmt = $conn->prepare($verify_sql);
+$verify_stmt->bind_param("ii", $cart_item_id, $_SESSION['user_id']);
+$verify_stmt->execute();
+$verify_result = $verify_stmt->get_result();
+
+if ($verify_result->num_rows === 0) {
+    echo json_encode(['success' => false, 'message' => 'Invalid cart item']);
+    exit();
+}
+
 // Remove item
-$delete_item = $conn->prepare("DELETE FROM cart_items WHERE CART_ITEM_ID = ?");
-$delete_item->bind_param("i", $cart_item_id);
-$delete_item->execute();
+$delete_sql = "DELETE FROM cart_items WHERE CART_ITEM_ID = ?";
+$delete_stmt = $conn->prepare($delete_sql);
+$delete_stmt->bind_param("i", $cart_item_id);
 
-// Get updated cart data
-$user_id = $_SESSION['user_id'];
-$cart_query = $conn->prepare("SELECT COUNT(*) as cart_count, 
-                             SUM(ci.QUANTITY) as item_count, 
-                             SUM(ci.QUANTITY * p.prod_price) as subtotal
-                             FROM cart_items ci
-                             JOIN product p ON ci.prod_id = p.prod_id
-                             JOIN cart c ON ci.CART_ID = c.CART_ID
-                             WHERE c.user_id = ?");
-$cart_query->bind_param("i", $user_id);
-$cart_query->execute();
-$cart_result = $cart_query->get_result();
-$cart_data = $cart_result->fetch_assoc();
-
-$delivery_fee = 5.00;
-$total = $cart_data['subtotal'] + $delivery_fee;
-
-echo json_encode([
-    'success' => true,
-    'message' => 'Item removed from cart',
-    'cart_count' => $cart_data['cart_count'],
-    'cart' => [
-        'item_count' => $cart_data['item_count'] ?? 0,
-        'subtotal' => $cart_data['subtotal'] ?? 0,
-        'delivery_fee' => $delivery_fee,
-        'total' => $total
-    ]
-]);
+if ($delete_stmt->execute()) {
+    // Get updated cart data
+    $cart_sql = "SELECT COUNT(*) as cart_count, 
+                        SUM(ci.QUANTITY) as item_count, 
+                        SUM(ci.QUANTITY * p.prod_price) as subtotal
+                 FROM cart_items ci
+                 JOIN product p ON ci.prod_id = p.prod_id
+                 JOIN cart c ON ci.CART_ID = c.CART_ID
+                 WHERE c.user_id = ?";
+    $cart_stmt = $conn->prepare($cart_sql);
+    $cart_stmt->bind_param("i", $_SESSION['user_id']);
+    $cart_stmt->execute();
+    $cart_result = $cart_stmt->get_result();
+    $cart_data = $cart_result->fetch_assoc();
+    
+    echo json_encode([
+        'success' => true,
+        'cart_count' => $cart_data['cart_count'] ?? 0,
+        'cart' => [
+            'item_count' => $cart_data['item_count'] ?? 0,
+            'subtotal' => $cart_data['subtotal'] ?? 0,
+            'total' => $cart_data['subtotal'] ?? 0
+        ]
+    ]);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Failed to remove item']);
+}
 
 $conn->close();
 ?>
