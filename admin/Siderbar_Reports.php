@@ -83,9 +83,9 @@ if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
                     <div class="report-results">
                         <h3>Report from <?= htmlspecialchars($start) ?> to <?= htmlspecialchars($end) ?>:</h3>
                         <ul>
-                            <li><strong>Total Revenue:</strong> $<?= number_format($reportData['total_revenue'] ?? 0, 2) ?></li>
+                            <li><strong>Total Revenue:</strong> RM <?= number_format($reportData['total_revenue'] ?? 0, 2) ?></li>
                             <li><strong>Total Orders:</strong> <?= $reportData['total_orders'] ?? 0 ?></li>
-                            <li><strong>Average Order:</strong> $<?= number_format($reportData['average_order'] ?? 0, 2) ?></li>
+                            <li><strong>Average Order:</strong> RM <?= number_format($reportData['average_order'] ?? 0, 2) ?></li>
 
                         </ul>
                     </div>
