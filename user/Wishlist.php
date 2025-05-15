@@ -60,7 +60,8 @@ $result = $conn->query($sql);
                 <div class="item-image">
                     <a href="product_details.php?id=<?php echo $product['prod_id']; ?>">
                         <img src="../assets/uploads/<?php echo htmlspecialchars($product['prod_image']); ?>" 
-                             alt="<?php echo htmlspecialchars($product['prod_name']); ?>">
+                            alt="<?php echo htmlspecialchars($product['prod_name']); ?>"
+                            onerror="this.src='../assets/uploads/default-product-image.png'">
                     </a>
                 </div>
                 <div class="item-details">
