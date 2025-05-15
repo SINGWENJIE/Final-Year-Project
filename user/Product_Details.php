@@ -346,7 +346,7 @@ if ($result->num_rows > 0) {
                 .then(data => {
                     if (data.success) {
                         if (data.action === 'added') {
-                            this.innerHTML = '<i class="fas fa-heart"></i> In Wishlist';
+                            this.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
                             showToast('Added to wishlist!', 'success');
                         } else {
                             this.innerHTML = originalHTML;
@@ -409,7 +409,7 @@ if ($result->num_rows > 0) {
                 .then(data => {
                     if (data.in_wishlist) {
                         const btn = document.querySelector('.add-to-wishlist');
-                        btn.innerHTML = '<i class="fas fa-heart"></i> In Wishlist';
+                        btn.innerHTML = '<i class="fas fa-heart"></i> Wishlist';
                         btn.style.color = '#e74c3c';
                     }
                 })

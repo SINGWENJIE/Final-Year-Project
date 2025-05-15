@@ -274,7 +274,7 @@ if ($conn->connect_error) {
 
         <nav class="main-nav">
             <a href="product_list.php"><i class="fas fa-store"></i> Products</a>
-            <a href="#"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="wishlist.php"><i class="fas fa-heart"></i> Wishlist</a>
             <a href="Cart.php"><i class="fas fa-shopping-cart"></i> Cart</a>
             <a href="order_history.php"><i class="fas fa-history"></i> History</a>
             <?php if(isset($_SESSION['user_name'])): ?>

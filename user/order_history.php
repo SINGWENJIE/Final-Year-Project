@@ -194,11 +194,6 @@ $conn->close();
                                     <i class="fas fa-star"></i> Leave Review
                                 </button>
                                 <?php endif; ?>
-                                <?php if ($order['order_status'] == 'pending'): ?>
-                                <button class="btn btn-cancel" data-order-id="<?php echo $order['order_id']; ?>">
-                                    <i class="fas fa-times"></i> Cancel Order
-                                </button>
-                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endwhile; ?>
