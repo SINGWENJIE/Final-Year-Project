@@ -2,6 +2,16 @@
 session_start();
 include '../db_connection.php';
 
+$recordsPerPage = 10;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$startFrom = ($page - 1) * $recordsPerPage;
+
+$countSql = "SELECT COUNT(*) AS total FROM orders";
+$countResult = $conn->query($countSql);
+$countRow = $countResult->fetch_assoc();
+$totalRecords = $countRow['total'];
+$totalPages = ceil($totalRecords / $recordsPerPage);
+
 //update status
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['order_id']) && isset($_POST['order_status'])) {
     $order_id = $_POST['order_id'];
@@ -35,7 +45,7 @@ function getOrderDetails($conn, $user_id)
         while ($item = $items_result->fetch_assoc()) {
             $product_name = $item['prod_name'];
             $quantity = $item['quantity'];
-            $price = $item['order_item_price'];  
+            $price = $item['order_item_price'];
             $total_price = $price * $quantity;
             $items[] = [
                 'product_name' => $product_name,
@@ -190,26 +200,26 @@ $orderStatuses = getOrderStatuses($conn);
                         $search = $_GET['search'] ?? '';
                         $search = trim($search);
 
-                        $sql = "SELECT o.order_id, u.user_name, o.total_amount, o.order_status, o.order_date, o.user_id
-                     FROM `orders` o
-                     JOIN `users` u ON o.user_id = u.user_id";
-
-
                         if ($search !== '') {
-                            $search = trim($search);
                             $sql = "SELECT o.order_id, u.user_name, o.total_amount, o.order_status, o.order_date, o.user_id
-                                    FROM `orders` o
-                                    JOIN `users` u ON o.user_id = u.user_id
-                                    WHERE o.order_id LIKE ? OR u.user_name LIKE ?"; //orde id and user name
+            FROM `orders` o
+            JOIN `users` u ON o.user_id = u.user_id
+            WHERE o.order_id LIKE ? OR u.user_name LIKE ?
+            ORDER BY o.order_date DESC
+            LIMIT ?, ?";
                             $stmt = $conn->prepare($sql);
                             $searchParam = "%$search%";
-                            $stmt->bind_param("ss", $searchParam, $searchParam);
+                            $stmt->bind_param("ssii", $searchParam, $searchParam, $startFrom, $recordsPerPage);
                         } else {
                             $sql = "SELECT o.order_id, u.user_name, o.total_amount, o.order_status, o.order_date, o.user_id
-                                    FROM `orders` o
-                                    JOIN `users` u ON o.user_id = u.user_id";
+            FROM `orders` o
+            JOIN `users` u ON o.user_id = u.user_id
+            ORDER BY o.order_date DESC
+            LIMIT ?, ?";
                             $stmt = $conn->prepare($sql);
+                            $stmt->bind_param("ii", $startFrom, $recordsPerPage);
                         }
+
 
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -242,6 +252,19 @@ $orderStatuses = getOrderStatuses($conn);
                         ?>
                     </tbody>
                 </table>
+                <div class="pagination">
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?= $page - 1; ?>"> &lt; </a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?= $i; ?>" class="<?= ($i == $page) ? 'active' : ''; ?>"><?= $i; ?></a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a href="?page=<?= $page + 1; ?>"> &gt; </a>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <script>

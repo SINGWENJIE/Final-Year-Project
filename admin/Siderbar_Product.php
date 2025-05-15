@@ -261,19 +261,15 @@ if (isset($_POST['update_product'])) {
                                     <td><?= $row['prod_price'] ?></td>
                                     <td><?= $row['prod_description'] ?></td>
                                     <td>
-                                    <img src="../assets/images/edit.png" alt="Edit" class="icon-btn" 
-     data-id="<?= $row['prod_id'] ?>"
-     data-name="<?= htmlspecialchars($row['prod_name'], ENT_QUOTES) ?>"
-     data-price="<?= $row['prod_price'] ?>"
-     data-stock="<?= $row['stock'] ?>"
-     data-category="<?= $row['category_id'] ?>"
-     data-description="<?= htmlspecialchars($row['prod_description'], ENT_QUOTES) ?>"
-     onclick="handleEditClick(this)" 
-     style="cursor: pointer;">
-
-
-
-
+                                        <img src="../assets/images/edit.png" alt="Edit" class="icon-btn"
+                                            data-id="<?= $row['prod_id'] ?>"
+                                            data-name="<?= htmlspecialchars($row['prod_name'], ENT_QUOTES) ?>"
+                                            data-price="<?= $row['prod_price'] ?>"
+                                            data-stock="<?= $row['stock'] ?>"
+                                            data-category="<?= $row['category_id'] ?>"
+                                            data-description="<?= htmlspecialchars($row['prod_description'], ENT_QUOTES) ?>"
+                                            onclick="handleEditClick(this)"
+                                            style="cursor: pointer;">
 
                                         <button onclick="confirmDelete(<?= $row['prod_id'] ?>)">
                                             <img src="../assets/images/delete.png" alt="Delete" class="icon-btn">
@@ -364,16 +360,17 @@ if (isset($_POST['update_product'])) {
 
             document.getElementById('edit-form').style.display = 'flex';
         }
-        function handleEditClick(element) {
-    const id = element.getAttribute('data-id');
-    const name = element.getAttribute('data-name');
-    const price = element.getAttribute('data-price');
-    const stock = element.getAttribute('data-stock');
-    const categoryId = element.getAttribute('data-category');
-    const description = element.getAttribute('data-description');
 
-    openEditForm(id, name, price, stock, categoryId, description);
-}
+        function handleEditClick(element) {
+            const id = element.getAttribute('data-id');
+            const name = element.getAttribute('data-name');
+            const price = element.getAttribute('data-price');
+            const stock = element.getAttribute('data-stock');
+            const categoryId = element.getAttribute('data-category');
+            const description = element.getAttribute('data-description');
+
+            openEditForm(id, name, price, stock, categoryId, description);
+        }
 
 
         function toggleEditForm() {

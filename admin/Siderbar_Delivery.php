@@ -2,6 +2,10 @@
 session_start();
 include '../db_connection.php';
 
+$recordsPerPage = 11;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$startFrom = ($page - 1) * $recordsPerPage;
+
 if (isset($_SESSION['admin_role'])) {
     $role = $_SESSION['admin_role'];
 }
@@ -18,6 +22,11 @@ if (isset($_POST['order_id'], $_POST['new_status'])) {
         $stmt->close();
     }
 }
+$countSql = "SELECT COUNT(*) AS total FROM delivery";
+$countResult = $conn->query($countSql);
+$countRow = $countResult->fetch_assoc();
+$totalRecords = $countRow['total'];
+$totalPages = ceil($totalRecords / $recordsPerPage);
 
 ?>
 <!DOCTYPE html>
@@ -82,10 +91,12 @@ if (isset($_POST['order_id'], $_POST['new_status'])) {
                     <tbody>
                         <?php
                         $sql = "SELECT d.order_id, d.delivery_status, u.user_name
-                            FROM delivery d
-                            JOIN orders o ON d.order_id = o.order_id
-                            JOIN users u ON o.user_id = u.user_id
-                            ORDER BY d.order_id DESC";
+    FROM delivery d
+    JOIN orders o ON d.order_id = o.order_id
+    JOIN users u ON o.user_id = u.user_id
+    ORDER BY d.order_id DESC
+    LIMIT $startFrom, $recordsPerPage";
+
                         $result = $conn->query($sql);
 
                         while ($row = $result->fetch_assoc()):
@@ -109,6 +120,19 @@ if (isset($_POST['order_id'], $_POST['new_status'])) {
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                <div class="pagination">
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?= $page - 1; ?>"> &lt; </a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?= $i; ?>" class="<?= ($i == $page) ? 'active' : ''; ?>"><?= $i; ?></a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a href="?page=<?= $page + 1; ?>"> &gt; </a>
+                    <?php endif; ?>
+                </div>
             </div>
         </main>
     </div>
