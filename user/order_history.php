@@ -134,7 +134,7 @@ $conn->close();
                         
                         <div class="form-group search-group">
                             <input type="text" name="search" placeholder="Search orders..." value="<?php echo htmlspecialchars($search_term); ?>">
-                            <button type="submit"><i class="fas fa-search"></i></button>
+                            </button>
                         </div>
                     </form>
                 </div>
