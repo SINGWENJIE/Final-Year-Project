@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Rating stars interaction
     ratingStars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            ratingValue.value = rating;
+            highlightStars(rating);
+        });
+        
         star.addEventListener('mouseover', function() {
             const rating = parseInt(this.getAttribute('data-rating'));
             highlightStars(rating);
@@ -19,26 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentRating = parseInt(ratingValue.value) || 0;
             highlightStars(currentRating);
         });
-        
-        star.addEventListener('click', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            ratingValue.value = rating;
-            highlightStars(rating);
-        });
     });
     
     function highlightStars(rating) {
         ratingStars.forEach(star => {
             const starRating = parseInt(star.getAttribute('data-rating'));
-            if (starRating <= rating) {
-                star.classList.add('hover');
-                star.classList.remove('far');
-                star.classList.add('fas');
-            } else {
-                star.classList.remove('hover');
-                star.classList.remove('fas');
-                star.classList.add('far');
-            }
+            star.classList.toggle('fas', starRating <= rating);
+            star.classList.toggle('far', starRating > rating);
         });
     }
     
@@ -59,51 +52,55 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     return response.json();
                 })
-                .then(products => {
-                    reviewProductSelect.innerHTML = '';
-                    
-                    if (products.length === 0) {
-                        reviewProductSelect.innerHTML = '<option value="" disabled>No products available for review</option>';
-                        return;
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        reviewProductSelect.innerHTML = '';
+                        
+                        if (data.length === 0) {
+                            reviewProductSelect.innerHTML = '<option value="" disabled>No products available for review</option>';
+                            return;
+                        }
+                        
+                        // Add default option
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Select a product';
+                        defaultOption.disabled = true;
+                        defaultOption.selected = true;
+                        reviewProductSelect.appendChild(defaultOption);
+                        
+                        // Add product options
+                        data.forEach(product => {
+                            const option = document.createElement('option');
+                            option.value = product.prod_id;
+                            option.textContent = product.prod_name;
+                            reviewProductSelect.appendChild(option);
+                        });
+                        
+                        // Show modal
+                        modal.style.display = 'block';
+                    } else {
+                        throw new Error(data.error || 'Invalid response');
                     }
-                    
-                    // Add default option
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = '';
-                    defaultOption.textContent = 'Select a product';
-                    defaultOption.disabled = true;
-                    defaultOption.selected = true;
-                    reviewProductSelect.appendChild(defaultOption);
-                    
-                    // Add product options
-                    products.forEach(product => {
-                        const option = document.createElement('option');
-                        option.value = product.prod_id;
-                        option.textContent = product.prod_name;
-                        reviewProductSelect.appendChild(option);
-                    });
-                    
-                    // Show modal
-                    modal.style.display = 'block';
                 })
                 .catch(error => {
                     console.error('Error loading products:', error);
-                    reviewProductSelect.innerHTML = '<option value="" disabled>Error loading products</option>';
-                    modal.style.display = 'block';
+                    showToast(error.message || 'Error loading products', 'error');
                 });
         });
     });
     
     // Close modal
-    closeModal.addEventListener('click', function() {
+    function closeReviewModal() {
         modal.style.display = 'none';
         resetReviewForm();
-    });
+    }
+    
+    closeModal.addEventListener('click', closeReviewModal);
     
     window.addEventListener('click', function(event) {
         if (event.target === modal) {
-            modal.style.display = 'none';
-            resetReviewForm();
+            closeReviewModal();
         }
     });
     
@@ -119,6 +116,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!reviewProductSelect.value) {
             showToast('Please select a product', 'error');
+            return;
+        }
+        
+        const textarea = reviewForm.querySelector('textarea');
+        if (!textarea.value.trim()) {
+            showToast('Please enter your review comments', 'error');
             return;
         }
         
@@ -142,9 +145,8 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                showToast('Thank you for your review!', 'success');
-                modal.style.display = 'none';
-                resetReviewForm();
+                showToast(data.message || 'Thank you for your review!', 'success');
+                closeReviewModal();
                 
                 // Reload the page after a short delay
                 setTimeout(() => location.reload(), 1500);
@@ -164,11 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetReviewForm() {
         reviewForm.reset();
         ratingValue.value = '';
-        ratingStars.forEach(star => {
-            star.classList.remove('fas', 'hover');
-            star.classList.add('far');
-        });
-        reviewProductSelect.innerHTML = '<option value="" disabled selected>Select a product</option>';
+        highlightStars(0);
     }
     
     // Helper function to show toast messages
@@ -180,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create toast element
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        toast.innerHTML = message;
+        toast.textContent = message;
         
         // Add to body
         document.body.appendChild(toast);
@@ -195,24 +193,5 @@ document.addEventListener('DOMContentLoaded', function() {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 3000);
-    }
-    
-    // Initialize cart count (would typically be fetched from server)
-    updateCartCount();
-    
-    function updateCartCount() {
-        // In a real application, you would fetch this from the server
-        // This is just a placeholder
-        fetch('get_cart_count.php')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.querySelector('.cart-count').textContent = data.count;
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching cart count:', error);
-                document.querySelector('.cart-count').textContent = '0';
-            });
     }
 });

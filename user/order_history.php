@@ -213,35 +213,40 @@ $conn->close();
 
     <!-- Review Modal -->
     <div class="modal" id="reviewModal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Leave a Review</h2>
-            <form id="reviewForm">
-                <input type="hidden" id="reviewOrderId" name="order_id">
-                <div class="form-group">
-                    <label>Select Product:</label>
-                    <select id="reviewProduct" name="prod_id" required>
-                        <!-- Products will be loaded via AJAX -->
-                    </select>
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Leave a Review</h2>
+        <form id="reviewForm">
+            <input type="hidden" id="reviewOrderId" name="order_id">
+            <div class="form-group">
+                <label>Select Product:</label>
+                <select id="reviewProduct" name="prod_id" class="form-control" required>
+                    <option value="" disabled selected>Loading products...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Rating:</label>
+                <div class="rating-stars">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
                 </div>
-                <div class="form-group">
-                    <label>Rating:</label>
-                    <div class="rating-stars">
-                        <i class="far fa-star" data-rating="1"></i>
-                        <i class="far fa-star" data-rating="2"></i>
-                        <i class="far fa-star" data-rating="3"></i>
-                        <i class="far fa-star" data-rating="4"></i>
-                        <i class="far fa-star" data-rating="5"></i>
-                    </div>
-                    <input type="hidden" id="ratingValue" name="rating" required>
-                </div>
-                <div class="form-group">
-                    <label>Your Review:</label>
-                    <textarea name="comment" rows="4" placeholder="Share your experience with this product..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-submit">Submit Review</button>
-            </form>
-        </div>
+                <input type="hidden" id="ratingValue" name="rating" required>
+            </div>
+            <div class="form-group">
+                <label>Your Review:</label>
+                <textarea name="comment" rows="4" class="form-control" placeholder="Share your experience with this product..." required></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeReviewModal()">Cancel</button>
+                <button type="submit" class="btn btn-submit">
+                    <i class="fas fa-paper-plane"></i> Submit Review
+                </button>
+            </div>
+        </form>
+    </div>
     </div>
 
     <script src="../user_assets/js/order_history.js"></script>
