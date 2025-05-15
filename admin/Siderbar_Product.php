@@ -5,12 +5,12 @@ include '../db_connection.php';
 $products_per_page = 3;
 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $products_per_page; 
+$offset = ($page - 1) * $products_per_page;
 
 if (isset($_POST['add_product'])) {
     $category_id = $_POST['category_id'];
     $product_name = mysqli_real_escape_string($conn, $_POST['prod_name']);
-    $price = floatval($_POST['prod_price']); 
+    $price = floatval($_POST['prod_price']);
     $stock = max(0, $_POST['stock']);
 
     $image = $_FILES['prod_image']['name'];
@@ -67,17 +67,23 @@ if (!empty($filter_category)) $conditions[] = "p.category_id = '$filter_category
 if (!empty($search_term)) $conditions[] = "LOWER(p.prod_name) LIKE '%$search_term%'";
 if ($conditions) $sql .= " WHERE " . implode(" AND ", $conditions);
 
-$sql .= " LIMIT $offset, $products_per_page"; 
+$sql .= " LIMIT $offset, $products_per_page";
 
 $products = $conn->query($sql);
 
 $count_sql = "SELECT COUNT(*) AS total_products FROM product p";
-if (!empty($filter_category)) $count_sql .= " WHERE p.category_id = '$filter_category'";
-if (!empty($search_term)) $count_sql .= " AND LOWER(p.prod_name) LIKE '%$search_term%'";
+$conditions = [];
+if (!empty($filter_category)) $conditions[] = "p.category_id = '$filter_category'";
+if (!empty($search_term)) $conditions[] = "LOWER(p.prod_name) LIKE '%$search_term%'";
+
+if ($conditions) {
+    $count_sql .= " WHERE " . implode(" AND ", $conditions);
+}
+
 $count_result = $conn->query($count_sql);
 $total_products = $count_result->fetch_assoc()['total_products'];
 
-$totalPages = ceil($total_products / $products_per_page); 
+$totalPages = ceil($total_products / $products_per_page);
 
 
 if (isset($_POST['update_product'])) {
@@ -86,7 +92,7 @@ if (isset($_POST['update_product'])) {
     $category_id = $_POST['edit_category_id'];
     $description = mysqli_real_escape_string($conn, $_POST['edit_description']);
     $price = floatval($_POST['edit_prod_price']);
-    $prod_name = mysqli_real_escape_string($conn, $_POST['edit_prod_name']); 
+    $prod_name = mysqli_real_escape_string($conn, $_POST['edit_prod_name']);
 
     $check_order_sql = "SELECT COUNT(*) AS order_count FROM order_item WHERE prod_id = '$id'";
     $check_order_result = $conn->query($check_order_sql);
@@ -255,9 +261,18 @@ if (isset($_POST['update_product'])) {
                                     <td><?= $row['prod_price'] ?></td>
                                     <td><?= $row['prod_description'] ?></td>
                                     <td>
-                                        <img src="../assets/images/edit.png" alt="Edit" class="icon-btn" onclick="openEditForm(<?= $row['prod_id'] ?>, '<?= addslashes($row['prod_name']) ?>', 
-                            <?= $row['prod_price'] ?>, <?= $row['stock'] ?>, <?= $row['category_id'] ?>, 
-                            '<?= addslashes($row['prod_description']) ?>')" style="cursor: pointer;">
+                                    <img src="../assets/images/edit.png" alt="Edit" class="icon-btn" 
+     data-id="<?= $row['prod_id'] ?>"
+     data-name="<?= htmlspecialchars($row['prod_name'], ENT_QUOTES) ?>"
+     data-price="<?= $row['prod_price'] ?>"
+     data-stock="<?= $row['stock'] ?>"
+     data-category="<?= $row['category_id'] ?>"
+     data-description="<?= htmlspecialchars($row['prod_description'], ENT_QUOTES) ?>"
+     onclick="handleEditClick(this)" 
+     style="cursor: pointer;">
+
+
+
 
 
                                         <button onclick="confirmDelete(<?= $row['prod_id'] ?>)">
@@ -273,7 +288,7 @@ if (isset($_POST['update_product'])) {
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="pagination">
                 <?php if ($page > 1): ?>
                     <a href="?page=<?= $page - 1; ?>"> &lt; </a>
@@ -339,13 +354,6 @@ if (isset($_POST['update_product'])) {
             searchFilter.style.display = (form.style.display === 'none') ? 'block' : 'none';
         }
 
-        function confirmDelete(productId) {
-            const categoryId = <?= json_encode($filter_category ?: '') ?>;
-            if (confirm("Are you sure you want to delete this product?")) {
-                window.location.href = "Siderbar_Product.php?delete_product=" + productId + "&category_id=" + categoryId;
-            }
-        }
-
         function openEditForm(id, name, price, stock, categoryId, description) {
             document.getElementById('edit_prod_id').value = id;
             document.getElementById('edit_prod_name').value = name;
@@ -356,6 +364,17 @@ if (isset($_POST['update_product'])) {
 
             document.getElementById('edit-form').style.display = 'flex';
         }
+        function handleEditClick(element) {
+    const id = element.getAttribute('data-id');
+    const name = element.getAttribute('data-name');
+    const price = element.getAttribute('data-price');
+    const stock = element.getAttribute('data-stock');
+    const categoryId = element.getAttribute('data-category');
+    const description = element.getAttribute('data-description');
+
+    openEditForm(id, name, price, stock, categoryId, description);
+}
+
 
         function toggleEditForm() {
             document.getElementById('edit-form').style.display = 'none';
