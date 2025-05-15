@@ -54,60 +54,40 @@ $result = $conn->query($sql);
         <h1 class="page-title">My Wishlist</h1>
 
         <?php if ($result->num_rows > 0): ?>
-        <div class="wishlist-layout">
-            <div class="wishlist-items">
-                <div class="wishlist-header">
-                    <div class="header-product">Product</div>
-                    <div class="header-price">Price</div>
-                    <div class="header-stock">Stock Status</div>
-                    <div class="header-actions">Actions</div>
+        <div class="wishlist-items">
+            <?php while($product = $result->fetch_assoc()): ?>
+            <div class="wishlist-item" data-id="<?php echo $product['prod_id']; ?>">
+                <div class="item-image">
+                    <a href="product_details.php?id=<?php echo $product['prod_id']; ?>">
+                        <img src="../assets/uploads/<?php echo htmlspecialchars($product['prod_image']); ?>" 
+                             alt="<?php echo htmlspecialchars($product['prod_name']); ?>">
+                    </a>
                 </div>
-
-                <?php while($product = $result->fetch_assoc()): ?>
-                <div class="wishlist-item" data-id="<?php echo $product['prod_id']; ?>">
-                    <div class="item-product">
-                        <div class="product-image">
-                            <img src="../assets/uploads/<?php echo htmlspecialchars($product['prod_image']); ?>" 
-                                 alt="<?php echo htmlspecialchars($product['prod_name']); ?>">
-                        </div>
-                        <div class="product-details">
-                            <h3><?php echo htmlspecialchars($product['prod_name']); ?></h3>
-                            <div class="product-id">ID: <?php echo $product['prod_id']; ?></div>
-                        </div>
-                    </div>
-                    <div class="item-price">
-                        RM <?php echo number_format($product['prod_price'], 2); ?>
-                    </div>
-                    <div class="item-stock">
+                <div class="item-details">
+                    <h3>
+                        <a href="product_details.php?id=<?php echo $product['prod_id']; ?>">
+                            <?php echo htmlspecialchars($product['prod_name']); ?>
+                        </a>
+                    </h3>
+                    <div class="price">RM <?php echo number_format($product['prod_price'], 2); ?></div>
+                    <div class="stock">
                         <?php if ($product['stock'] > 0): ?>
                             <span class="in-stock"><i class="fas fa-check-circle"></i> In Stock</span>
                         <?php else: ?>
                             <span class="out-of-stock"><i class="fas fa-times-circle"></i> Out of Stock</span>
                         <?php endif; ?>
                     </div>
-                    <div class="item-actions">
-                        <button class="remove-btn" data-id="<?php echo $product['prod_id']; ?>">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                        <button class="add-to-cart-btn" data-id="<?php echo $product['prod_id']; ?>">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                    </div>
                 </div>
-                <?php endwhile; ?>
-            </div>
-
-            <div class="wishlist-summary">
-                <h2>Wishlist Summary</h2>
-                <div class="summary-row">
-                    <span>Items</span>
-                    <span class="item-count"><?php echo $result->num_rows; ?></span>
+                <div class="item-actions">
+                    <button class="remove-from-wishlist" data-id="<?php echo $product['prod_id']; ?>">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                    <button class="add-to-cart" data-id="<?php echo $product['prod_id']; ?>">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
                 </div>
-                <div class="summary-divider"></div>
-                <a href="product_list.php" class="continue-shopping">
-                    <i class="fas fa-arrow-left"></i> Continue Shopping
-                </a>
             </div>
+            <?php endwhile; ?>
         </div>
         <?php else: ?>
         <div class="empty-wishlist">
