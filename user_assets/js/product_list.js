@@ -1,75 +1,65 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Common function to reorganize products into rows
-    function reorganizeProducts(visibleProducts) {
-        const productsContainer = document.getElementById('productsContainer');
-        productsContainer.innerHTML = ''; // Clear current content
+    // Store original product cards on initial load
+    const originalProducts = Array.from(document.querySelectorAll('.product-card')).map(card => card.cloneNode(true));
+    let currentProducts = [...originalProducts];
 
-        for (let i = 0; i < visibleProducts.length; i += 5) {
+    // Common reorganization function
+    function reorganizeProducts(products) {
+        const productsContainer = document.getElementById('productsContainer');
+        productsContainer.innerHTML = '';
+
+        for (let i = 0; i < products.length; i += 5) {
             const row = document.createElement('div');
             row.className = 'product-row';
             
-            for (let j = 0; j < 5 && (i + j) < visibleProducts.length; j++) {
-                row.appendChild(visibleProducts[i + j]);
+            for (let j = 0; j < 5 && (i + j) < products.length; j++) {
+                row.appendChild(products[i + j].cloneNode(true));
             }
             
             productsContainer.appendChild(row);
         }
+        reattachEventListeners();
     }
 
     // Search functionality
     const searchBtn = document.getElementById('searchBtn');
     const searchInput = document.getElementById('searchInput');
-    
+
     function filterProducts() {
         const searchTerm = searchInput.value.toLowerCase();
-        const visibleProducts = [];
-
-        document.querySelectorAll('.product-card').forEach(card => {
+        currentProducts = originalProducts.filter(card => {
             const productName = card.querySelector('h3').textContent.toLowerCase();
             const productDesc = card.querySelector('.description').textContent.toLowerCase();
-            
-            if (productName.includes(searchTerm) || productDesc.includes(searchTerm)) {
-                visibleProducts.push(card.cloneNode(true)); // Clone the node to preserve
-            }
+            return productName.includes(searchTerm) || productDesc.includes(searchTerm);
         });
-
-        reorganizeProducts(visibleProducts);
-        reattachEventListeners(); // Reattach event listeners to new elements
+        reorganizeProducts(currentProducts);
     }
 
     // Category filter functionality
     const categoryFilter = document.getElementById('categoryFilter');
     const filterBtn = document.getElementById('filterBtn');
-    
+
     function filterByCategory() {
         const selectedCategory = categoryFilter.value;
-        const visibleProducts = [];
-
-        document.querySelectorAll('.product-card').forEach(card => {
+        currentProducts = originalProducts.filter(card => {
             const cardCategory = card.getAttribute('data-category');
-            if (selectedCategory === '' || cardCategory === selectedCategory) {
-                visibleProducts.push(card.cloneNode(true));
-            }
+            return selectedCategory === '' || cardCategory === selectedCategory;
         });
-
-        reorganizeProducts(visibleProducts);
-        reattachEventListeners();
+        reorganizeProducts(currentProducts);
     }
 
-    // Reattach event listeners after DOM changes
+    // Reattach event listeners
     function reattachEventListeners() {
-        // Quantity controls
         document.querySelectorAll('.quantity-plus, .quantity-minus').forEach(button => {
             button.addEventListener('click', handleQuantity);
         });
 
-        // Add to cart buttons
         document.querySelectorAll('.add-to-cart').forEach(button => {
             button.addEventListener('click', handleAddToCart);
         });
     }
 
-    // Event handlers
+    // Quantity control handler
     function handleQuantity(e) {
         const wrapper = e.target.closest('.quantity-controls');
         const input = wrapper.querySelector('.quantity');
@@ -83,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Add to cart handler
     function handleAddToCart() {
         const productId = this.getAttribute('data-id');
         const quantity = this.parentElement.querySelector('.quantity').value;
@@ -90,14 +81,13 @@ document.addEventListener('DOMContentLoaded', function() {
         alert(`Added ${quantity} ${productName}(s) to cart!`);
     }
 
-    // Initial event listeners
+    // Event listeners
     searchBtn.addEventListener('click', filterProducts);
     searchInput.addEventListener('keyup', function(e) {
         if (e.key === 'Enter') filterProducts();
     });
     filterBtn.addEventListener('click', filterByCategory);
-    
-    // Initialize
-    filterByCategory();
-    reattachEventListeners();
+
+    // Initial load
+    reorganizeProducts(originalProducts);
 });
