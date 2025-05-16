@@ -75,10 +75,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add to cart handler
     function handleAddToCart() {
+        // const productId = this.getAttribute('data-id');
+        // const quantity = this.parentElement.querySelector('.quantity').value;
+        // const productName = this.closest('.product-card').querySelector('h3').textContent;
+        // alert(`Added ${quantity} ${productName}(s) to cart!`);
+
         const productId = this.getAttribute('data-id');
-        const quantity = this.parentElement.querySelector('.quantity').value;
-        const productName = this.closest('.product-card').querySelector('h3').textContent;
-        alert(`Added ${quantity} ${productName}(s) to cart!`);
+        // const quantity = document.querySelector('.quantity').value;
+        const quantity = 1;
+        
+        // Show loading state
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+        this.disabled = true;
+        
+        // AJAX request to add to cart
+        fetch('add_to_cart.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Added to cart successfully!', 'success');
+                updateCartCount(data.cart_count);
+            } else {
+                showToast(data.message || 'Failed to add to cart', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('An error occurred. Please try again.', 'error');
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            this.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+            this.disabled = false;
+        });
     }
 
     // Event listeners

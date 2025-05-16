@@ -94,8 +94,8 @@ $products_result = $conn->query($sql);
                                            aria-label="Quantity">
                                     <button class="quantity-plus" type="button" aria-label="Increase quantity">+</button>
                                 </div>
-                                <button class="add-to-cart" data-id="<?php echo $product['prod_id']; ?>">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                <button class="add-to-cart" data-id="<?php echo $row['prod_id']; ?>">
+                                    <i class="fas fa-shopping-cart" id="add-to-cart"></i> Add to Cart
                                 </button>
                             </div>
                         </div>
