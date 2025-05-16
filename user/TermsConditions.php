@@ -1,35 +1,19 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <title>GOGO | Shop Conveniently</title>
     <link rel="icon" type="image" href="../../image/GOGO.png">
-    <link rel="stylesheet" href="TermsConditions.css">
+    <link rel="stylesheet" href="../user_assets/css/Policies.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
 </head>
 
 <body>
-    <header>
-        <div class="header-main">
-            <a href="MainPage.html">
-                <img src="../../image/gogoname.png" alt="GOGO Logo">
-            </a>
-            <form class="search-form">
-                <div class="search">
-                    <span class="search-icon material-symbols-outlined">search</span>
-                    <input class="search-input" type="search" placeholder="Search">
-                </div>
-            </form>
-        </div>
-
-        <nav>
-            <ul class="nav-links">
-                <li><a href="MainPage.html">Menu</a></li>
-                <li><a href="AboutUs.html">About GOGO</a></li>
-                <li><a href="CustomerService.html">Customer Service</a></li>
-            </ul>
-        </nav>
-    </header>
+    <?php include 'header.php'; ?>
 
     <section class="terms-content">
         <div class="terms-wrapper">
@@ -98,35 +82,7 @@
         </div>
       </section>
 
- 
-    <div class="footer-nav">
-        <div class="footer-column">
-            <h4>GOGO</h4>
-            <ul>
-                <li><a href="../AboutUs/AboutUs.html">About GOGO</a></li>
-                <li><a href="#">Policies</a></li>
-                <li><a href="TermsConditions.html">Terms & Conditions</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-column">
-            <h4>Support</h4>
-            <ul>
-                <li><a href="#">FAQs</a></li>
-                <li><a href="#">Download App</a></li>
-                <li><a href="#">Contact Us</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-column">
-            <h4>Legal</h4>
-            <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Anti-Bribery</a></li>
-                <li><a href="#">Loyalty Program</a></li>
-            </ul>
-        </div>
-    </div>
+    <?php include 'footer.php'; ?>
 
 </body>
 

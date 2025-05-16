@@ -32,19 +32,19 @@
     <div class="footer-column">
         <h4>Policies</h4>
         <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="../TermsConditions/TermsConditions.html">Terms & Conditions</a></li>
-            <li><a href="#">Anti Bribery Policies</a></li>
-            <li><a href="#">Electrical Policy</a></li>
+            <li><a href="PrivacyPolicy.php">Privacy Policy</a></li>
+            <li><a href="TermsConditions.php">Terms & Conditions</a></li>
+            <li><a href="AntiBriberyPolicy.php">Anti Bribery Policies</a></li>
+            <li><a href="ElectricalPolicy.php">Electrical Policy</a></li>
         </ul>
     </div>
 
     <div class="footer-column">
         <h4>&nbsp;</h4>
         <ul>
-            <li><a href="#">Return Policy</a></li>
-            <li><a href="#">Product Policy</a></li>
-            <li><a href="#">Halal Statement</a></li>
+            <li><a href="ReturnPolicy.php">Return Policy</a></li>
+            <li><a href="ProductPolicy.php">Product Policy</a></li>
+            <li><a href="HalalStatement.php">Halal Statement</a></li>
         </ul>
     </div>
 
