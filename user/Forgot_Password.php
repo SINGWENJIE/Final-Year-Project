@@ -34,12 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($user) {
             // Generate reset token
             $reset_token = bin2hex(random_bytes(32));
-            $expiry = date('Y-m-d H:i:s', time() + 3600); // 1 hour expiry
+            $expiry = gmdate('Y-m-d H:i:s', time() + 3600); // UTC time
 
-            // Debug output (remove in production)
-            error_log("Generated token: $reset_token");
-            error_log("Expiry time: $expiry");
-
+            // Update user record
             $stmt = $pdo->prepare("UPDATE users SET reset_token = :token, reset_expiry = :expiry WHERE email = :email");
             $stmt->execute([
                 ':token' => $reset_token,
@@ -48,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ]);
             
             // Create reset link
-            $base_url = "http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']);
             $reset_link = "http://" . $_SERVER['HTTP_HOST'] . "/Final-Year-Project/user/reset_password.php?token=" . $reset_token;
             
             // Send email with PHPMailer
@@ -57,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mail->isSMTP();
                 $mail->Host = 'smtp.gmail.com';
                 $mail->SMTPAuth = true;
-                $mail->Username = 'qiaoxuanp@gmail.com'; // Your email
-                $mail->Password = 'cguc amid omyn lxcs'; // Your app password
+                $mail->Username = 'qiaoxuanp@gmail.com';
+                $mail->Password = 'cguc amid omyn lxcs';
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
 

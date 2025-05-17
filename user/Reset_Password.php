@@ -7,9 +7,6 @@ $username = "root";
 $password = "";  
 $dbname = "gogo_supermarket"; 
 
-// Set timezone to match database
-date_default_timezone_set('Asia/Kuala_Lumpur');
-
 $error = '';
 $success = '';
 
@@ -21,38 +18,28 @@ if (!$token) {
     exit();
 }
 
-// Debug output
-error_log("Reset Password Attempt - Token: $token");
-error_log("Current Time: " . date('Y-m-d H:i:s'));
-
 // Verify token is valid when page loads
 try {
     $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Check token validity
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE reset_token = :token AND reset_expiry > NOW()");
+    // Check token validity using UTC time
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE reset_token = :token AND reset_expiry > UTC_TIMESTAMP()");
     $stmt->execute([':token' => $token]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$user) {
-        // Get debug info
-        $debug_stmt = $pdo->prepare("SELECT email, reset_token, reset_expiry, NOW() as db_time FROM users WHERE reset_token IS NOT NULL");
-        $debug_stmt->execute();
-        $debug_data = $debug_stmt->fetchAll(PDO::FETCH_ASSOC);
-        error_log("Token Debug Data: " . print_r($debug_data, true));
-        
         $error = "Invalid or expired reset token. Please request a new password reset.";
     } else {
         $_SESSION['reset_user_id'] = $user['user_id'];
+        $_SESSION['reset_token'] = $token;
     }
 } catch (PDOException $e) {
     $error = "Database error: " . $e->getMessage();
-    error_log("Database Error: " . $e->getMessage());
 }
 
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['reset_user_id'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['reset_user_id']) && isset($_SESSION['reset_token'])) {
     try {
         $password = $_POST['password'];
         $confirm_password = $_POST['confirm_password'];
@@ -72,14 +59,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['reset_user_id'])) {
         
         // Update password and clear reset token
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE users SET user_password = :password, reset_token = NULL, reset_expiry = NULL WHERE user_id = :user_id");
+        $stmt = $pdo->prepare("UPDATE users 
+                              SET user_password = :password, 
+                                  reset_token = NULL, 
+                                  reset_expiry = NULL 
+                              WHERE user_id = :user_id 
+                              AND reset_token = :token");
         $stmt->execute([
             ':password' => $hashed_password,
-            ':user_id' => $_SESSION['reset_user_id']
+            ':user_id' => $_SESSION['reset_user_id'],
+            ':token' => $_SESSION['reset_token']
         ]);
         
         // Clear session
         unset($_SESSION['reset_user_id']);
+        unset($_SESSION['reset_token']);
         
         $_SESSION['password_reset_success'] = true;
         header("Location: login.php?reset=success");
@@ -88,22 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['reset_user_id'])) {
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
-}
-
-// Verify token is valid when page loads
-try {
-    $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE reset_token = :token AND reset_expiry > NOW()");
-    $stmt->execute([':token' => $token]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$user) {
-        $error = "Invalid or expired reset token. Please request a new password reset.";
-    }
-} catch (PDOException $e) {
-    $error = "Database error: " . $e->getMessage();
 }
 ?>
 
@@ -301,10 +279,6 @@ try {
                 <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
             
-            <?php if (!empty($success)): ?>
-                <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
-            <?php endif; ?>
-            
             <form method="post">
                 <div class="form-group">
                     <label for="password">New Password</label>
@@ -352,29 +326,20 @@ try {
                 const password = this.value;
                 let strength = 0;
                 
-                // Check length
                 if (password.length >= 4) strength += 20;
                 if (password.length >= 8) strength += 20;
-                
-                // Check for uppercase letters
                 if (/[A-Z]/.test(password)) strength += 20;
-                
-                // Check for numbers
                 if (/[0-9]/.test(password)) strength += 20;
-                
-                // Check for special characters
                 if (/[^A-Za-z0-9]/.test(password)) strength += 20;
                 
-                // Update strength bar
                 passwordStrengthBar.style.width = strength + '%';
                 
-                // Update color based on strength
                 if (strength < 40) {
-                    passwordStrengthBar.style.backgroundColor = '#d9534f'; // Red
+                    passwordStrengthBar.style.backgroundColor = '#d9534f';
                 } else if (strength < 80) {
-                    passwordStrengthBar.style.backgroundColor = '#f0ad4e'; // Yellow
+                    passwordStrengthBar.style.backgroundColor = '#f0ad4e';
                 } else {
-                    passwordStrengthBar.style.backgroundColor = '#5cb85c'; // Green
+                    passwordStrengthBar.style.backgroundColor = '#5cb85c';
                 }
             });
             
