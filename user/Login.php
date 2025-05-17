@@ -28,6 +28,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_name'] = $user['user_name'];
             $_SESSION['email'] = $user['email'];
             
+            // Check if "Remember me" was checked
+            if (isset($_POST['remember'])) {
+                // Create remember token (simplified example)
+                $rememberToken = bin2hex(random_bytes(32));
+                $expiry = time() + 60 * 60 * 24 * 30; // 30 days
+                
+                // Store token in database (you'll need to add this column to your users table)
+                // $stmt = $pdo->prepare("UPDATE users SET remember_token = :token, token_expiry = :expiry WHERE user_id = :user_id");
+                // $stmt->execute([':token' => $rememberToken, ':expiry' => date('Y-m-d H:i:s', $expiry), ':user_id' => $user['user_id']]);
+                
+                // Set cookie
+                setcookie('remember', $rememberToken, $expiry, '/');
+            }
+            
             // Redirect to dashboard or home page
             header("Location: MainPage.php");
             exit();
@@ -244,7 +258,7 @@ $registration_success = isset($_GET['registration']) && $_GET['registration'] ==
         </div>
         
         <?php if ($registration_success): ?>
-            <div class="success-message">Registration successful! Please login with your credentials.</div>
+            <div class="success-message">Registration is successful! Please login with your credentials.</div>
         <?php endif; ?>
         
         <?php if (isset($error)): ?>
@@ -254,7 +268,9 @@ $registration_success = isset($_GET['registration']) && $_GET['registration'] ==
         <form id="loginForm" method="post">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" required>
+                <input type="email" id="email" name="email" class="form-control" 
+                       value="<?php echo isset($_SESSION['registration_email']) ? htmlspecialchars($_SESSION['registration_email']) : ''; ?>" required>
+                <?php unset($_SESSION['registration_email']); ?>
             </div>
             
             <div class="form-group">
@@ -279,11 +295,9 @@ $registration_success = isset($_GET['registration']) && $_GET['registration'] ==
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // If coming from registration, auto-focus the email field
-            <?php if ($registration_success && isset($_SESSION['registration_email'])): ?>
-                document.getElementById('email').value = '<?php echo $_SESSION['registration_email']; ?>';
+            // If coming from registration, auto-focus the password field
+            <?php if ($registration_success): ?>
                 document.getElementById('password').focus();
-                <?php unset($_SESSION['registration_email']); ?>
             <?php endif; ?>
         });
     </script>

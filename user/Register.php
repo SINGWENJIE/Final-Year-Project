@@ -192,30 +192,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $user_id = $pdo->lastInsertId();
 
-            // Insert address if provided
-            if (isset($_POST['recipient_name'])) {
-                $recipient_name = filter_var($_POST['recipient_name'], FILTER_SANITIZE_STRING);
-                $street_address = filter_var($_POST['street_address'], FILTER_SANITIZE_STRING);
-                $city = filter_var($_POST['city'], FILTER_SANITIZE_STRING);
-                $state = filter_var($_POST['state'], FILTER_SANITIZE_STRING);
-                $postal_code = filter_var($_POST['postal_code'], FILTER_SANITIZE_STRING);
-                $phone_number = filter_var($_POST['phone_number'], FILTER_SANITIZE_STRING);
-                $note = isset($_POST['note']) ? filter_var($_POST['note'], FILTER_SANITIZE_STRING) : null;
-
-                $stmt = $pdo->prepare("INSERT INTO address (user_id, recipient_name, street_address, city, state, postal_code, is_default, phone_number, note) 
-                                      VALUES (:user_id, :recipient_name, :street_address, :city, :state, :postal_code, 1, :phone_number, :note)");
-                
-                $stmt->execute([
-                    ':user_id' => $user_id,
-                    ':recipient_name' => $recipient_name,
-                    ':street_address' => $street_address,
-                    ':city' => $city,
-                    ':state' => $state,
-                    ':postal_code' => $postal_code,
-                    ':phone_number' => $phone_number,
-                    ':note' => $note
-                ]);
-            }
+            // Create a cart for the new user
+            $stmt = $pdo->prepare("INSERT INTO cart (user_id) VALUES (:user_id)");
+            $stmt->execute([':user_id' => $user_id]);
 
             $pdo->commit();
             
@@ -225,6 +204,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_SESSION['otp_verified']);
             unset($_SESSION['otp_sent']);
             unset($_SESSION['otp_created_time']);
+            
+            // Store email in session for auto-fill in login
+            $_SESSION['registration_email'] = $email;
             
             // Redirect to success page
             header("Location: login.php?registration=success");
@@ -255,7 +237,7 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
     <title>Supermarket - User Registration</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
+         :root {
             --primary-color: #4CAF50;
             --primary-dark: #45a049;
             --secondary-color: #f5f5f5;
@@ -655,6 +637,15 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
             </div>
         </div>
         
+        <!-- Error and success messages -->
+        <?php if (!empty($error)): ?>
+            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        
+        <?php if (!empty($success)): ?>
+            <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
+        <?php endif; ?>
+        
         <!-- Step 1: Email Verification -->
         <form id="emailForm" class="form-step <?php echo $step == 'email' ? 'active' : ''; ?>" method="post">
             <div class="form-group">
@@ -672,14 +663,6 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
         <!-- Step 2: OTP Verification -->
         <form id="otpForm" class="form-step <?php echo $step == 'verify' ? 'active' : ''; ?>" method="post">
             <input type="hidden" name="verify_otp" value="1">
-    
-            <?php if (!empty($error)): ?>
-                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-            <?php endif; ?>
-    
-            <?php if (!empty($success)): ?>
-                <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
-            <?php endif; ?>
     
             <div class="form-group">
                 <label for="otp">Enter 6-digit OTP</label>
@@ -716,6 +699,8 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
         
         <!-- Step 3: User Details -->
         <form id="detailsForm" class="form-step <?php echo $step == 'details' ? 'active' : ''; ?>" method="post">
+            <input type="hidden" name="register" value="1">
+            
             <div class="form-group">
                 <label for="user_name">Full Name</label>
                 <input type="text" id="user_name" name="user_name" class="form-control" required>
@@ -739,7 +724,7 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
                     <div class="password-strength-bar" id="passwordStrengthBar"></div>
                 </div>
                 <div class="password-hint">
-                    Must contain at least 1 uppercase letter, 1 symbol, and minimum 4 characters
+                    Must contain at least 1 uppercase letter, 1 symbol, and minimum 8 characters
                 </div>
             </div>
             
@@ -747,50 +732,6 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
                 <label for="confirm_password">Confirm Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
                 <div id="passwordMatch" class="password-hint"></div>
-            </div>
-            
-            <div class="form-group">
-                <h3>Delivery Address</h3>
-            </div>
-            
-            <div class="form-group">
-                <label for="recipient_name">Recipient Name</label>
-                <input type="text" id="recipient_name" name="recipient_name" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="street_address">Delivery Address</label>
-                <input type="text" id="street_address" name="street_address" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="city">City</label>
-                <select id="city" name="city" class="form-control" required>
-                    <option value="">Select City</option>
-                    <option value="MELAKA TENGAH">MELAKA TENGAH</option>
-                    <option value="ALOR GAJAH">ALOR GAJAH</option>
-                    <option value="JASIN">JASIN</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="state">State</label>
-                <input type="text" id="state" name="state" class="form-control" value="MALACCA" readonly>
-            </div>
-            
-            <div class="form-group">
-                <label for="postal_code">Postal Code</label>
-                <input type="text" id="postal_code" name="postal_code" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone_number">Contact Number</label>
-                <input type="tel" id="phone_number" name="phone_number" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="note">Delivery Instructions (Optional)</label>
-                <textarea id="note" name="note" class="form-control" rows="3"></textarea>
             </div>
             
             <button type="submit" class="btn">Complete Registration</button>
@@ -877,25 +818,15 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
             });
             
             // Phone number formatting
-            const phoneInputs = [document.getElementById('user_phone_num'), document.getElementById('phone_number')];
-            phoneInputs.forEach(input => {
-                if (input) {
-                    input.addEventListener('input', function() {
-                        let phoneNumber = this.value.replace(/\D/g, '');
-                        if (phoneNumber.length > 3 && phoneNumber.length <= 6) {
-                            phoneNumber = phoneNumber.replace(/(\d{3})(\d{0,3})/, '$1-$2');
-                        } else if (phoneNumber.length > 6) {
-                            phoneNumber = phoneNumber.replace(/(\d{3})(\d{3})(\d{0,4})/, '$1-$2 $3');
-                        }
-                        this.value = phoneNumber;
-                    });
+            const phoneInput = document.getElementById('user_phone_num');
+            phoneInput.addEventListener('input', function() {
+                let phoneNumber = this.value.replace(/\D/g, '');
+                if (phoneNumber.length > 3 && phoneNumber.length <= 6) {
+                    phoneNumber = phoneNumber.replace(/(\d{3})(\d{0,3})/, '$1-$2');
+                } else if (phoneNumber.length > 6) {
+                    phoneNumber = phoneNumber.replace(/(\d{3})(\d{3})(\d{0,4})/, '$1-$2 $3');
                 }
-            });
-            
-            // Postal code validation (Malaysian postal codes are 5 digits)
-            const postalCodeInput = document.getElementById('postal_code');
-            postalCodeInput.addEventListener('input', function() {
-                this.value = this.value.replace(/\D/g, '').substring(0, 5);
+                this.value = phoneNumber;
             });
             
             // Age validation
@@ -916,43 +847,49 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
                 }
             });
             
-            // Form validation
-            const detailsForm = document.getElementById('detailsForm');
-            detailsForm.addEventListener('submit', function(e) {
-                // Check if passwords match
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    e.preventDefault();
-                    alert('Passwords do not match!');
-                    return;
-                }
-                
-                // Check password strength
-                const hasUpperCase = /[A-Z]/.test(passwordInput.value);
-                const hasSymbol = /[^A-Za-z0-9]/.test(passwordInput.value);
-                const hasMinLength = passwordInput.value.length >= 4;
-                
-                if (!hasUpperCase || !hasSymbol || !hasMinLength) {
-                    e.preventDefault();
-                    alert('Password must contain at least 1 uppercase letter, 1 symbol, and minimum 4 characters');
-                    return;
-                }
-                
-                // Check if birth date is filled
-                if (!birthDateInput.value) {
-                    e.preventDefault();
-                    alert('Please enter your date of birth');
-                    return;
-                }
-            });
-            
             // Resend OTP button
-            const resendOtpBtn = document.querySelector('.resend-otp');
+            const resendOtpBtn = document.getElementById('resendOtpLink');
             if (resendOtpBtn) {
                 resendOtpBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    alert('A new OTP has been sent to your email. For demo purposes, the OTP remains the same.');
+                    
+                    // Create a hidden form to resend OTP
+                    const form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = '';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'resend_otp';
+                    input.value = '1';
+                    
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
                 });
             }
+            
+            // Countdown timer for OTP resend
+            <?php if (isset($_SESSION['last_otp_resend'])): ?>
+                let seconds = 60;
+                const countdownElement = document.getElementById('countdown');
+                const resendLink = document.getElementById('resendOtpLink');
+                
+                resendLink.style.pointerEvents = 'none';
+                resendLink.style.opacity = '0.7';
+                
+                const countdownInterval = setInterval(function() {
+                    seconds--;
+                    countdownElement.textContent = seconds;
+                    
+                    if (seconds <= 0) {
+                        clearInterval(countdownInterval);
+                        resendLink.style.pointerEvents = 'auto';
+                        resendLink.style.opacity = '1';
+                        countdownElement.parentNode.removeChild(countdownElement);
+                    }
+                }, 1000);
+            <?php endif; ?>
         });
     </script>
 </body>
