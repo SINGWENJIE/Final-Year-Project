@@ -6,6 +6,13 @@ $password = "";
 $dbname = "gogo_supermarket"; 
 
 session_start();
+require '../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$error = '';
+$success = '';
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -15,7 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Step 1: Email verification
         if (isset($_POST['email'])) {
-            $email = $_POST['email'];
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Please enter a valid email address.");
+            }
             
             // Check if email already exists
             $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
@@ -28,40 +39,137 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $otp = rand(100000, 999999);
             $_SESSION['registration_otp'] = $otp;
             $_SESSION['registration_email'] = $email;
+            $_SESSION['otp_created_time'] = time();
             
-            // In a real application, you would send this OTP to the user's email
-            // For this example, we'll just display it
-            $_SESSION['otp_display'] = $otp;
-            
-            header("Location: register.php?step=verify");
-            exit();
+            // Send OTP via email
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'qiaoxuanp@gmail.com'; // Replace with your email
+                $mail->Password = 'cguc amid omyn lxcs'; // Replace with your app password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                $mail->setFrom('qiaoxuanp@gmail.com', 'GoGo Supermarket');
+                $mail->addAddress($email);
+                $mail->addReplyTo('no-reply@gmail.com', 'No Reply');
+
+                $mail->isHTML(false);
+                $mail->Subject = 'Your Registration OTP Code';
+                $mail->Body = "Your OTP code is: $otp\n\nThis code will expire in 10 minutes.";
+
+                $mail->send();
+                $_SESSION['otp_sent'] = true;
+                $success = "OTP has been sent to your email.";
+                header("Location: register.php?step=verify");
+                exit();
+            } catch (Exception $e) {
+                throw new Exception("Failed to send OTP. Please try again later.");
+            }
         }
         
         // Step 2: OTP verification
-        if (isset($_POST['otp'])) {
-            if ($_POST['otp'] != $_SESSION['registration_otp']) {
+        if (isset($_POST['verify_otp'])) {
+            if (!isset($_SESSION['otp_created_time']) || (time() - $_SESSION['otp_created_time']) > 600) { // 10 minutes expiry
+                throw new Exception("OTP expired. Please request a new one.");
+            }
+            
+            $user_otp = '';
+            for ($i = 1; $i <= 6; $i++) {
+                if (isset($_POST["otp$i"])) {
+                    $user_otp .= $_POST["otp$i"];
+                }
+            }
+            
+            if (strlen($user_otp) !== 6 || !is_numeric($user_otp)) {
+                throw new Exception("Please enter a valid 6-digit OTP.");
+            }
+            
+            if ($user_otp != $_SESSION['registration_otp']) {
                 throw new Exception("Invalid OTP. Please try again.");
             }
             
             $_SESSION['otp_verified'] = true;
+            $success = "OTP verified successfully!";
             header("Location: register.php?step=details");
             exit();
         }
+
+        // For Resending OTP
+        if (isset($_POST['resend_otp'])) {
+            if (!isset($_SESSION['registration_email'])) {
+                throw new Exception("Email not found in session. Please start registration again.");
+            }
+            
+            // Rate limiting - don't allow resending more than once every 60 seconds
+            if (isset($_SESSION['last_otp_resend']) && (time() - $_SESSION['last_otp_resend'] < 60)) {
+                throw new Exception("Please wait at least 60 seconds before requesting a new OTP.");
+            }
+            
+            $email = $_SESSION['registration_email'];
+            $otp = rand(100000, 999999);
+            $_SESSION['registration_otp'] = $otp;
+            $_SESSION['otp_created_time'] = time();
+            $_SESSION['last_otp_resend'] = time();
+            
+            // Send OTP via email
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'qiaoxuanp@gmail.com';
+                $mail->Password = 'cguc amid omyn lxcs';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                $mail->setFrom('qiaoxuanp@gmail.com', 'GoGo Supermarket');
+                $mail->addAddress($email);
+                $mail->addReplyTo('no-reply@gmail.com', 'No Reply');
+
+                $mail->isHTML(false);
+                $mail->Subject = 'Your New Registration OTP Code';
+                $mail->Body = "Your new OTP code is: $otp\n\nThis code will expire in 10 minutes.";
+
+                $mail->send();
+                $success = "New OTP has been sent to your email.";
+                header("Location: register.php?step=verify");
+                exit();
+            } catch (Exception $e) {
+                throw new Exception("Failed to send OTP. Please try again later.");
+            }
+        }
         
         // Step 3: User details
-        if (isset($_POST['user_name']) && isset($_SESSION['otp_verified'])) {
+        if (isset($_POST['register']) && isset($_SESSION['otp_verified'])) {
             $pdo->beginTransaction();
 
-            // Get user form data
-            $user_name = $_POST['user_name'];
+            // Validate and sanitize inputs
+            $user_name = filter_var($_POST['user_name'], FILTER_SANITIZE_STRING);
             $email = $_SESSION['registration_email'];
-            $user_password = password_hash($_POST['user_password'], PASSWORD_DEFAULT);
-            $user_phone_num = $_POST['user_phone_num'];
+            $user_password = $_POST['user_password'];
+            $confirm_password = $_POST['confirm_password'];
+            $user_phone_num = filter_var($_POST['user_phone_num'], FILTER_SANITIZE_STRING);
             $birth_date = $_POST['birth_date'];
-            $status = 'active';
-            $user_created_at = date('Y-m-d H:i:s');
-
-            // Calculate age
+            
+            // Password validation
+            if (strlen($user_password) < 8) {
+                throw new Exception("Password must be at least 8 characters long.");
+            }
+            
+            if (!preg_match('/[A-Z]/', $user_password) || !preg_match('/[^a-zA-Z0-9]/', $user_password)) {
+                throw new Exception("Password must contain at least one uppercase letter and one special character.");
+            }
+            
+            if ($user_password !== $confirm_password) {
+                throw new Exception("Passwords do not match.");
+            }
+            
+            $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
+            
+            // Age validation
             $today = new DateTime();
             $birthday = new DateTime($birth_date);
             $age = $today->diff($birthday)->y;
@@ -72,31 +180,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // Insert user into database
             $stmt = $pdo->prepare("INSERT INTO users (user_name, email, user_password, user_phone_num, user_created_at, status, birth_date) 
-                                  VALUES (:user_name, :email, :user_password, :user_phone_num, :user_created_at, :status, :birth_date)");
+                                  VALUES (:user_name, :email, :user_password, :user_phone_num, NOW(), 'active', :birth_date)");
             
             $stmt->execute([
                 ':user_name' => $user_name,
                 ':email' => $email,
-                ':user_password' => $user_password,
+                ':user_password' => $hashed_password,
                 ':user_phone_num' => $user_phone_num,
-                ':user_created_at' => $user_created_at,
-                ':status' => $status,
                 ':birth_date' => $birth_date
             ]);
 
             $user_id = $pdo->lastInsertId();
 
-            // Get address form data if provided
+            // Insert address if provided
             if (isset($_POST['recipient_name'])) {
-                $recipient_name = $_POST['recipient_name'];
-                $street_address = $_POST['street_address'];
-                $city = $_POST['city'];
-                $state = $_POST['state'];
-                $postal_code = $_POST['postal_code'];
-                $phone_number = $_POST['phone_number'];
-                $note = $_POST['note'] ?? null;
+                $recipient_name = filter_var($_POST['recipient_name'], FILTER_SANITIZE_STRING);
+                $street_address = filter_var($_POST['street_address'], FILTER_SANITIZE_STRING);
+                $city = filter_var($_POST['city'], FILTER_SANITIZE_STRING);
+                $state = filter_var($_POST['state'], FILTER_SANITIZE_STRING);
+                $postal_code = filter_var($_POST['postal_code'], FILTER_SANITIZE_STRING);
+                $phone_number = filter_var($_POST['phone_number'], FILTER_SANITIZE_STRING);
+                $note = isset($_POST['note']) ? filter_var($_POST['note'], FILTER_SANITIZE_STRING) : null;
 
-                // Insert address into database
                 $stmt = $pdo->prepare("INSERT INTO address (user_id, recipient_name, street_address, city, state, postal_code, is_default, phone_number, note) 
                                       VALUES (:user_id, :recipient_name, :street_address, :city, :state, :postal_code, 1, :phone_number, :note)");
                 
@@ -118,14 +223,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_SESSION['registration_otp']);
             unset($_SESSION['registration_email']);
             unset($_SESSION['otp_verified']);
-            unset($_SESSION['otp_display']);
+            unset($_SESSION['otp_sent']);
+            unset($_SESSION['otp_created_time']);
             
             // Redirect to success page
             header("Location: login.php?registration=success");
             exit();
         }
     } catch (Exception $e) {
-        // Rollback transaction if error occurs
         if (isset($pdo) && $pdo->inTransaction()) {
             $pdo->rollBack();
         }
@@ -135,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Determine current step
 $step = isset($_GET['step']) ? $_GET['step'] : 'email';
-if ($step == 'verify' && !isset($_SESSION['registration_otp'])) {
+if ($step == 'verify' && !isset($_SESSION['otp_sent'])) {
     $step = 'email';
 }
 if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_verified'])) {
@@ -364,8 +469,7 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
         }
         
         .btn-outline:hover {
-            background-color:rgb(207, 242, 186);
-            color: rgb(35, 43, 29);
+            background-color:rgb(249, 249, 249);
         }
         
         .text-center {
@@ -528,17 +632,6 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
             <h1>Create Your Account</h1>
             <p>Join our supermarket to enjoy exclusive deals and convenient shopping</p>
         </div>
-        
-        <?php if (isset($error)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
-        
-        <?php if (isset($_SESSION['otp_display'])): ?>
-            <div class="success-message">
-                For demonstration purposes, your OTP is: <strong><?php echo $_SESSION['otp_display']; ?></strong>
-            </div>
-        <?php endif; ?>
-        
         <div class="progress-steps">
             <div class="progress-bar" style="width: 
                 <?php 
@@ -578,10 +671,20 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
         
         <!-- Step 2: OTP Verification -->
         <form id="otpForm" class="form-step <?php echo $step == 'verify' ? 'active' : ''; ?>" method="post">
+            <input type="hidden" name="verify_otp" value="1">
+    
+            <?php if (!empty($error)): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+    
+            <?php if (!empty($success)): ?>
+                <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+    
             <div class="form-group">
                 <label for="otp">Enter 6-digit OTP</label>
                 <p class="text-center mb-4">We've sent a verification code to <strong><?php echo isset($_SESSION['registration_email']) ? htmlspecialchars($_SESSION['registration_email']) : ''; ?></strong></p>
-                
+        
                 <div class="otp-container">
                     <input type="text" id="otp1" name="otp1" class="otp-input" maxlength="1" required>
                     <input type="text" id="otp2" name="otp2" class="otp-input" maxlength="1" required>
@@ -590,16 +693,22 @@ if ($step == 'details' && (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_
                     <input type="text" id="otp5" name="otp5" class="otp-input" maxlength="1" required>
                     <input type="text" id="otp6" name="otp6" class="otp-input" maxlength="1" required>
                 </div>
-                
+        
                 <input type="hidden" id="otp" name="otp">
-                
+        
                 <p class="text-center">
-                    Didn't receive code? <a href="#" class="resend-otp">Resend OTP</a>
+                    Didn't receive code? 
+                    <a href="#" class="resend-otp" id="resendOtpLink">
+                        Resend OTP
+                        <?php if (isset($_SESSION['last_otp_resend'])): ?>
+                            (Available in <span id="countdown">60</span>s)
+                        <?php endif; ?>
+                    </a>
                 </p>
             </div>
-            
+    
             <button type="submit" class="btn">Verify</button>
-            
+    
             <button type="button" class="btn btn-outline mt-3" onclick="window.location.href='register.php'">
                 Change Email
             </button>
